@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Welcome to UCU_Unity_Can_Unite</title>
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css"
+      rel="stylesheet"
+    />
+  </head>
+  <body class="bg-gray-100">
+    <header class="bg-white shadow-md">
+      <nav
+        class="container mx-auto px-6 py-3 flex justify-between items-center"
+      >
+        <div class="flex items-center">
+          <img
+            src="{{url_for('static', filename='images/unitywb.png')}}"
+            alt="Credit Union Logo"
+            class="h-10 mr-3"
+          />
+          <span class="font-bold text-xl text-gray-800">UCU_Unity_Can_Unite</span>
+        </div>
+        <div>
+          <a href="/login" class="text-gray-800 hover:text-blue-600 mx-3"
+            >Login</a
+          >
+          <a
+            href="/register"
+            class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+            >Join Now</a
+          >
+        </div>
+      </nav>
+    </header>
+
+    <main>
+      <section class="relative">
+        <img
+          src="{{url_for('static', filename='images/intro.png')}}"
+          alt="Credit Union Cover"
+          class="w-full h-[600px] object-cover"
+        />
+        <!-- <div
+          class="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center"
+        >
+          <div class="text-center text-white">
+            <h1 class="text-5xl font-bold mb-4">Welcome to UCU_Unity_Can_Unite</h1>
+            <p class="text-xl mb-8">Empowering Your Financial Future</p>
+            <a
+              href="/register"
+              class="bg-blue-600 text-white px-8 py-3 rounded-full text-lg hover:bg-blue-700 transition duration-300"
+              >Get Started</a
+            >
+          </div>
+        </div> -->
+      </section>
+
+      <section class="container mx-auto px-6 py-16">
+        <h2 class="text-3xl font-bold text-center mb-8">Our Services</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div class="bg-white p-6 rounded-lg shadow-md">
+            <h3 class="text-xl font-semibold mb-4">Savings Accounts</h3>
+            <p class="text-gray-600">
+              Secure your future with our high-yield savings accounts.
+            </p>
+          </div>
+          <div class="bg-white p-6 rounded-lg shadow-md">
+            <h3 class="text-xl font-semibold mb-4">Personal Loans</h3>
+            <p class="text-gray-600">
+              Get the financial support you need with our flexible loan options.
+            </p>
+          </div>
+          <div class="bg-white p-6 rounded-lg shadow-md">
+            <h3 class="text-xl font-semibold mb-4">Online Banking</h3>
+            <p class="text-gray-600">
+              Manage your finances anytime, anywhere with our secure online
+              platform.
+            </p>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="bg-gray-800 text-white py-8">
+      <div class="container mx-auto px-6 text-center">
+        <p>&copy; 2024 UCU_Unity_Can_Unite. All rights reserved.</p>
+      </div>
+    </footer>
+  </body>
+</html>

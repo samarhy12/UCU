@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard - UCU_Unity_Can_Unite</title>
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css"
+      rel="stylesheet"
+    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/js/all.min.js"></script>
+  </head>
+  <body class="bg-gray-100">
+    <nav class="bg-blue-600 text-white shadow-lg">
+      <div
+        class="container mx-auto px-6 py-3 flex justify-between items-center"
+      >
+        <div class="flex items-center">
+          <img
+            src="{{url_for('static', filename='images/unitywb.png')}}"
+            alt="Credit Union Logo"
+            class="h-10 mr-3"
+          />
+          <span class="font-bold text-xl">UCU_Unity_Can_Unite</span>
+        </div>
+        <div>
+          <a href="/dashboard" class="mx-3 hover:text-blue-200">Dashboard</a>
+          <a href="/profile" class="mx-3 hover:text-blue-200">Profile</a>
+          <a href="/logout" class="mx-3 hover:text-blue-200">Logout</a>
+        </div>
+      </div>
+    </nav>
+
+    <div class="container mx-auto px-6 py-8">
+      <h1 class="text-3xl font-bold text-gray-800 mb-6">
+        Welcome, {{ user.first_name }}!
+      </h1>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div class="bg-white rounded-lg shadow-md p-6">
+          <h2 class="text-xl font-semibold mb-4 text-gray-700">
+            Account Balance
+          </h2>
+          <p class="text-3xl font-bold text-green-600">GHS{{ user.balance }}</p>
+        </div>
+        <div class="bg-white rounded-lg shadow-md p-6">
+          <h2 class="text-xl font-semibold mb-4 text-gray-700">
+            Total Contributions
+          </h2>
+          <p class="text-3xl font-bold text-blue-600">
+            GHS{{ total_contributions }}
+          </p>
+        </div>
+        <div class="bg-white rounded-lg shadow-md p-6">
+          <h2 class="text-xl font-semibold mb-4 text-gray-700">Active Loans</h2>
+          <p class="text-3xl font-bold text-red-600">{{ active_loans }}</p>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="bg-white rounded-lg shadow-md p-6">
+          <h2 class="text-2xl font-semibold mb-4 text-gray-700">
+            Recent Transactions
+          </h2>
+          <ul class="divide-y divide-gray-200">
+            {% for transaction in recent_transactions %}
+            <li class="py-3 flex justify-between items-center">
+              <span class="text-gray-700">{{ transaction.description }}</span>
+              <span
+                class="font-semibold {% if transaction.amount > 0 %}text-green-600{% else %}text-red-600{% endif %}"
+              >
+                ${{ transaction.amount }}
+              </span>
+            </li>
+            {% endfor %}
+          </ul>
+          <a
+            href="/transactions"
+            class="mt-4 inline-block text-blue-600 hover:text-blue-800"
+            >View all transactions</a
+          >
+        </div>
+        <div class="bg-white rounded-lg shadow-md p-6">
+          <h2 class="text-2xl font-semibold mb-4 text-gray-700">
+            Quick Actions
+          </h2>
+          <div class="grid grid-cols-2 gap-4">
+            <a
+              href="{{url_for('contribute')}}"
+              class="bg-blue-600 text-white py-3 px-4 rounded-lg text-center hover:bg-blue-700 transition duration-300"
+            >
+              <i class="fas fa-piggy-bank mr-2"></i>Make Contribution
+            </a>
+            <a
+              href="{{url_for('contribute')}}"
+              class="bg-green-600 text-white py-3 px-4 rounded-lg text-center hover:bg-green-700 transition duration-300"
+            >
+              <i class="fas fa-hand-holding-usd mr-2"></i>Apply for Loan
+            </a>
+            <a
+              href="/transfer"
+              class="bg-purple-600 text-white py-3 px-4 rounded-lg text-center hover:bg-purple-700 transition duration-300"
+            >
+              <i class="fas fa-exchange-alt mr-2"></i>Transfer Funds
+            </a>
+            <a
+              href="/support"
+              class="bg-yellow-600 text-white py-3 px-4 rounded-lg text-center hover:bg-yellow-700 transition duration-300"
+            >
+              <i class="fas fa-headset mr-2"></i>Contact Support
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <footer class="bg-gray-800 text-white py-4 mt-12">
+      <div class="container mx-auto px-6 text-center">
+        <p>&copy; 2024 UCU_Unity_Can_Unite. All rights reserved.</p>
+      </div>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Profile - UCU_Unity_Can_Unite</title>
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css"
+      rel="stylesheet"
+    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/js/all.min.js"></script>
+  </head>
+  <body class="bg-gray-100">
+    <nav class="bg-blue-600 text-white shadow-lg">
+      <div
+        class="container mx-auto px-6 py-3 flex justify-between items-center"
+      >
+        <div class="flex items-center">
+          <img
+            src="/api/placeholder/200/60"
+            alt="Credit Union Logo"
+            class="h-10 mr-3"
+          />
+          <span class="font-bold text-xl">UCU_Unity_Can_Unite</span>
+        </div>
+        <div>
+          <a href="/dashboard" class="mx-3 hover:text-blue-200">Dashboard</a>
+          <a href="/profile" class="mx-3 hover:text-blue-200">Profile</a>
+          <a href="/logout" class="mx-3 hover:text-blue-200">Logout</a>
+        </div>
+      </div>
+    </nav>
+
+    <div class="container mx-auto px-6 py-8">
+      <h1 class="text-3xl font-bold text-gray-800 mb-6">Your Profile</h1>
+
+      <div class="bg-white rounded-lg shadow-md p-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <h2 class="text-2xl font-semibold mb-4 text-gray-700">
+              Personal Information
+            </h2>
+            <div class="mb-4">
+              <label class="block text-gray-700 text-sm font-bold mb-2"
+                >Full Name</label
+              >
+              <p class="text-gray-600">
+                {{ user.first_name }} {{ user.last_name }}
+              </p>
+            </div>
+            <div class="mb-4">
+              <label class="block text-gray-700 text-sm font-bold mb-2"
+                >Email</label
+              >
+              <p class="text-gray-600">{{ user.email }}</p>
+            </div>
+            <div class="mb-4">
+              <label class="block text-gray-700 text-sm font-bold mb-2"
+                >Date of Birth</label
+              >
+              <p class="text-gray-600">{{ user.date_of_birth }}</p>
+            </div>
+            <div class="mb-4">
+              <label class="block text-gray-700 text-sm font-bold mb-2"
+                >Occupation</label
+              >
+              <p class="text-gray-600">{{ user.occupation }}</p>
+            </div>
+          </div>
+          <div>
+            <h2 class="text-2xl font-semibold mb-4 text-gray-700">
+              Contact Information
+            </h2>
+            <div class="mb-4">
+              <label class="block text-gray-700 text-sm font-bold mb-2"
+                >Phone Number</label
+              >
+              <p class="text-gray-600">{{ user.phone_number }}</p>
+            </div>
+            <div class="mb-4">
+              <label class="block text-gray-700 text-sm font-bold mb-2"
+                >Address</label
+              >
+              <p class="text-gray-600">{{ user.address }}</p>
+              <p class="text-gray-600">
+                {{ user.city }}, {{ user.state }} {{ user.zip_code }}
+              </p>
+              <p class="text-gray-600">{{ user.country }}</p>
+            </div>
+          </div>
+        </div>
+        <div class="mt-6">
+          <h2 class="text-2xl font-semibold mb-4 text-gray-700">
+            Account Information
+          </h2>
+          <div class="mb-4">
+            <label class="block text-gray-700 text-sm font-bold mb-2"
+              >Account Number</label
+            >
+            <p class="text-gray-600">{{ user.account_number }}</p>
+          </div>
+          <div class="mb-4">
+            <label class="block text-gray-700 text-sm font-bold mb-2"
+              >National ID</label
+            >
+            <p class="text-gray-600">{{ user.national_id }}</p>
+          </div>
+        </div>
+        <div class="mt-6">
+          <a
+            href="/edit-profile"
+            class="bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition duration-300"
+            >Edit Profile</a
+          >
+        </div>
+      </div>
+    </div>
+
+    <footer class="bg-gray-800 text-white py-4 mt-12">
+      <div class="container mx-auto px-6 text-center">
+        <p>&copy; 2024 UCU_Unity_Can_Unite. All rights reserved.</p>
+      </div>
+    </footer>
+  </body>
+</html>

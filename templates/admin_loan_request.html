@@ -1,0 +1,18 @@
+{% extends "base.html" %} {% block title %}Loan Requests{% endblock %} {% block
+content %}
+<h2>Pending Loan Requests</h2>
+{% if loans %}
+<ul>
+  {% for loan in loans %}
+  <li>
+    User: {{ loan.user.username }} | Amount: ${{ loan.amount }} | Purpose: {{
+    loan.purpose }}
+    <a href="{{ url_for('approve_loan', loan_id=loan.id) }}" class="btn"
+      >Approve</a
+    >
+  </li>
+  {% endfor %}
+</ul>
+{% else %}
+<p>No pending loan requests.</p>
+{% endif %} {% endblock %}
