@@ -5,8 +5,8 @@ content %}
 <ul>
   {% for loan in loans %}
   <li>
-    User: {{ loan.user.username }} | Amount: ${{ loan.amount }} | Purpose: {{
-    loan.purpose }}
+    User: {{ loan.user.first_name }} {{ loan.user.last_name }} | Amount: GHS{{
+    loan.amount }} | Purpose: {{ loan.purpose }}
     <a href="{{ url_for('approve_loan', loan_id=loan.id) }}" class="btn"
       >Approve</a
     >

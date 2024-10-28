@@ -41,7 +41,6 @@ class User(UserMixin, db.Model):
     __tablename__ = 'user'
     
     id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(80), unique=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
     password_hash = db.Column(db.String(128), nullable=False)
     is_verified = db.Column(db.Boolean, default=False)
@@ -50,13 +49,13 @@ class User(UserMixin, db.Model):
     account_number = db.Column(db.String(20), unique=True)
     first_name = db.Column(db.String(50), nullable=False)
     last_name = db.Column(db.String(50), nullable=False)
+    other_names = db.Column(db.String(50), nullable=True)
     date_of_birth = db.Column(db.Date, nullable=False)
     occupation = db.Column(db.String(100), nullable=False)
     phone_number = db.Column(db.String(20), nullable=False)
     address = db.Column(db.String(200), nullable=False)
     city = db.Column(db.String(100), nullable=False)
     state = db.Column(db.String(100), nullable=False)
-    zip_code = db.Column(db.String(20), nullable=False)
     country = db.Column(db.String(100), nullable=False)
     national_id_file = db.Column(db.String(255), nullable=True)  # File path to uploaded National ID
     
@@ -73,7 +72,7 @@ class User(UserMixin, db.Model):
     def to_dict(self):
         return {
             'id': self.id,
-            'username': self.username,
+            'other_names': self.other_names,
             'email': self.email,
             'first_name': self.first_name,
             'last_name': self.last_name,
@@ -83,14 +82,13 @@ class User(UserMixin, db.Model):
             'address': self.address,
             'city': self.city,
             'state': self.state,
-            'zip_code': self.zip_code,
             'country': self.country,
             'national_id_file': self.national_id_file,
         }
 
     
     def __repr__(self):
-        return f'<User {self.username}>'
+        return f'<User {self.account_number}>'
 
 
 class Contribution(db.Model):
@@ -145,33 +143,33 @@ from datetime import datetime
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
-        username = request.form.get('username')
+        other_names = request.form.get('other_names')
         email = request.form.get('email')
         password = request.form.get('password')
         national_id = request.form.get('national_id')
         first_name = request.form.get('first_name')
         last_name = request.form.get('last_name')
+        other_names = request.form.get('other_names')
         date_of_birth_str = request.form.get('date_of_birth')  # Get the date as a string
         occupation = request.form.get('occupation')
         phone_number = request.form.get('phone_number')
         address = request.form.get('address')
         city = request.form.get('city')
         state = request.form.get('state')
-        zip_code = request.form.get('zip_code')
         country = request.form.get('country')
 
         # Convert the date string to a Python date object
         date_of_birth = datetime.strptime(date_of_birth_str, '%Y-%m-%d').date()
 
-        existing_user = User.query.filter((User.username == username) | (User.email == email)).first()
+        existing_user = User.query.filter( (User.email == email)).first()
         if existing_user:
-            flash('Username or email already exists.', 'error')
+            flash('Email already exists.', 'error')
             return redirect(url_for('register'))
 
-        new_user = User(username=username, email=email, national_id=national_id,
+        new_user = User(other_names=other_names, email=email, national_id=national_id,
                         first_name=first_name, last_name=last_name, date_of_birth=date_of_birth,
                         occupation=occupation, phone_number=phone_number, address=address,
-                        city=city, state=state, zip_code=zip_code, country=country)
+                        city=city, state=state, country=country)
         new_user.set_password(password)
 
         # Handle file upload
@@ -195,9 +193,9 @@ def register():
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        username = request.form.get('username')
+        email = request.form.get('email')
         password = request.form.get('password')
-        user = User.query.filter_by(username=username).first()
+        user = User.query.filter_by(email=email).first()
 
         if user and user.check_password(password):
             login_user(user)
@@ -206,7 +204,7 @@ def login():
                 flash('Your account is not yet verified. Some features may be limited.', 'warning')
             return redirect(url_for('dashboard'))
         else:
-            flash('Invalid username or password.', 'error')
+            flash('Invalid email or password.', 'error')
 
     return render_template('login.html')
 
@@ -227,7 +225,7 @@ def generate_account_number():
 
 @app.route('/admin/verify_users', methods=['GET'])
 def admin_verify_users():
-    users = User.query.all()
+    users = User.query.filter_by(is_verified=False).all()
     users_dict = [user.to_dict() for user in users]  # Convert User objects to dictionaries
     return render_template('admin_verify_users.html', users=users_dict)
 
@@ -256,9 +254,9 @@ def verify_user(user_id):
         return redirect(url_for('admin_verify_users'))
 
     # Send email notification to user
-    subject = 'YUCU_Unity_Can_Unite Account Has Been Verified'
+    subject = 'Your UCU_Unity_Can_Unite Account Has Been Verified'
     body = f"""
-    Dear {user.username},
+    Dear {user.first_name} {user.last_name},
 
     YUCU_Unity_Can_Unite account has been verified. Your account number is {user.account_number}.
 
@@ -275,7 +273,7 @@ def verify_user(user_id):
         print(f"Error sending email: {e}")
         flash('User has been verified, but there was an issue sending the email notification.', 'warning')
 
-    flash(f'User {user.username} has been verified.', 'success')
+    flash(f'User {user.first_name} {user.last_name} has been verified.', 'success')
     return redirect(url_for('admin_verify_users'))
 
 
@@ -318,7 +316,7 @@ def loan_application():
         try:
             amount = float(request.form.get('amount'))
             purpose = request.form.get('purpose')
-            guarantor_username = request.form.get('guarantor')
+            guarantor_email = request.form.get('guarantor')
             term = int(request.form.get('term'))
             income = float(request.form.get('income'))
 
@@ -328,9 +326,9 @@ def loan_application():
                 return render_template('loan_application.html')
 
             # Find the guarantor by username
-            guarantor = User.query.filter_by(username=guarantor_username).first()
+            guarantor = User.query.filter_by(email=guarantor_email).first()
             if not guarantor:
-                flash('Guarantor not found. Please enter a valid username.', 'error')
+                flash('Guarantor not found. Please enter a valid email.', 'error')
                 return render_template('loan_application.html')
 
             # Create and submit the loan application
@@ -359,7 +357,7 @@ def admin_dashboard():
     # Check if the current user is an admin
     if not current_user.is_admin:
         flash('Access denied! Admins only.', 'danger')
-        return redirect(url_for('index'))
+        return redirect(url_for('home'))
     
     # Fetch data dynamically (you would replace these with real queries)
     total_users = User.query.count()
@@ -427,7 +425,7 @@ def approve_loan(loan_id):
         flash('There was an error sending the notification email.', 'error')
         app.logger.error(f'Error sending email to {loan.user.email}: {e}')
 
-    flash(f'Loan for user {loan.user.username} has been approved and notified via email.', 'success')
+    flash(f'Loan for user {loan.user.first_name} {loan.user.last_name} has been approved and notified via email.', 'success')
     return redirect(url_for('admin_loan_requests'))
 
 
@@ -437,29 +435,29 @@ if __name__ == '__main__':
         db.create_all()
 
         # Insert users if they don't already exist
-        if not User.query.filter_by(username='testuser').first():
-            user1 = User(username='testuser', email='agyareyraphael@gmail.com', 
+        if not User.query.filter_by(email='agyareyraphael@gmail.com').first():
+            user1 = User(other_names='testuser', email='agyareyraphael@gmail.com', 
                          first_name='Test', last_name='User', date_of_birth=datetime(1990, 1, 1), 
                          occupation='Developer', phone_number='1234567890', address='123 Street',
-                         city='City', state='State', zip_code='00000', country='Country', 
+                         city='City', state='State', country='Country', 
                          national_id='1234567890123')
             user1.set_password('password')
             db.session.add(user1)
 
-        if not User.query.filter_by(username='testuser2').first():
-            user2 = User(username='testuser2', email='raphaelagyarey@gmail.com', 
+        if not User.query.filter_by(email='raphaelagyarey@gmail.com').first():
+            user2 = User(other_names='testuser2', email='raphaelagyarey@gmail.com', 
                          first_name='Test2', last_name='User2', date_of_birth=datetime(1992, 2, 2), 
                          occupation='Designer', phone_number='0987654321', address='456 Avenue',
-                         city='Another City', state='Another State', zip_code='11111', country='Another Country', 
+                         city='Another City', state='Another State', country='Another Country', 
                          national_id='9876543210987')
             user2.set_password('password')
             db.session.add(user2)
 
-        if not User.query.filter_by(username='admin').first():
-            admin = User(username='admin', email='info@raydexhub.com', 
+        if not User.query.filter_by(email='info@raydexhub.com').first():
+            admin = User(other_names='admin', email='info@raydexhub.com', 
                          first_name='Admin', last_name='User', date_of_birth=datetime(1985, 5, 5), 
                          occupation='Admin', phone_number='1231231234', address='Admin Street',
-                         city='Admin City', state='Admin State', zip_code='99999', country='Admin Country', 
+                         city='Admin City', state='Admin State', country='Admin Country', 
                          national_id='0000000000000', is_admin=True)
             admin.set_password('adminpassword')
             db.session.add(admin)

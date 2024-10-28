@@ -11,7 +11,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/js/all.min.js"></script>
     <script>
       function openModal(user) {
-        document.getElementById("modal-username").innerText = user.username;
+        document.getElementById("modal-other_names").innerText =
+          user.other_names;
         document.getElementById("modal-email").innerText = user.email;
         document.getElementById(
           "modal-fullname"
@@ -56,7 +57,7 @@
         <table class="min-w-full">
           <thead>
             <tr class="bg-gray-200 text-gray-600">
-              <th class="px-4 py-2 text-left">Username</th>
+              <th class="px-4 py-2 text-left">other_names</th>
               <th class="px-4 py-2 text-left">Email</th>
               <th class="px-4 py-2 text-left">Full Name</th>
               <th class="px-4 py-2 text-left">National ID</th>
@@ -66,7 +67,7 @@
           <tbody>
             {% for user in users %}
             <tr class="border-b">
-              <td class="px-4 py-2">{{ user.username }}</td>
+              <td class="px-4 py-2">{{ user.other_names }}</td>
               <td class="px-4 py-2">{{ user.email }}</td>
               <td class="px-4 py-2">
                 {{ user.first_name }} {{ user.last_name }}
@@ -122,7 +123,9 @@
     >
       <div class="bg-white rounded-lg shadow-lg p-6 w-1/2">
         <h2 class="text-xl font-bold mb-4">User Details</h2>
-        <p><strong>Username:</strong> <span id="modal-username"></span></p>
+        <p>
+          <strong>other_names:</strong> <span id="modal-other_names"></span>
+        </p>
         <p><strong>Email:</strong> <span id="modal-email"></span></p>
         <p><strong>Full Name:</strong> <span id="modal-fullname"></span></p>
         <p>
