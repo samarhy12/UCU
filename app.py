@@ -1,12 +1,13 @@
 from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import case
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 import os
 import random
 import string
-from datetime import datetime
+from datetime import datetime, timedelta
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -107,28 +108,58 @@ class Loan(db.Model):
     __tablename__ = 'loan'
     
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)  # User who is taking the loan
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     amount = db.Column(db.Float, nullable=False)
+    interest_rate = db.Column(db.Float, nullable=True)  # Changed to nullable=True since it's set on approval
+    total_amount = db.Column(db.Float, nullable=True)   # Changed to nullable=True since it's calculated on approval
+    amount_paid = db.Column(db.Float, default=0.0)
+    remaining_amount = db.Column(db.Float, nullable=True)  # Changed to nullable=True since it's set on approval
     purpose = db.Column(db.String(200), nullable=False)
-    guarantor_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)  # Guarantor for the loan
-    term = db.Column(db.Integer, nullable=False)  # Loan term in months
-    income = db.Column(db.Float, nullable=False)  # Monthly income of the applicant
-    status = db.Column(db.String(20), default='pending')  # Status: pending, approved, rejected
+    guarantor_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    term = db.Column(db.Integer, nullable=False)
+    income = db.Column(db.Float, nullable=False)
+    status = db.Column(db.String(20), default='pending')
     application_date = db.Column(db.DateTime, default=datetime.utcnow)
-    approval_date = db.Column(db.DateTime, nullable=True)  # Date when loan is approved/rejected
-    repayment_date = db.Column(db.DateTime, nullable=True)  # Date when loan should be repaid
+    approval_date = db.Column(db.DateTime, nullable=True)
+    repayment_date = db.Column(db.DateTime, nullable=True)
 
     def approve_loan(self):
         self.status = 'approved'
         self.approval_date = datetime.utcnow()
+        
+        # Set interest rate based on loan term
+        if self.term == 30:  # Emergency loan (30 days)
+            self.interest_rate = 0.055  # 5.5% interest
+        elif self.term == 47:  # Development Support loan (47 days)
+            self.interest_rate = 0.03   # 3% interest
+        elif self.term == 150:  # Installment loan (150 days)
+            self.interest_rate = 0.10   # 10% interest
+        else:
+            # Default interest rate for any other term
+            self.interest_rate = 0.05   # 5% interest
+            
+        # Calculate total amount with interest
+        self.total_amount = self.amount * (1 + self.interest_rate)
+        self.remaining_amount = self.total_amount
+        
+        # Set repayment date based on term
+        self.repayment_date = datetime.utcnow() + timedelta(days=self.term)
+
+    def make_payment(self, payment_amount):
+        if payment_amount <= self.remaining_amount:
+            self.amount_paid += payment_amount
+            self.remaining_amount -= payment_amount
+            if self.remaining_amount <= 0:
+                self.status = 'completed'
+            return True
+        return False
 
     def reject_loan(self):
         self.status = 'rejected'
         self.approval_date = datetime.utcnow()
 
     def __repr__(self):
-        return f'<Loan {self.amount} for User {self.user_id}, Status: {self.status}>'
-
+        return f'<Loan {self.id} - {self.status}>'
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -306,13 +337,11 @@ def contribute():
 @app.route('/loan_application', methods=['GET', 'POST'])
 @login_required
 def loan_application():
-    # Check if the user account is verified
     if not current_user.is_verified:
         flash('Your account needs to be verified before you can apply for loans.', 'warning')
         return redirect(url_for('dashboard'))
     
     if request.method == 'POST':
-        # Validate form data
         try:
             amount = float(request.form.get('amount'))
             purpose = request.form.get('purpose')
@@ -320,19 +349,23 @@ def loan_application():
             term = int(request.form.get('term'))
             income = float(request.form.get('income'))
 
-            # Check if the amount and income are positive values
             if amount <= 0 or income <= 0:
                 flash('Loan amount and monthly income must be greater than zero.', 'error')
                 return render_template('loan_application.html')
 
-            # Find the guarantor by username
             guarantor = User.query.filter_by(email=guarantor_email).first()
             if not guarantor:
                 flash('Guarantor not found. Please enter a valid email.', 'error')
                 return render_template('loan_application.html')
 
-            # Create and submit the loan application
-            loan = Loan(user_id=current_user.id, amount=amount, purpose=purpose, guarantor_id=guarantor.id, term=term, income=income)
+            loan = Loan(
+                user_id=current_user.id,
+                amount=amount,
+                purpose=purpose,
+                guarantor_id=guarantor.id,
+                term=term,
+                income=income
+            )
             db.session.add(loan)
             db.session.commit()
 
@@ -344,11 +377,46 @@ def loan_application():
             return render_template('loan_application.html')
         
         except Exception as e:
-            db.session.rollback()  # Rollback the session on error
+            db.session.rollback()
             flash('An error occurred while submitting your application. Please try again.', 'error')
             app.logger.error(f'Error during loan application submission: {e}')
 
     return render_template('loan_application.html')
+
+# Add a new route for processing loan payments
+@app.route('/admin/process_payment/<int:loan_id>', methods=['POST'])
+@login_required
+def process_payment(loan_id):
+    if not current_user.is_admin:
+        flash('You do not have permission to perform this action.', 'error')
+        return redirect(url_for('dashboard'))
+    
+    loan = Loan.query.get_or_404(loan_id)
+    payment_amount = float(request.form.get('payment_amount', 0))
+    
+    if loan.make_payment(payment_amount):
+        db.session.commit()
+        flash(f'Payment of {payment_amount:.2f} processed successfully.', 'success')
+        
+        # Send email notification to user
+        subject = 'Loan Payment Received'
+        body = f"""
+        Dear {loan.user.first_name} {loan.user.last_name},
+
+        We have received your loan payment of ${payment_amount:.2f}.
+        Remaining balance: ${loan.remaining_amount:.2f}
+
+        Best regards,
+        Credit Union Team
+        """
+        try:
+            send_email(subject, loan.user.email, body)
+        except Exception as e:
+            flash('Payment processed but email notification failed.', 'warning')
+    else:
+        flash('Invalid payment amount.', 'error')
+    
+    return redirect(url_for('admin_loan_requests'))
 
 
 @app.route('/admin/dashboard')
@@ -384,8 +452,50 @@ def admin_loan_requests():
         flash('You do not have permission to access this page.', 'error')
         return redirect(url_for('dashboard'))
     
-    pending_loans = Loan.query.filter_by(status='pending').all()
-    return render_template('admin_loan_requests.html', loans=pending_loans)
+    loans = Loan.query.order_by(
+        case(
+            (Loan.status == 'pending', 1),
+            (Loan.status == 'approved', 2),
+            (Loan.status == 'rejected', 3)
+        ),
+        Loan.application_date.desc()
+    ).all()
+    print(len(loans))
+    
+    return render_template('admin_loan_requests.html', loans=loans)
+
+@app.route('/admin/reject_loan/<int:loan_id>', methods=['GET'])
+@login_required
+def reject_loan(loan_id):
+    if not current_user.is_admin:
+        flash('You do not have permission to perform this action.', 'error')
+        return redirect(url_for('dashboard'))
+    
+    loan = Loan.query.get_or_404(loan_id)
+    loan.reject_loan()
+    db.session.commit()
+    
+    # Send email notification
+    subject = 'Loan Application Status Update'
+    body = f"""
+    Dear {loan.user.first_name} {loan.user.last_name},
+
+    We regret to inform you that your loan application for GHS {loan.amount:.2f} has been rejected.
+
+    If you have any questions, please contact our support team.
+
+    Best regards,
+    Credit Union Team
+    """
+    
+    try:
+        send_email(subject, loan.user.email, body)
+    except Exception as e:
+        flash('There was an error sending the notification email.', 'warning')
+        app.logger.error(f'Error sending email to {loan.user.email}: {e}')
+
+    flash(f'Loan for {loan.user.first_name} {loan.user.last_name} has been rejected.', 'success')
+    return redirect(url_for('admin_loan_requests'))
 
 @app.route('/admin/approve_loan/<int:loan_id>', methods=['GET'])
 @login_required
