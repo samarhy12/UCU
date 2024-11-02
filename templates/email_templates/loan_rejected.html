@@ -1,0 +1,88 @@
+{% extends "email_templates/base_email.html" %} {% block title %}Loan
+Application Status{% endblock %} {% block content %}
+<div class="content">
+  <h2>Loan Application Update</h2>
+
+  <p>Dear {{ loan.user.first_name }} {{ loan.user.last_name }},</p>
+
+  <p>
+    We have carefully reviewed your loan application and regret to inform you
+    that we are unable to approve your request at this time.
+  </p>
+
+  <table class="details-table">
+    <tr>
+      <td><strong>Application Date:</strong></td>
+      <td>{{ loan.application_date.strftime('%B %d, %Y') }}</td>
+    </tr>
+    <tr>
+      <td><strong>Requested Amount:</strong></td>
+      <td>GHS {{ "%.2f"|format(loan.amount) }}</td>
+    </tr>
+  </table>
+
+  <p>Our decision was based on one or more of the following factors:</p>
+
+  <ul style="list-style-type: none; padding-left: 0">
+    <li style="margin-bottom: 10px">
+      • Credit Assessment: Current credit score or credit history does not meet
+      our lending criteria
+    </li>
+    <li style="margin-bottom: 10px">
+      • Loan Qualification: The requested amount exceeds our current lending
+      parameters for your profile
+    </li>
+    <li style="margin-bottom: 10px">
+      • Information Verification: Some information provided could not be
+      verified or requires additional documentation
+    </li>
+    <li style="margin-bottom: 10px">
+      • Existing Commitments: Current outstanding loans or financial obligations
+      affect eligibility
+    </li>
+    <li style="margin-bottom: 10px">
+      • Guarantor Status: Unable to secure the required guarantor approval for
+      the loan
+    </li>
+  </ul>
+
+  <p>We encourage you to:</p>
+  <ul style="list-style-type: none; padding-left: 0">
+    <li style="margin-bottom: 10px">
+      • Schedule a consultation with our financial advisors to discuss your
+      options
+    </li>
+    <li style="margin-bottom: 10px">
+      • Review and update your financial information
+    </li>
+    <li style="margin-bottom: 10px">
+      • Consider applying for a different loan amount or product that might
+      better suit your current situation
+    </li>
+  </ul>
+
+  <p>
+    You are welcome to reapply after 3 months, during which time we recommend
+    working with our financial advisory team to strengthen your application.
+  </p>
+
+  <div style="text-align: center; margin: 25px 0">
+    <a href="{{ url_for('dashboard', _external=True) }}" class="button"
+      >Schedule a Consultation</a
+    >
+  </div>
+
+  <p>
+    We value your membership with UCU Credit Union and are committed to helping
+    you achieve your financial goals. Our team is ready to discuss alternative
+    solutions that might better serve your needs.
+  </p>
+
+  <p>
+    If you would like to discuss this decision or explore other options, please
+    don't hesitate to contact our support team.
+  </p>
+
+  <p>Best regards,<br />UCU Credit Union Team</p>
+</div>
+{% endblock %}

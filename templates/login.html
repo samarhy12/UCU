@@ -1,66 +1,65 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Login - UCU_Unity_Can_Unite</title>
-    <link
-      href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css"
-      rel="stylesheet"
-    />
-  </head>
-  <body class="bg-gray-100 h-screen flex items-center justify-center">
+{% extends "base.html" %}
+
+{% block title %}Login{% endblock %}
+
+{% block content %}
+<div class="min-h-[calc(100vh-13rem)] flex items-center justify-center">
     <div class="bg-white p-8 rounded-lg shadow-md w-96">
-      <div class="text-center mb-8">
-        <img
-          src="{{url_for('static', filename='images/unitywb.png')}}"
-          alt="Credit Union Logo"
-          class="mx-auto mb-4"
-          style="height: 200px"
-        />
-        <h2 class="text-2xl font-bold text-gray-800">Welcome Back</h2>
-      </div>
-      <form action="/login" method="POST">
-        <div class="mb-4">
-          <label for="email" class="block text-gray-700 text-sm font-bold mb-2"
-            >Email</label
-          >
-          <input
-            type="email"
-            id="email"
-            name="email"
-            class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-            required
-          />
+        <div class="text-center mb-8">
+            <img
+                src="{{ url_for('static', filename='images/unitywb.png') }}"
+                alt="Credit Union Logo"
+                class="mx-auto mb-4"
+                style="height: 200px"
+            />
+            <h2 class="text-2xl font-bold text-gray-800">Welcome Back</h2>
         </div>
-        <div class="mb-6">
-          <label
-            for="password"
-            class="block text-gray-700 text-sm font-bold mb-2"
-            >Password</label
-          >
-          <input
-            type="password"
-            id="password"
-            name="password"
-            class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline"
-            required
-          />
+        
+        <form action="{{ url_for('login') }}" method="POST">
+            <div class="mb-4">
+                <label for="email" class="block text-gray-700 text-sm font-bold mb-2">
+                    Email
+                </label>
+                <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-primary-500"
+                    required
+                />
+            </div>
+            
+            <div class="mb-6">
+                <label for="password" class="block text-gray-700 text-sm font-bold mb-2">
+                    Password
+                </label>
+                <input
+                    type="password"
+                    id="password"
+                    name="password"
+                    class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:ring-2 focus:ring-primary-500"
+                    required
+                />
+            </div>
+            
+            <div class="flex items-center justify-between">
+                <button
+                    type="submit"
+                    class="w-full bg-primary-600 hover:bg-primary-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition-colors duration-200 hover-lift"
+                >
+                    Sign In
+                </button>
+            </div>
+        </form>
+        
+        <div class="text-center mt-6">
+            <a 
+                href="{{ url_for('register') }}" 
+                class="text-sm text-primary-600 hover:text-primary-800 transition-colors duration-200"
+            >
+                Don't have an account? Register
+            </a>
         </div>
-        <div class="flex items-center justify-between">
-          <button
-            type="submit"
-            class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full"
-          >
-            Sign In
-          </button>
-        </div>
-      </form>
-      <div class="text-center mt-6">
-        <a href="/register" class="text-sm text-blue-600 hover:text-blue-800"
-          >Don't have an account? Register</a
-        >
-      </div>
     </div>
-  </body>
-</html>
+</div>
+{% endblock %}

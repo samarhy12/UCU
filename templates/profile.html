@@ -1,125 +1,224 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Profile - UCU_Unity_Can_Unite</title>
-    <link
-      href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css"
-      rel="stylesheet"
-    />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/js/all.min.js"></script>
-  </head>
-  <body class="bg-gray-100">
-    <nav class="bg-blue-600 text-white shadow-lg">
-      <div
-        class="container mx-auto px-6 py-3 flex justify-between items-center"
-      >
-        <div class="flex items-center">
-          <img
-            src="/api/placeholder/200/60"
-            alt="Credit Union Logo"
-            class="h-10 mr-3"
-          />
-          <span class="font-bold text-xl">UCU_Unity_Can_Unite</span>
-        </div>
-        <div>
-          <a href="/dashboard" class="mx-3 hover:text-blue-200">Dashboard</a>
-          <a href="/profile" class="mx-3 hover:text-blue-200">Profile</a>
-          <a href="/logout" class="mx-3 hover:text-blue-200">Logout</a>
-        </div>
+{% extends "base.html" %} {% block content %}
+<div class="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100">
+  <div class="container mx-auto px-4 py-8 sm:px-6 lg:px-8">
+    <!-- Profile Header -->
+    <div class="mb-8 text-center">
+      <div class="relative inline-block">
+        <img
+          src="/api/placeholder/128/128"
+          alt="Profile Picture"
+          class="w-32 h-32 rounded-full border-4 border-white shadow-lg mx-auto"
+        />
+        <span
+          class="absolute bottom-2 right-2 w-4 h-4 bg-green-400 border-2 border-white rounded-full"
+        ></span>
       </div>
-    </nav>
+      <h1 class="mt-4 text-3xl font-bold text-gray-900">
+        {{ user.first_name }} {{ user.last_name }}
+      </h1>
+    </div>
 
-    <div class="container mx-auto px-6 py-8">
-      <h1 class="text-3xl font-bold text-gray-800 mb-6">Your Profile</h1>
-
-      <div class="bg-white rounded-lg shadow-md p-6">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div>
-            <h2 class="text-2xl font-semibold mb-4 text-gray-700">
-              Personal Information
-            </h2>
-            <div class="mb-4">
-              <label class="block text-gray-700 text-sm font-bold mb-2"
-                >Full Name</label
-              >
-              <p class="text-gray-600">
-                {{ user.first_name }} {{ user.last_name }}
-              </p>
-            </div>
-            <div class="mb-4">
-              <label class="block text-gray-700 text-sm font-bold mb-2"
-                >Email</label
-              >
-              <p class="text-gray-600">{{ user.email }}</p>
-            </div>
-            <div class="mb-4">
-              <label class="block text-gray-700 text-sm font-bold mb-2"
-                >Date of Birth</label
-              >
-              <p class="text-gray-600">{{ user.date_of_birth }}</p>
-            </div>
-            <div class="mb-4">
-              <label class="block text-gray-700 text-sm font-bold mb-2"
-                >Occupation</label
-              >
-              <p class="text-gray-600">{{ user.occupation }}</p>
-            </div>
-          </div>
-          <div>
-            <h2 class="text-2xl font-semibold mb-4 text-gray-700">
-              Contact Information
-            </h2>
-            <div class="mb-4">
-              <label class="block text-gray-700 text-sm font-bold mb-2"
-                >Phone Number</label
-              >
-              <p class="text-gray-600">{{ user.phone_number }}</p>
-            </div>
-            <div class="mb-4">
-              <label class="block text-gray-700 text-sm font-bold mb-2"
-                >Address</label
-              >
-              <p class="text-gray-600">{{ user.address }}</p>
-              <p class="text-gray-600">
-                {{ user.city }}, {{ user.state }} {{ user.zip_code }}
-              </p>
-              <p class="text-gray-600">{{ user.country }}</p>
-            </div>
-          </div>
-        </div>
-        <div class="mt-6">
-          <h2 class="text-2xl font-semibold mb-4 text-gray-700">
-            Account Information
-          </h2>
-          <div class="mb-4">
-            <label class="block text-gray-700 text-sm font-bold mb-2"
-              >Account Number</label
-            >
-            <p class="text-gray-600">{{ user.account_number }}</p>
-          </div>
-          <div class="mb-4">
-            <label class="block text-gray-700 text-sm font-bold mb-2"
-              >National ID</label
-            >
-            <p class="text-gray-600">{{ user.national_id }}</p>
-          </div>
-        </div>
-        <div class="mt-6">
-          <a
-            href="/edit-profile"
-            class="bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition duration-300"
-            >Edit Profile</a
+    <!-- Main Profile Content -->
+    <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
+      <!-- Profile Navigation -->
+      <div class="border-b border-gray-200">
+        <nav class="flex justify-center space-x-8 px-4">
+          <button
+            class="px-3 py-4 text-sm font-medium text-blue-600 border-b-2 border-blue-600"
           >
+            Personal Info
+          </button>
+          <button
+            class="px-3 py-4 text-sm font-medium text-gray-500 hover:text-gray-700"
+          >
+            Security
+          </button>
+          <button
+            class="px-3 py-4 text-sm font-medium text-gray-500 hover:text-gray-700"
+          >
+            Preferences
+          </button>
+        </nav>
+      </div>
+
+      <!-- Profile Sections -->
+      <div class="p-6 lg:p-8">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <!-- Personal Information -->
+          <div class="space-y-6">
+            <div class="bg-gray-50 rounded-xl p-6">
+              <h2
+                class="text-xl font-semibold text-gray-900 mb-4 flex items-center"
+              >
+                <svg
+                  class="w-5 h-5 mr-2 text-blue-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                  />
+                </svg>
+                Personal Information
+              </h2>
+              <div class="space-y-4">
+                <div class="flex justify-between items-center">
+                  <span class="text-sm font-medium text-gray-500"
+                    >Full Name</span
+                  >
+                  <span class="text-sm text-gray-900"
+                    >{{ user.first_name }} {{ user.last_name }}</span
+                  >
+                </div>
+                <div class="flex justify-between items-center">
+                  <span class="text-sm font-medium text-gray-500">Email</span>
+                  <span class="text-sm text-gray-900">{{ user.email }}</span>
+                </div>
+                <div class="flex justify-between items-center">
+                  <span class="text-sm font-medium text-gray-500"
+                    >Date of Birth</span
+                  >
+                  <span class="text-sm text-gray-900"
+                    >{{ user.date_of_birth }}</span
+                  >
+                </div>
+                <div class="flex justify-between items-center">
+                  <span class="text-sm font-medium text-gray-500"
+                    >Occupation</span
+                  >
+                  <span class="text-sm text-gray-900"
+                    >{{ user.occupation }}</span
+                  >
+                </div>
+              </div>
+            </div>
+
+            <!-- Account Information -->
+            <div class="bg-gray-50 rounded-xl p-6">
+              <h2
+                class="text-xl font-semibold text-gray-900 mb-4 flex items-center"
+              >
+                <svg
+                  class="w-5 h-5 mr-2 text-blue-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"
+                  />
+                </svg>
+                Account Information
+              </h2>
+              <div class="space-y-4">
+                <div class="flex justify-between items-center">
+                  <span class="text-sm font-medium text-gray-500"
+                    >Account Number</span
+                  >
+                  <span class="text-sm text-gray-900"
+                    >{{ user.account_number }}</span
+                  >
+                </div>
+                <div class="flex justify-between items-center">
+                  <span class="text-sm font-medium text-gray-500"
+                    >National ID</span
+                  >
+                  <span class="text-sm text-gray-900"
+                    >{{ user.national_id }}</span
+                  >
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Contact Information -->
+          <div class="space-y-6">
+            <div class="bg-gray-50 rounded-xl p-6">
+              <h2
+                class="text-xl font-semibold text-gray-900 mb-4 flex items-center"
+              >
+                <svg
+                  class="w-5 h-5 mr-2 text-blue-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                  />
+                </svg>
+                Contact Information
+              </h2>
+              <div class="space-y-4">
+                <div class="flex justify-between items-center">
+                  <span class="text-sm font-medium text-gray-500"
+                    >Phone Number</span
+                  >
+                  <span class="text-sm text-gray-900"
+                    >{{ user.phone_number }}</span
+                  >
+                </div>
+                <div>
+                  <span class="text-sm font-medium text-gray-500 block mb-2"
+                    >Address</span
+                  >
+                  <div class="text-sm text-gray-900 space-y-1">
+                    <p>{{ user.address }}</p>
+                    <p>{{ user.city }}, {{ user.state }} {{ user.zip_code }}</p>
+                    <p>{{ user.country }}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="bg-gray-50 rounded-xl p-6">
+              <h2
+                class="text-xl font-semibold text-gray-900 mb-4 flex items-center"
+              >
+                <svg
+                  class="w-5 h-5 mr-2 text-blue-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                  />
+                </svg>
+                Quick Actions
+              </h2>
+              <div class="space-y-3">
+                <a
+                  href="/edit-profile"
+                  class="block w-full px-4 py-2 text-sm font-medium text-center text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 transition duration-300"
+                >
+                  Edit Profile
+                </a>
+                <button
+                  class="block w-full px-4 py-2 text-sm font-medium text-center text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:ring-4 focus:ring-gray-200 transition duration-300"
+                >
+                  Change Password
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
-
-    <footer class="bg-gray-800 text-white py-4 mt-12">
-      <div class="container mx-auto px-6 text-center">
-        <p>&copy; 2024 UCU_Unity_Can_Unite. All rights reserved.</p>
-      </div>
-    </footer>
-  </body>
-</html>
+  </div>
+</div>
+{% endblock %}

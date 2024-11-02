@@ -1,0 +1,38 @@
+{% extends "email_templates/base_email.html" %} {% block title %}Monthly
+Contribution Recorded{% endblock %} {% block content %}
+<div class="content">
+  <h2>Hello {{ user.first_name }},</h2>
+
+  <p>
+    We're pleased to confirm that your monthly contribution has been
+    successfully recorded.
+  </p>
+
+  <table class="details-table">
+    <tr>
+      <td>Contribution Amount:</td>
+      <td class="amount">${{ "%.2f"|format(amount) }}</td>
+    </tr>
+    <tr>
+      <td>Month:</td>
+      <td>{{ month }}</td>
+    </tr>
+  </table>
+
+  <p>
+    Thank you for maintaining regular savings with UCU Credit Union. Your
+    commitment to saving helps build a stronger financial future.
+  </p>
+
+  <a href="{{ url_for('dashboard', _external=True) }}" class="button"
+    >View Your Savings Progress</a
+  >
+
+  <p>
+    If you notice any discrepancies or have questions about your contribution,
+    please contact us immediately.
+  </p>
+
+  <p>Best regards,<br />UCU Credit Union Team</p>
+</div>
+{% endblock %}

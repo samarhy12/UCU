@@ -1,151 +1,105 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>User Verification - Admin Panel</title>
-    <link
-      href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css"
-      rel="stylesheet"
-    />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/js/all.min.js"></script>
-    <script>
-      function openModal(user) {
-        document.getElementById("modal-other_names").innerText =
-          user.other_names;
-        document.getElementById("modal-email").innerText = user.email;
-        document.getElementById(
-          "modal-fullname"
-        ).innerText = `${user.first_name} ${user.last_name}`;
-        document.getElementById("modal-national-id").innerText =
-          user.national_id;
-        document.getElementById("modal").classList.remove("hidden");
-      }
+{% extends "base.html" %} {% block title %}Register{% endblock %} {% block
+content %}
+<script>
+  function openModal(user) {
+    document.getElementById("modal-other_names").innerText = user.other_names;
+    document.getElementById("modal-email").innerText = user.email;
+    document.getElementById(
+      "modal-fullname"
+    ).innerText = `${user.first_name} ${user.last_name}`;
+    document.getElementById("modal-national-id").innerText = user.national_id;
+    document.getElementById("modal").classList.remove("hidden");
+  }
 
-      function closeModal() {
-        document.getElementById("modal").classList.add("hidden");
-      }
-    </script>
-  </head>
-  <body class="bg-gray-100">
-    <nav class="bg-blue-600 text-white shadow-lg">
-      <div
-        class="container mx-auto px-6 py-3 flex justify-between items-center"
+  function closeModal() {
+    document.getElementById("modal").classList.add("hidden");
+  }
+</script>
+
+<div class="container mx-auto px-6 py-8">
+  <h1 class="text-3xl font-bold text-gray-800 mb-6">User Verification</h1>
+
+  <div class="bg-white rounded-lg shadow-md p-6">
+    <table class="min-w-full">
+      <thead>
+        <tr class="bg-gray-200 text-gray-600">
+          <th class="px-4 py-2 text-left">other_names</th>
+          <th class="px-4 py-2 text-left">Email</th>
+          <th class="px-4 py-2 text-left">Full Name</th>
+          <th class="px-4 py-2 text-left">National ID</th>
+          <th class="px-4 py-2 text-left">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for user in users %}
+        <tr class="border-b">
+          <td class="px-4 py-2">{{ user.other_names }}</td>
+          <td class="px-4 py-2">{{ user.email }}</td>
+          <td class="px-4 py-2">{{ user.first_name }} {{ user.last_name }}</td>
+          <td class="px-4 py-2">{{ user.national_id }}</td>
+          <td class="px-4 py-2">
+            <a
+              href="/admin/user_details/{{ user.id }}"
+              class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-1 px-3 rounded focus:outline-none focus:shadow-outline"
+            >
+              View Details
+            </a>
+            <form
+              action="/admin/verify_user/{{ user.id }}"
+              method="POST"
+              class="inline"
+            >
+              <button
+                type="submit"
+                name="action"
+                value="approve"
+                class="bg-green-600 hover:bg-green-700 text-white font-bold py-1 px-3 rounded focus:outline-none focus:shadow-outline"
+              >
+                Approve
+              </button>
+            </form>
+            <form
+              action="/admin/verify_user/{{ user.id }}"
+              method="POST"
+              class="inline"
+            >
+              <button
+                type="submit"
+                name="action"
+                value="reject"
+                class="bg-red-600 hover:bg-red-700 text-white font-bold py-1 px-3 rounded focus:outline-none focus:shadow-outline"
+              >
+                Reject
+              </button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Modal -->
+<div
+  id="modal"
+  class="hidden fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center"
+>
+  <div class="bg-white rounded-lg shadow-lg p-6 w-1/2">
+    <h2 class="text-xl font-bold mb-4">User Details</h2>
+    <p><strong>other_names:</strong> <span id="modal-other_names"></span></p>
+    <p><strong>Email:</strong> <span id="modal-email"></span></p>
+    <p><strong>Full Name:</strong> <span id="modal-fullname"></span></p>
+    <p><strong>National ID:</strong> <span id="modal-national-id"></span></p>
+    <div class="flex justify-end mt-4">
+      <button
+        onclick="closeModal()"
+        class="bg-gray-300 hover:bg-gray-400 text-black font-bold py-1 px-3 rounded focus:outline-none focus:shadow-outline"
       >
-        <div class="flex items-center">
-          <img
-            src="/api/placeholder/200/60"
-            alt="Credit Union Logo"
-            class="h-10 mr-3"
-          />
-          <span class="font-bold text-xl">UCU_Unity_Can_Unite Admin</span>
-        </div>
-        <div>
-          <a href="/admin/dashboard" class="mx-3 hover:text-blue-200"
-            >Dashboard</a
-          >
-          <a href="/admin/users" class="mx-3 hover:text-blue-200">Users</a>
-          <a href="logout" class="mx-3 hover:text-blue-200">Logout</a>
-        </div>
-      </div>
-    </nav>
-
-    <div class="container mx-auto px-6 py-8">
-      <h1 class="text-3xl font-bold text-gray-800 mb-6">User Verification</h1>
-
-      <div class="bg-white rounded-lg shadow-md p-6">
-        <table class="min-w-full">
-          <thead>
-            <tr class="bg-gray-200 text-gray-600">
-              <th class="px-4 py-2 text-left">other_names</th>
-              <th class="px-4 py-2 text-left">Email</th>
-              <th class="px-4 py-2 text-left">Full Name</th>
-              <th class="px-4 py-2 text-left">National ID</th>
-              <th class="px-4 py-2 text-left">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for user in users %}
-            <tr class="border-b">
-              <td class="px-4 py-2">{{ user.other_names }}</td>
-              <td class="px-4 py-2">{{ user.email }}</td>
-              <td class="px-4 py-2">
-                {{ user.first_name }} {{ user.last_name }}
-              </td>
-              <td class="px-4 py-2">{{ user.national_id }}</td>
-              <td class="px-4 py-2">
-                <a
-                  href="/admin/user_details/{{ user.id }}"
-                  class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-1 px-3 rounded focus:outline-none focus:shadow-outline"
-                >
-                  View Details
-                </a>
-                <form
-                  action="/admin/verify_user/{{ user.id }}"
-                  method="POST"
-                  class="inline"
-                >
-                  <button
-                    type="submit"
-                    name="action"
-                    value="approve"
-                    class="bg-green-600 hover:bg-green-700 text-white font-bold py-1 px-3 rounded focus:outline-none focus:shadow-outline"
-                  >
-                    Approve
-                  </button>
-                </form>
-                <form
-                  action="/admin/verify_user/{{ user.id }}"
-                  method="POST"
-                  class="inline"
-                >
-                  <button
-                    type="submit"
-                    name="action"
-                    value="reject"
-                    class="bg-red-600 hover:bg-red-700 text-white font-bold py-1 px-3 rounded focus:outline-none focus:shadow-outline"
-                  >
-                    Reject
-                  </button>
-                </form>
-              </td>
-            </tr>
-            {% endfor %}
-          </tbody>
-        </table>
-      </div>
+        Close
+      </button>
     </div>
+  </div>
+</div>
 
-    <!-- Modal -->
-    <div
-      id="modal"
-      class="hidden fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center"
-    >
-      <div class="bg-white rounded-lg shadow-lg p-6 w-1/2">
-        <h2 class="text-xl font-bold mb-4">User Details</h2>
-        <p>
-          <strong>other_names:</strong> <span id="modal-other_names"></span>
-        </p>
-        <p><strong>Email:</strong> <span id="modal-email"></span></p>
-        <p><strong>Full Name:</strong> <span id="modal-fullname"></span></p>
-        <p>
-          <strong>National ID:</strong> <span id="modal-national-id"></span>
-        </p>
-        <div class="flex justify-end mt-4">
-          <button
-            onclick="closeModal()"
-            class="bg-gray-300 hover:bg-gray-400 text-black font-bold py-1 px-3 rounded focus:outline-none focus:shadow-outline"
-          >
-            Close
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <footer class="bg-gray-800 text-white py-4 mt-12">
-      <div class="container mx-auto px-6 text-center">
-        <p>&copy; 2024 UCU_Unity_Can_Unite. All rights reserved.</p>
-      </div>
-    </footer>
-  </body>
-</html>
+{% endblock %}

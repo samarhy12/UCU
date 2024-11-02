@@ -1,118 +1,73 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Admin Dashboard - UCU_Unity_Can_Unite</title>
-    <link
-      href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css"
-      rel="stylesheet"
-    />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/js/all.min.js"></script>
-  </head>
-  <body class="bg-gray-100">
-    <nav class="bg-blue-600 text-white shadow-lg">
-      <div
-        class="container mx-auto px-6 py-3 flex justify-between items-center"
-      >
-        <div class="flex items-center">
-          <img
-            src="/api/placeholder/200/60"
-            alt="Credit Union Logo"
-            class="h-10 mr-3"
-          />
-          <span class="font-bold text-xl">UCU_Unity_Can_Unite - Admin</span>
-        </div>
-        <div>
-          <a href="/admin/dashboard" class="mx-3 hover:text-blue-200"
-            >Dashboard</a
-          >
-          <a href="/admin/verify_users" class="mx-3 hover:text-blue-200"
-            >Verify Users</a
-          >
-          <a href="/admin/loan_requests" class="mx-3 hover:text-blue-200"
-            >Loan Requests</a
-          >
-          <a href="/logout" class="mx-3 hover:text-blue-200">Logout</a>
-        </div>
-      </div>
-    </nav>
-    <div class="container mx-auto px-6 py-8">
-      <h1 class="text-3xl font-bold text-gray-800 mb-6">Admin Dashboard</h1>
+{% extends "base.html" %} {% block title %}Register{% endblock %} {% block
+content %}
+<div class="container mx-auto px-6 py-8">
+  <h1 class="text-3xl font-bold text-gray-800 mb-6">Admin Dashboard</h1>
 
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <div class="bg-white rounded-lg shadow-md p-6">
-          <h2 class="text-xl font-semibold mb-4 text-gray-700">Total Users</h2>
-          <p class="text-3xl font-bold text-blue-600">{{ total_users }}</p>
-        </div>
-        <div class="bg-white rounded-lg shadow-md p-6">
-          <h2 class="text-xl font-semibold mb-4 text-gray-700">
-            Pending Verifications
-          </h2>
-          <p class="text-3xl font-bold text-yellow-600">
-            {{ pending_verifications }}
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+    <div class="bg-white rounded-lg shadow-md p-6">
+      <h2 class="text-xl font-semibold mb-4 text-gray-700">Total Users</h2>
+      <p class="text-3xl font-bold text-blue-600">{{ total_users }}</p>
+    </div>
+    <div class="bg-white rounded-lg shadow-md p-6">
+      <h2 class="text-xl font-semibold mb-4 text-gray-700">
+        Pending Verifications
+      </h2>
+      <p class="text-3xl font-bold text-yellow-600">
+        {{ pending_verifications }}
+      </p>
+    </div>
+    <div class="bg-white rounded-lg shadow-md p-6">
+      <h2 class="text-xl font-semibold mb-4 text-gray-700">
+        Pending Loan Requests
+      </h2>
+      <p class="text-3xl font-bold text-red-600">{{ pending_loans }}</p>
+    </div>
+  </div>
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <div class="bg-white rounded-lg shadow-md p-6">
+      <h2 class="text-2xl font-semibold mb-4 text-gray-700">
+        Recent Activities
+      </h2>
+      <ul class="divide-y divide-gray-200">
+        {% for activity in recent_activities %}
+        <li class="py-3">
+          <p class="text-sm text-gray-600">
+            {{ activity.timestamp.strftime('%Y-%m-%d %H:%M') }}
           </p>
-        </div>
-        <div class="bg-white rounded-lg shadow-md p-6">
-          <h2 class="text-xl font-semibold mb-4 text-gray-700">
-            Pending Loan Requests
-          </h2>
-          <p class="text-3xl font-bold text-red-600">{{ pending_loans }}</p>
-        </div>
-      </div>
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div class="bg-white rounded-lg shadow-md p-6">
-          <h2 class="text-2xl font-semibold mb-4 text-gray-700">
-            Recent Activities
-          </h2>
-          <ul class="divide-y divide-gray-200">
-            {% for activity in recent_activities %}
-            <li class="py-3">
-              <p class="text-sm text-gray-600">
-                {{ activity.timestamp.strftime('%Y-%m-%d %H:%M') }}
-              </p>
-              <p class="text-gray-800">{{ activity.description }}</p>
-            </li>
-            {% endfor %}
-          </ul>
-        </div>
-        <div class="bg-white rounded-lg shadow-md p-6">
-          <h2 class="text-2xl font-semibold mb-4 text-gray-700">
-            Quick Actions
-          </h2>
-          <div class="grid grid-cols-2 gap-4">
-            <a
-              href="/admin/verify_users"
-              class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded text-center"
-            >
-              <i class="fas fa-user-check mr-2"></i>Verify Users
-            </a>
-            <a
-              href="/admin/loan_requests"
-              class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded text-center"
-            >
-              <i class="fas fa-money-check-alt mr-2"></i>Review Loans
-            </a>
-            <a
-              href="/admin/reports"
-              class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded text-center"
-            >
-              <i class="fas fa-chart-bar mr-2"></i>Generate Reports
-            </a>
-            <a
-              href="/admin/settings"
-              class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded text-center"
-            >
-              <i class="fas fa-cog mr-2"></i>System Settings
-            </a>
-          </div>
-        </div>
+          <p class="text-gray-800">{{ activity.description }}</p>
+        </li>
+        {% endfor %}
+      </ul>
+    </div>
+    <div class="bg-white rounded-lg shadow-md p-6">
+      <h2 class="text-2xl font-semibold mb-4 text-gray-700">Quick Actions</h2>
+      <div class="grid grid-cols-2 gap-4">
+        <a
+          href="/admin/verify_users"
+          class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded text-center"
+        >
+          <i class="fas fa-user-check mr-2"></i>Verify Users
+        </a>
+        <a
+          href="/admin/loan_requests"
+          class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded text-center"
+        >
+          <i class="fas fa-money-check-alt mr-2"></i>Review Loans
+        </a>
+        <a
+          href="{{ url_for('manage_contributions')}}"
+          class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded text-center"
+        >
+          <i class="fas fa-chart-bar mr-2"></i>Manage cotributions
+        </a>
+        <a
+          href="/admin/settings"
+          class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded text-center"
+        >
+          <i class="fas fa-cog mr-2"></i>System Settings
+        </a>
       </div>
     </div>
-    <footer class="bg-gray-200 text-center py-4 mt-8">
-      <p class="text-gray-600">
-        &copy; 2024 UCU_Unity_Can_Unite. All rights reserved.
-      </p>
-    </footer>
-  </body>
-</html>
+  </div>
+</div>
+{% endblock %}

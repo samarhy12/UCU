@@ -1,0 +1,168 @@
+<!-- templates/admin_manage_contributions.html -->
+{% extends "base.html" %} {% block content %}
+<div class="container mx-auto px-4 py-8">
+  <h1 class="text-2xl font-bold mb-6">Manage Monthly Contributions</h1>
+
+  <div class="overflow-x-auto">
+    <table class="min-w-full bg-white border border-gray-300">
+      <thead>
+        <tr>
+          <th class="px-6 py-3 bg-gray-100 text-left">Member</th>
+          <th class="px-6 py-3 bg-gray-100 text-left">Account Number</th>
+          <th class="px-6 py-3 bg-gray-100 text-right">Monthly Target</th>
+          <th class="px-6 py-3 bg-gray-100 text-right">Total Contributions</th>
+          <th class="px-6 py-3 bg-gray-100 text-center">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for data in user_data %}
+        <tr class="border-t border-gray-300">
+          <td class="px-6 py-4">
+            {{ data.user.first_name }} {{ data.user.last_name }}
+          </td>
+          <td class="px-6 py-4">{{ data.user.account_number }}</td>
+          <td class="px-6 py-4 text-right">
+            {% if data.monthly_target %} GHS {{
+            "%.2f"|format(data.monthly_target.target_amount) }} {% else %} Not
+            set {% endif %}
+          </td>
+          <td class="px-6 py-4 text-right">
+            GHS {{ "%.2f"|format(data.total_contributions) }}
+          </td>
+          <td class="px-6 py-4">
+            <div class="flex justify-center space-x-4">
+              <!-- Set Monthly Target Button -->
+              <button
+                onclick="showTargetModal('{{ data.user.id }}')"
+                class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+              >
+                Set Target
+              </button>
+
+              <!-- Record Contribution Button -->
+              <button
+                onclick="showContributionModal('{{ data.user.id }}')"
+                class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
+              >
+                Record Contribution
+              </button>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Set Monthly Target Modal -->
+<div id="targetModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden">
+  <div class="flex items-center justify-center min-h-screen">
+    <div class="bg-white p-6 rounded-lg shadow-xl">
+      <h2 class="text-xl font-bold mb-4">Set Monthly Target</h2>
+      <form id="targetForm" method="POST">
+        <div class="mb-4">
+          <label class="block text-gray-700 mb-2">Target Amount (GHS)</label>
+          <input
+            type="number"
+            name="target_amount"
+            step="0.01"
+            min="0"
+            class="w-full px-3 py-2 border rounded"
+            required
+          />
+        </div>
+        <div class="flex justify-end space-x-4">
+          <button
+            type="button"
+            onclick="hideTargetModal()"
+            class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+          >
+            Save
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Record Contribution Modal -->
+<div
+  id="contributionModal"
+  class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden"
+>
+  <div class="flex items-center justify-center min-h-screen">
+    <div class="bg-white p-6 rounded-lg shadow-xl">
+      <h2 class="text-xl font-bold mb-4">Record Monthly Contribution</h2>
+      <form id="contributionForm" method="POST">
+        <div class="mb-4">
+          <label class="block text-gray-700 mb-2">Amount (GHS)</label>
+          <input
+            type="number"
+            name="amount"
+            step="0.01"
+            min="0"
+            class="w-full px-3 py-2 border rounded"
+            required
+          />
+        </div>
+        <div class="mb-4">
+          <label class="block text-gray-700 mb-2">Month</label>
+          <input
+            type="month"
+            name="month"
+            value="{{ current_month }}"
+            class="w-full px-3 py-2 border rounded"
+            required
+          />
+        </div>
+        <div class="flex justify-end space-x-4">
+          <button
+            type="button"
+            onclick="hideContributionModal()"
+            class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+          >
+            Save
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  function showTargetModal(userId) {
+    const modal = document.getElementById("targetModal");
+    const form = document.getElementById("targetForm");
+    form.action = `/admin/set_monthly_target/${userId}`;
+    modal.classList.remove("hidden");
+  }
+
+  function hideTargetModal() {
+    document.getElementById("targetModal").classList.add("hidden");
+  }
+
+  function showContributionModal(userId) {
+    const modal = document.getElementById("contributionModal");
+    const form = document.getElementById("contributionForm");
+    form.action = `/admin/record_monthly_contribution/${userId}`;
+    modal.classList.remove("hidden");
+  }
+
+  function hideContributionModal() {
+    document.getElementById("contributionModal").classList.add("hidden");
+  }
+</script>
+{% endblock %}

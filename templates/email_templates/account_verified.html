@@ -1,0 +1,31 @@
+{% extends "email_templates/base_email.html" %} {% block title %}Account
+Verified{% endblock %} {% block content %}
+<h2>Welcome to UCU Credit Union!</h2>
+<p>Dear {{ user.first_name }} {{ user.last_name }},</p>
+<p>
+  Your UCU Credit Union account has been successfully verified. You can now
+  access all features of our services.
+</p>
+
+<div
+  style="
+    background-color: #e2e8f0;
+    padding: 15px;
+    border-radius: 5px;
+    margin: 15px 0;
+  "
+>
+  <p style="margin: 0">
+    <strong>Your Account Number:</strong> {{ user.account_number }}
+  </p>
+</div>
+
+<p>You can now:</p>
+<ul>
+  <li>Make contributions to your savings</li>
+  <li>Apply for loans</li>
+  <li>View your account statement</li>
+</ul>
+
+<a href="{{ url_for('login', _external=True) }}" class="button">Log In Now</a>
+{% endblock %}

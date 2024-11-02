@@ -1,0 +1,35 @@
+{% extends "email_templates/base_email.html" %} {% block title %}Monthly Savings
+Target Updated{% endblock %} {% block content %}
+<div class="content">
+  <h2>Hello {{ user.first_name }},</h2>
+
+  <p>
+    Your monthly savings target has been updated in your UCU Credit Union
+    account.
+  </p>
+
+  <table class="details-table">
+    <tr>
+      <td>New Monthly Target:</td>
+      <td class="amount">${{ "%.2f"|format(target_amount) }}</td>
+    </tr>
+  </table>
+
+  <p>
+    This target will help you track your savings progress and achieve your
+    financial goals. You can view your savings progress at any time by logging
+    into your account.
+  </p>
+
+  <a href="{{ url_for('dashboard', _external=True) }}" class="button"
+    >View Your Dashboard</a
+  >
+
+  <p>
+    If you have any questions about your savings target or need assistance,
+    please don't hesitate to contact our support team.
+  </p>
+
+  <p>Best regards,<br />UCU Credit Union Team</p>
+</div>
+{% endblock %}

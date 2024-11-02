@@ -1,0 +1,30 @@
+{% extends "email_templates/base_email.html" %} {% block title %}Loan Approved{%
+endblock %} {% block content %}
+<h2>Loan Application Approved</h2>
+<p>Dear {{ loan.user.first_name }} {{ loan.user.last_name }},</p>
+<p>We're pleased to inform you that your loan application has been approved.</p>
+
+<table class="details-table">
+  <tr>
+    <td><strong>Loan Amount:</strong></td>
+    <td class="amount">GHS {{ "%.2f"|format(loan.amount) }}</td>
+  </tr>
+  <tr>
+    <td><strong>Interest Rate:</strong></td>
+    <td>{{ "%.1f"|format(loan.interest_rate * 100) }}%</td>
+  </tr>
+  <tr>
+    <td><strong>Total Amount Due:</strong></td>
+    <td>GHS {{ "%.2f"|format(loan.total_amount) }}</td>
+  </tr>
+  <tr>
+    <td><strong>Repayment Date:</strong></td>
+    <td>{{ loan.repayment_date.strftime('%B %d, %Y') }}</td>
+  </tr>
+</table>
+
+<p>Please log in to your account to view the complete loan details.</p>
+<a href="{{ url_for('dashboard', _external=True) }}" class="button"
+  >View Loan Details</a
+>
+{% endblock %}

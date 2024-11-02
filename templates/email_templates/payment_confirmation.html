@@ -1,0 +1,46 @@
+{% extends "email_templates/base_email.html" %} {% block title %}Loan Payment
+Confirmation{% endblock %} {% block content %}
+<div class="content">
+  <h2>Hello {{ user.first_name }},</h2>
+
+  <p>
+    Thank you for your loan payment. We're writing to confirm that your payment
+    has been successfully processed.
+  </p>
+
+  <table class="details-table">
+    <tr>
+      <td>Payment Amount:</td>
+      <td class="amount">${{ "%.2f"|format(payment_amount) }}</td>
+    </tr>
+    <tr>
+      <td>Payment Date:</td>
+      <td>{{ payment_date.strftime('%B %d, %Y') }}</td>
+    </tr>
+    <tr>
+      <td>Loan ID:</td>
+      <td>{{ loan.id }}</td>
+    </tr>
+    <tr>
+      <td>Remaining Balance:</td>
+      <td>${{ "%.2f"|format(loan.remaining_balance) }}</td>
+    </tr>
+  </table>
+
+  <p>
+    Your payment has been applied to your loan account. You can view your
+    complete loan details and payment history on your dashboard.
+  </p>
+
+  <a href="{{ url_for('dashboard', _external=True) }}" class="button"
+    >View Your Loan Details</a
+  >
+
+  <p>
+    If you have any questions about your loan or payments, our team is here to
+    help.
+  </p>
+
+  <p>Best regards,<br />UCU Credit Union Team</p>
+</div>
+{% endblock %}

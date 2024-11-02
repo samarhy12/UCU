@@ -1,92 +1,357 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Welcome to UCU_Unity_Can_Unite</title>
-    <link
-      href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css"
-      rel="stylesheet"
-    />
-  </head>
-  <body class="bg-gray-100">
-    <header class="bg-white shadow-md">
-      <nav
-        class="container mx-auto px-6 py-3 flex justify-between items-center"
-      >
-        <div class="flex items-center">
-          <img
-            src="{{url_for('static', filename='images/unitywb.png')}}"
-            alt="Credit Union Logo"
-            class="h-10 mr-3"
-          />
-          <span class="font-bold text-xl text-gray-800">UCU_Unity_Can_Unite</span>
-        </div>
-        <div>
-          <a href="/login" class="text-gray-800 hover:text-blue-600 mx-3"
-            >Login</a
-          >
-          <a
-            href="/register"
-            class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-            >Join Now</a
-          >
-        </div>
-      </nav>
-    </header>
-
-    <main>
-      <section class="relative">
-        <img
-          src="{{url_for('static', filename='images/intro.png')}}"
-          alt="Credit Union Cover"
-          class="w-full h-[600px] object-cover"
-        />
-        <!-- <div
-          class="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center"
+{% extends "base.html" %} {% block title %}Welcome to UCU Credit Union{%
+endblock %} {% block content %}
+<!-- Hero Section -->
+<div class="relative overflow-hidden bg-primary-600 py-24 sm:py-32">
+  <div class="mx-auto max-w-7xl px-6 lg:px-8">
+    <div class="mx-auto max-w-2xl text-center" data-aos="fade-up">
+      <h1 class="text-4xl font-bold tracking-tight text-white sm:text-6xl">
+        UCU Made Simple, Life Made Better
+      </h1>
+      <p class="mt-6 text-lg leading-8 text-primary-100">
+        Experience the future of comfort with UCU. We combine innovative
+        technology with personalized service to help you achieve your financial
+        goals.
+      </p>
+      <div class="mt-10 flex items-center justify-center gap-x-6">
+        <a
+          href="{{ url_for('register') }}"
+          class="transform hover:scale-105 transition-all rounded-md bg-white px-6 py-3 text-lg font-semibold text-primary-600 shadow-sm hover:bg-primary-50"
         >
-          <div class="text-center text-white">
-            <h1 class="text-5xl font-bold mb-4">Welcome to UCU_Unity_Can_Unite</h1>
-            <p class="text-xl mb-8">Empowering Your Financial Future</p>
-            <a
-              href="/register"
-              class="bg-blue-600 text-white px-8 py-3 rounded-full text-lg hover:bg-blue-700 transition duration-300"
-              >Get Started</a
-            >
-          </div>
-        </div> -->
-      </section>
+          Get Started
+        </a>
+        <a
+          href="#learn-more"
+          class="text-white hover:text-primary-200 transition-all"
+        >
+          Learn more <span aria-hidden="true">→</span>
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
 
-      <section class="container mx-auto px-6 py-16">
-        <h2 class="text-3xl font-bold text-center mb-8">Our Services</h2>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <div class="bg-white p-6 rounded-lg shadow-md">
-            <h3 class="text-xl font-semibold mb-4">Savings Accounts</h3>
-            <p class="text-gray-600">
-              Secure your future with our high-yield savings accounts.
-            </p>
+<!-- Features Section -->
+<div id="learn-more" class="py-24 sm:py-32">
+  <div class="mx-auto max-w-7xl px-6 lg:px-8">
+    <div class="mx-auto max-w-2xl text-center" data-aos="fade-up">
+      <h2 class="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
+        Why Choose UCU Credit Union?
+      </h2>
+      <p class="mt-6 text-lg leading-8 text-gray-600">
+        We offer comprehensive financial solutions designed to meet your unique
+        needs.
+      </p>
+    </div>
+    <div class="mx-auto mt-16 max-w-7xl">
+      <div class="grid grid-cols-1 gap-12 sm:grid-cols-2 lg:grid-cols-3">
+        <!-- Feature 1 -->
+        <div
+          class="relative p-8 bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all"
+          data-aos="fade-up"
+          data-aos-delay="100"
+        >
+          <div
+            class="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2"
+          >
+            <div class="rounded-full bg-primary-600 p-4">
+              <i class="fas fa-piggy-bank text-2xl text-white"></i>
+            </div>
           </div>
-          <div class="bg-white p-6 rounded-lg shadow-md">
-            <h3 class="text-xl font-semibold mb-4">Personal Loans</h3>
-            <p class="text-gray-600">
-              Get the financial support you need with our flexible loan options.
-            </p>
-          </div>
-          <div class="bg-white p-6 rounded-lg shadow-md">
-            <h3 class="text-xl font-semibold mb-4">Online Banking</h3>
-            <p class="text-gray-600">
-              Manage your finances anytime, anywhere with our secure online
-              platform.
+          <div class="mt-8 text-center">
+            <h3 class="text-xl font-semibold text-gray-900">
+              High-Yield Savings
+            </h3>
+            <p class="mt-4 text-gray-600">
+              Earn more with our competitive interest rates and flexible savings
+              options.
             </p>
           </div>
         </div>
-      </section>
-    </main>
 
-    <footer class="bg-gray-800 text-white py-8">
-      <div class="container mx-auto px-6 text-center">
-        <p>&copy; 2024 UCU_Unity_Can_Unite. All rights reserved.</p>
+        <!-- Feature 2 -->
+        <div
+          class="relative p-8 bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all"
+          data-aos="fade-up"
+          data-aos-delay="200"
+        >
+          <div
+            class="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2"
+          >
+            <div class="rounded-full bg-primary-600 p-4">
+              <i class="fas fa-mobile-alt text-2xl text-white"></i>
+            </div>
+          </div>
+          <div class="mt-8 text-center">
+            <h3 class="text-xl font-semibold text-gray-900">Digital</h3>
+            <p class="mt-4 text-gray-600">
+              Access anywhere, anytime with our secure online platform.
+            </p>
+          </div>
+        </div>
+
+        <!-- Feature 3 -->
+        <div
+          class="relative p-8 bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all"
+          data-aos="fade-up"
+          data-aos-delay="300"
+        >
+          <div
+            class="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2"
+          >
+            <div class="rounded-full bg-primary-600 p-4">
+              <i class="fas fa-hand-holding-usd text-2xl text-white"></i>
+            </div>
+          </div>
+          <div class="mt-8 text-center">
+            <h3 class="text-xl font-semibold text-gray-900">Personal Loans</h3>
+            <p class="mt-4 text-gray-600">
+              Get the financial support you need with competitive rates and
+              flexible terms.
+            </p>
+          </div>
+        </div>
       </div>
-    </footer>
-  </body>
-</html>
+    </div>
+  </div>
+</div>
+
+<!-- Services Section -->
+<div class="bg-primary-50 py-24 sm:py-32">
+  <div class="mx-auto max-w-7xl px-6 lg:px-8">
+    <div class="grid grid-cols-1 gap-16 lg:grid-cols-2">
+      <!-- Left Column -->
+      <div data-aos="fade-right">
+        <h2 class="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
+          Comprehensive Financial Services
+        </h2>
+        <p class="mt-6 text-lg leading-8 text-gray-600">
+          We offer a wide range of financial services to help you build a secure
+          future.
+        </p>
+        <div class="mt-10 space-y-8">
+          <div class="flex items-center gap-x-4">
+            <div
+              class="flex h-12 w-12 items-center justify-center rounded-full bg-primary-600"
+            >
+              <i class="fas fa-check text-white"></i>
+            </div>
+            <div>
+              <h3 class="text-lg font-semibold text-gray-900">
+                Checking Accounts
+              </h3>
+              <p class="mt-2 text-gray-600">
+                Free checking with no minimum balance requirements.
+              </p>
+            </div>
+          </div>
+          <div class="flex items-center gap-x-4">
+            <div
+              class="flex h-12 w-12 items-center justify-center rounded-full bg-primary-600"
+            >
+              <i class="fas fa-check text-white"></i>
+            </div>
+            <div>
+              <h3 class="text-lg font-semibold text-gray-900">
+                Investment Options
+              </h3>
+              <p class="mt-2 text-gray-600">
+                Grow your wealth with our investment solutions.
+              </p>
+            </div>
+          </div>
+          <div class="flex items-center gap-x-4">
+            <div
+              class="flex h-12 w-12 items-center justify-center rounded-full bg-primary-600"
+            >
+              <i class="fas fa-check text-white"></i>
+            </div>
+            <div>
+              <h3 class="text-lg font-semibold text-gray-900">Loans</h3>
+              <p class="mt-2 text-gray-600">
+                Make your dream a reality with our loan options.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Right Column -->
+      <div class="relative" data-aos="fade-left">
+        <div class="bg-white p-8 rounded-2xl shadow-lg">
+          <h3 class="text-2xl font-semibold text-gray-900 mb-6">
+            Ready to get started?
+          </h3>
+          <form
+            class="space-y-6"
+            action="{{ url_for('submit_contact') }}"
+            method="POST"
+          >
+            <div>
+              <label class="block text-sm font-medium text-gray-700"
+                >Full Name</label
+              >
+              <input
+                type="text"
+                name="full_name"
+                required
+                minlength="2"
+                class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:border-primary-500 focus:ring-primary-500"
+              />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700"
+                >Email</label
+              >
+              <input
+                type="email"
+                name="email"
+                required
+                class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:border-primary-500 focus:ring-primary-500"
+              />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700"
+                >Service Interest</label
+              >
+              <select
+                name="service_interest"
+                required
+                class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:border-primary-500 focus:ring-primary-500"
+              >
+                <option value="">Select a service</option>
+                <option value="savings">Savings Account</option>
+                <option value="personal_loan">Personal Loan</option>
+                <option value="mortgage">Mortgage</option>
+                <option value="investment">Investment</option>
+              </select>
+            </div>
+            <button
+              type="submit"
+              class="w-full bg-primary-600 text-white rounded-md px-4 py-2 hover:bg-primary-700 transition-colors"
+            >
+              Request Information
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Testimonials Section -->
+<div class="py-24 sm:py-32">
+  <div class="mx-auto max-w-7xl px-6 lg:px-8">
+    <div class="mx-auto max-w-2xl text-center" data-aos="fade-up">
+      <h2 class="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
+        What Our Members Say
+      </h2>
+      <p class="mt-6 text-lg leading-8 text-gray-600">
+        Don't just take our word for it. Here's what our valued members have to
+        say.
+      </p>
+    </div>
+    <div
+      class="mx-auto mt-16 grid max-w-7xl grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3"
+    >
+      <!-- Testimonial 1 -->
+      <div
+        class="flex flex-col bg-white p-8 rounded-2xl shadow-lg"
+        data-aos="fade-up"
+        data-aos-delay="100"
+      >
+        <div class="flex items-center gap-x-4 mb-4">
+          <div
+            class="h-12 w-12 rounded-full bg-primary-100 flex items-center justify-center"
+          >
+            <i class="fas fa-user text-primary-600"></i>
+          </div>
+          <div>
+            <h3 class="text-lg font-semibold text-gray-900">Sarah Johnson</h3>
+            <p class="text-gray-600">Savings Account Member</p>
+          </div>
+        </div>
+        <p class="text-gray-600 flex-grow">
+          "The high-yield savings account has helped me save more than ever
+          before. The customer service is exceptional!"
+        </p>
+        <div class="mt-4 flex text-primary-600">
+          <i class="fas fa-star"></i>
+          <i class="fas fa-star"></i>
+          <i class="fas fa-star"></i>
+          <i class="fas fa-star"></i>
+          <i class="fas fa-star"></i>
+        </div>
+      </div>
+
+      <!-- Testimonial 2 -->
+      <div
+        class="flex flex-col bg-white p-8 rounded-2xl shadow-lg"
+        data-aos="fade-up"
+        data-aos-delay="200"
+      >
+        <div class="flex items-center gap-x-4 mb-4">
+          <div
+            class="h-12 w-12 rounded-full bg-primary-100 flex items-center justify-center"
+          >
+            <i class="fas fa-user text-primary-600"></i>
+          </div>
+          <div>
+            <h3 class="text-lg font-semibold text-gray-900">Michael Chen</h3>
+            <p class="text-gray-600">Personal Loan Customer</p>
+          </div>
+        </div>
+        <p class="text-gray-600 flex-grow">
+          "Getting a personal loan was smooth and hassle-free. The rates were
+          competitive and the process was transparent."
+        </p>
+        <div class="mt-4 flex text-primary-600">
+          <i class="fas fa-star"></i>
+          <i class="fas fa-star"></i>
+          <i class="fas fa-star"></i>
+          <i class="fas fa-star"></i>
+          <i class="fas fa-star"></i>
+        </div>
+      </div>
+
+      <!-- Testimonial 3 -->
+      <div
+        class="flex flex-col bg-white p-8 rounded-2xl shadow-lg"
+        data-aos="fade-up"
+        data-aos-delay="300"
+      >
+        <div class="flex items-center gap-x-4 mb-4">
+          <div
+            class="h-12 w-12 rounded-full bg-primary-100 flex items-center justify-center"
+          >
+            <i class="fas fa-user text-primary-600"></i>
+          </div>
+          <div>
+            <h3 class="text-lg font-semibold text-gray-900">Emily Rodriguez</h3>
+            <p class="text-gray-600">Mobile Banking User</p>
+          </div>
+        </div>
+        <p class="text-gray-600 flex-grow">
+          "The mobile banking app is intuitive and makes managing my finances so
+          much easier. I love the security features!"
+        </p>
+        <div class="mt-4 flex text-primary-600">
+          <i class="fas fa-star"></i>
+          <i class="fas fa-star"></i>
+          <i class="fas fa-star"></i>
+          <i class="fas fa-star"></i>
+          <i class="fas fa-star"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- AOS Animation Script -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+<script>
+  AOS.init({
+    duration: 1000,
+    easing: "ease-out",
+    once: true,
+  });
+</script>
+{% endblock %}
