@@ -62,12 +62,13 @@ content %}
               >
                 Approve Loan
               </a>
-              <button
+              <a
+                href="{{ url_for('reject_loan', loan_id=loan.id) }}"
                 type="button"
                 class="inline-flex items-center px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-medium rounded-lg text-sm"
               >
                 Reject Loan
-              </button>
+              </a>
               {% endif %}
             </div>
           </div>

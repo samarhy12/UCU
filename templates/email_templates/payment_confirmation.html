@@ -11,7 +11,7 @@ Confirmation{% endblock %} {% block content %}
   <table class="details-table">
     <tr>
       <td>Payment Amount:</td>
-      <td class="amount">${{ "%.2f"|format(payment_amount) }}</td>
+      <td class="amount">GHS{{ "%.2f"|format(payment_amount) }}</td>
     </tr>
     <tr>
       <td>Payment Date:</td>
@@ -41,6 +41,6 @@ Confirmation{% endblock %} {% block content %}
     help.
   </p>
 
-  <p>Best regards,<br />UCU Credit Union Team</p>
+  <p>Best regards,<br />Unity Credit Union Team</p>
 </div>
 {% endblock %}

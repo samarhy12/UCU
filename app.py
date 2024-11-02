@@ -194,7 +194,7 @@ def load_user(user_id):
 def send_email(subject, recipient, template, **kwargs):
     msg = Message(
         subject,
-        sender=('UCU Credit Union', os.getenv('MAIL_USERNAME')),
+        sender=('Unity Credit Union', os.getenv('MAIL_USERNAME')),
         recipients=[recipient]
     )
     
@@ -270,7 +270,7 @@ def submit_contact():
         
         # Send confirmation email to user
         send_email(
-            subject='Thank you for contacting UCU Credit Union',
+            subject='Thank you for contacting Unity Credit Union',
             recipient=email,
             template='user_contact_confirmation',
             user_name=full_name,
@@ -468,7 +468,7 @@ def verify_user(user_id):
         db.session.commit()
         # Send email with new template
         send_email(
-            'Your UCU Credit Union Account Has Been Verified',
+            'Your Unity Credit Union Account Has Been Verified',
             user.email,
             'account_verified',
             user=user
