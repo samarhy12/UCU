@@ -34,6 +34,7 @@ app.config['MAIL_DEFAULT_SENDER'] = ('Raydex Hub', os.getenv('MAIL_USERNAME'))
 app.config['MAIL_DEBUG'] = True
 
 mail = Mail(app)
+application = app
 
 # Add this function to send emails
 def send_email(subject, recipient, body):
