@@ -392,6 +392,12 @@ def register():
                 # Save user to database
                 db.session.add(new_user)
                 db.session.commit()
+                send_email(
+                'Your Unity Credit Union Account Has Been Created Successfully',
+                email,
+                'account_created',
+                user=new_user
+                )
                 flash('Registration successful! Please log in.', 'success')
                 return redirect(url_for('login'))
             except Exception as e:

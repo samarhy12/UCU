@@ -1,0 +1,14 @@
+{% extends "email_templates/base_email.html" %} {% block title %}Account
+Created{% endblock %} {% block content %}
+<h2>Welcome to Unity Credit Union!</h2>
+<p>Dear {{ user.first_name }} {{ user.last_name }},</p>
+<p>
+  Your Unity Credit Union account has been created successfully. Please hold on
+  as the team verifies the details provided. You will be contacted once your
+  account is verified.
+</p>
+<p>Best regards,<br />Unity Credit Union Team</p>
+<br />
+<p>Your membership - Our Proud Concern</p>
+<a href="https://ucu.raydexhub.com/login" class="button">Log In Now</a>
+{% endblock %}
