@@ -10,6 +10,3 @@ htmlcov/
 docs/_build/
 .env
 .log
-instance
-.db
-credit_union.db
