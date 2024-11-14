@@ -23,7 +23,7 @@ Confirmation{% endblock %} {% block content %}
     </tr>
     <tr>
       <td>Remaining Balance:</td>
-      <td>${{ "%.2f"|format(loan.remaining_balance) }}</td>
+      <td>GHS{{ "%.2f"|format(loan.remaining_amount) }}</td>
     </tr>
   </table>
 

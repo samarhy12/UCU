@@ -9,7 +9,7 @@
         <tr>
           <th class="px-6 py-3 bg-gray-100 text-left">Member</th>
           <th class="px-6 py-3 bg-gray-100 text-left">Account Number</th>
-          <th class="px-6 py-3 bg-gray-100 text-right">Monthly Target</th>
+          <th class="px-6 py-3 bg-gray-100 text-right">Undo Action</th>
           <th class="px-6 py-3 bg-gray-100 text-right">Total Contributions</th>
           <th class="px-6 py-3 bg-gray-100 text-center">Actions</th>
         </tr>
@@ -22,9 +22,14 @@
           </td>
           <td class="px-6 py-4">{{ data.user.account_number }}</td>
           <td class="px-6 py-4 text-right">
-            {% if data.monthly_target %} GHS {{
-            "%.2f"|format(data.monthly_target.target_amount) }} {% else %} Not
-            set {% endif %}
+            <div class="flex justify-center space-x-4">
+              <!-- Set Monthly Target Button -->
+              <a
+                href="/admin/undo_monthly_contribution/{{data.user.id}}"
+                class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+              >
+                Undo
+              </a>
           </td>
           <td class="px-6 py-4 text-right">
             GHS {{ "%.2f"|format(data.total_contributions) }}

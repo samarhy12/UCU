@@ -1,0 +1,30 @@
+{% extends "base_email.html" %} {% block content %}
+<h2>Monthly Contribution Reversal Notification</h2>
+<p>Dear {{ user.first_name }},</p>
+
+<p>
+  We are reaching out to inform you that your recent monthly contribution of {{
+  amount }} for {{ month }} was recorded in error. This contribution has now
+  been reversed in our system.
+</p>
+
+<p>Here are the details of the reversed transaction:</p>
+<ul>
+  <li><strong>Amount:</strong> {{ amount }}</li>
+  <li><strong>Month:</strong> {{ month }}</li>
+  <li>
+    <strong>Reversal Date:</strong> {{ reversal_date.strftime('%Y-%m-%d
+    %H:%M:%S') }}
+  </li>
+</ul>
+
+<p>
+  We apologize for any inconvenience this may have caused. If you have any
+  questions or concerns, please do not hesitate to contact us.
+</p>
+
+<p>
+  Best regards,<br />
+  The Raydex Hub Team
+</p>
+{% endblock %}

@@ -8,6 +8,14 @@ content %}
       "modal-fullname"
     ).innerText = `${user.first_name} ${user.last_name}`;
     document.getElementById("modal-national-id").innerText = user.national_id;
+    // Set passport photo in modal if it exists
+    const modalPhoto = document.getElementById("modal-passport-photo");
+    if (user.passport_photo) {
+      modalPhoto.src = user.passport_photo;
+      modalPhoto.classList.remove("hidden");
+    } else {
+      modalPhoto.classList.add("hidden");
+    }
     document.getElementById("modal").classList.remove("hidden");
   }
 
@@ -23,7 +31,8 @@ content %}
     <table class="min-w-full">
       <thead>
         <tr class="bg-gray-200 text-gray-600">
-          <th class="px-4 py-2 text-left">other_names</th>
+          <th class="px-4 py-2 text-left">Photo</th>
+          <th class="px-4 py-2 text-left">Other Names</th>
           <th class="px-4 py-2 text-left">Email</th>
           <th class="px-4 py-2 text-left">Full Name</th>
           <th class="px-4 py-2 text-left">National ID</th>
@@ -33,6 +42,21 @@ content %}
       <tbody>
         {% for user in users %}
         <tr class="border-b">
+          <td class="px-4 py-2">
+            {% if user.passport_photo %}
+            <img
+              src="{{ user.passport_photo }}"
+              alt="Passport photo"
+              class="w-16 h-16 object-cover rounded-full"
+            />
+            {% else %}
+            <div
+              class="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center"
+            >
+              <span class="text-gray-500">No photo</span>
+            </div>
+            {% endif %}
+          </td>
           <td class="px-4 py-2">{{ user.other_names }}</td>
           <td class="px-4 py-2">{{ user.email }}</td>
           <td class="px-4 py-2">{{ user.first_name }} {{ user.last_name }}</td>
@@ -87,10 +111,26 @@ content %}
 >
   <div class="bg-white rounded-lg shadow-lg p-6 w-1/2">
     <h2 class="text-xl font-bold mb-4">User Details</h2>
-    <p><strong>other_names:</strong> <span id="modal-other_names"></span></p>
-    <p><strong>Email:</strong> <span id="modal-email"></span></p>
-    <p><strong>Full Name:</strong> <span id="modal-fullname"></span></p>
-    <p><strong>National ID:</strong> <span id="modal-national-id"></span></p>
+    <div class="flex items-start space-x-6">
+      <div class="flex-shrink-0">
+        <img
+          id="modal-passport-photo"
+          src=""
+          alt="Passport photo"
+          class="w-32 h-32 object-cover rounded-lg hidden"
+        />
+      </div>
+      <div class="flex-grow">
+        <p>
+          <strong>Other Names:</strong> <span id="modal-other_names"></span>
+        </p>
+        <p><strong>Email:</strong> <span id="modal-email"></span></p>
+        <p><strong>Full Name:</strong> <span id="modal-fullname"></span></p>
+        <p>
+          <strong>National ID:</strong> <span id="modal-national-id"></span>
+        </p>
+      </div>
+    </div>
     <div class="flex justify-end mt-4">
       <button
         onclick="closeModal()"
@@ -101,5 +141,4 @@ content %}
     </div>
   </div>
 </div>
-
 {% endblock %}

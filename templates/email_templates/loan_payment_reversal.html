@@ -1,0 +1,29 @@
+{% extends "base_email.html" %} {% block content %}
+<h2>Loan Payment Reversal Notification</h2>
+<p>Dear {{ user.first_name }},</p>
+
+<p>
+  We wanted to inform you that a loan payment of {{ payment_amount }} was
+  recorded by mistake. This payment has now been reversed in our system.
+</p>
+
+<p>Here are the details of the reversed transaction:</p>
+<ul>
+  <li><strong>Payment Amount:</strong> {{ payment_amount }}</li>
+  <li><strong>Loan ID:</strong> {{ loan.id }}</li>
+  <li>
+    <strong>Reversal Date:</strong> {{ reversal_date.strftime('%Y-%m-%d
+    %H:%M:%S') }}
+  </li>
+</ul>
+
+<p>
+  We apologize for any confusion or inconvenience caused by this error. If you
+  have further questions, please reach out to us.
+</p>
+
+<p>
+  Thank you for your understanding.<br />
+  The Raydex Hub Team
+</p>
+{% endblock %}
