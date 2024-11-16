@@ -16,6 +16,7 @@
       enctype="multipart/form-data"
       class="space-y-6"
       id="loanForm"
+      action="{{ url_for('guest_loan_application')}}"
     >
       <!-- Main content -->
       <div class="bg-white shadow sm:rounded-lg overflow-hidden">
@@ -401,7 +402,7 @@
   </div>
 </div>
 
-<script>
+<!-- <script>
   document
     .getElementById("loanForm")
     .addEventListener("submit", function (event) {
@@ -505,36 +506,8 @@
         const originalText = submitButton.textContent;
         submitButton.disabled = true;
         submitButton.textContent = "Submitting...";
-
         // Here you would typically send the form data to your server
         // For demonstration, we'll use a setTimeout to simulate an API call
-        setTimeout(() => {
-          // Reset button state
-          submitButton.disabled = false;
-          submitButton.textContent = originalText;
-
-          // Show success message
-          const successMessage = document.createElement("div");
-          successMessage.className =
-            "fixed top-4 right-4 bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded shadow-lg";
-          successMessage.innerHTML = `
-            <div class="flex items-center">
-              <svg class="w-6 h-6 mr-2 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-              </svg>
-              <span>Application submitted successfully!</span>
-            </div>
-          `;
-          document.body.appendChild(successMessage);
-
-          // Remove success message after 3 seconds
-          setTimeout(() => {
-            successMessage.remove();
-          }, 3000);
-
-          // Reset form
-          this.reset();
-        }, 1500);
       }
     });
 
@@ -548,5 +521,5 @@
       }
     });
   });
-</script>
+</script> -->
 {% endblock %}

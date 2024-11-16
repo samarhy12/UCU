@@ -23,13 +23,14 @@
           <td class="px-6 py-4">{{ data.user.account_number }}</td>
           <td class="px-6 py-4 text-right">
             <div class="flex justify-center space-x-4">
-              <!-- Set Monthly Target Button -->
               <a
-                href="/admin/undo_monthly_contribution/{{data.user.id}}"
+                href="#"
                 class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+                onclick="showUndoModal('{{ data.user.id }}')"
               >
                 Undo
               </a>
+            </div>
           </td>
           <td class="px-6 py-4 text-right">
             GHS {{ "%.2f"|format(data.total_contributions) }}
@@ -54,6 +55,80 @@
             </div>
           </td>
         </tr>
+
+        <!-- Modal for Undoing Monthly Contribution -->
+        <div
+          class="fixed z-10 inset-0 overflow-y-auto hidden"
+          id="undo-modal-{{ data.user.id }}"
+          aria-labelledby="modal-title"
+          role="dialog"
+          aria-modal="true"
+        >
+          <div
+            class="flex items-center justify-center min-h-screen px-4 pb-20 text-center sm:block sm:p-0"
+          >
+            <div
+              class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"
+              aria-hidden="true"
+            ></div>
+
+            <div
+              class="inline-block align-middle bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full"
+            >
+              <div class="bg-white px-6 py-4">
+                <h3 class="text-lg font-medium text-gray-900" id="modal-title">
+                  Undo Monthly Contribution
+                </h3>
+                <form
+                  method="post"
+                  class="mt-4"
+                  action="{{ url_for('undo_monthly_contribution') }}"
+                >
+                  <input
+                    type="hidden"
+                    name="user_id"
+                    value="{{ data.user.id }}"
+                  />
+                  <div class="mb-4">
+                    <label
+                      class="block text-gray-700 font-bold mb-2"
+                      for="contribution"
+                    >
+                      Choose a contribution to undo:
+                    </label>
+                    <select
+                      name="contribution_id"
+                      class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                    >
+                      {% for contribution in data.user.contributions %}
+                      <option value="{{ contribution.id }}">
+                        {{ contribution.user.first_name }} {{
+                        contribution.user.last_name }} - {{ contribution.month
+                        }} ({{ contribution.amount }})
+                      </option>
+                      {% endfor %}
+                    </select>
+                  </div>
+                  <div class="flex justify-end space-x-4">
+                    <button
+                      type="button"
+                      class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                      onclick="hideUndoModal('{{ data.user.id }}')"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                    >
+                      Undo Contribution
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
         {% endfor %}
       </tbody>
     </table>
@@ -168,6 +243,16 @@
 
   function hideContributionModal() {
     document.getElementById("contributionModal").classList.add("hidden");
+  }
+
+  function showUndoModal(userId) {
+    const modal = document.getElementById(`undo-modal-${userId}`);
+    modal.classList.remove("hidden");
+  }
+
+  function hideUndoModal(userId) {
+    const modal = document.getElementById(`undo-modal-${userId}`);
+    modal.classList.add("hidden");
   }
 </script>
 {% endblock %}

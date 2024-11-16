@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, flash, send_file, abort, Blueprint
+from flask import Flask, render_template, request, redirect, url_for, flash, send_file, abort, jsonify, current_app
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import case
 from flask_migrate import Migrate
@@ -13,6 +13,7 @@ from dotenv import load_dotenv
 import re
 from functools import wraps
 from itsdangerous import URLSafeTimedSerializer
+from sqlalchemy import func
 
 load_dotenv()
 app = Flask(__name__)
@@ -849,7 +850,6 @@ def manage_contributions():
             'monthly_contribution': monthly_contribution,
             'total_contributions': total_contributions
         })
-    
     return render_template('admin_manage_contributions.html', 
                          user_data=user_data,
                          current_month=current_month)
@@ -988,38 +988,42 @@ def process_payment(loan_id):
     
     return redirect(url_for('admin_loan_requests'))
 
-@app.route('/admin/undo_monthly_contribution/<int:contribution_id>', methods=['POST','GET'])
+@app.route('/admin/undo_monthly_contribution', methods=['GET', 'POST'])
 @login_required
 @admin_required
-def undo_monthly_contribution(contribution_id):
-    if not current_user.is_admin:
-        flash('You do not have permission to perform this action.', 'error')
-        return redirect(url_for('dashboard'))
-
-    contribution = Contribution.query.get_or_404(contribution_id)
-    user = contribution.user
-
-    try:
-        db.session.delete(contribution)
-        db.session.commit()
-        flash(f'Monthly contribution for {user.first_name} {user.last_name} has been undone.', 'success')
-
-        send_email(
-            'Monthly Contribution Reversal',
-            user.email,
-            'contribution_reversal',
-            user=user,
-            amount=contribution.amount,
-            month=contribution.month
-        )
-
-    except Exception as e:
-        db.session.rollback()
-        flash('An error occurred while undoing the contribution.', 'error')
-        app.logger.error(f'Error undoing monthly contribution: {e}')
-
-    return redirect(url_for('manage_contributions'))
-
+def undo_monthly_contribution():
+    if request.method == 'POST':
+        contribution_id = request.form.get('contribution_id')
+        contribution = Contribution.query.get(contribution_id)
+        
+        if not contribution:
+            flash('The specified contribution does not exist.', 'error')
+            return redirect(url_for('manage_contributions'))
+        
+        user = contribution.user
+        
+        try:
+            db.session.delete(contribution)
+            db.session.commit()
+            flash(f'Monthly contribution for {user.first_name} {user.last_name} in {contribution.month} has been undone.', 'success')
+            
+            send_email(
+                'Monthly Contribution Reversal',
+                user.email,
+                'monthly_contribution_reversal.html',
+                user=user,
+                amount=contribution.amount,
+                month=contribution.month
+            )
+        except Exception as e:
+            db.session.rollback()
+            flash('An error occurred while undoing the contribution.', 'error')
+            app.logger.error(f'Error undoing monthly contribution: {e}')
+        
+        return redirect(url_for('manage_contributions'))
+    
+    contributions = Contribution.query.all()
+    return render_template('admin/undo_contribution_modal.html', contributions=contributions)
 
 @app.route('/admin/undo_loan_payment/<int:loan_id>', methods=['POST', 'GET'])
 @login_required
@@ -1159,24 +1163,24 @@ def guest_loan_application():
                 db.session.commit()
 
                 # Send notification emails
-                send_email(
-                    'Non-Member Loan Application Received',
-                    user.email,
-                    'guest_loan_application',
-                    user=user,
-                    loan=loan
-                )
+                # send_email(
+                #     'Non-Member Loan Application Received',
+                #     user.email,
+                #     'guest_loan_application',
+                #     user=user,
+                #     loan=loan
+                # )
 
-                # Notify admin
-                admin_users = User.query.filter_by(is_admin=True).all()
-                for admin in admin_users:
-                    send_email(
-                        'New Non-Member Loan Application',
-                        admin.email,
-                        'admin_guest_loan_notification',
-                        user=user,
-                        loan=loan
-                    )
+                # # Notify admin
+                # admin_users = User.query.filter_by(is_admin=True).all()
+                # for admin in admin_users:
+                #     send_email(
+                #         'New Non-Member Loan Application',
+                #         admin.email,
+                #         'admin_guest_loan_notification',
+                #         user=user,
+                #         loan=loan
+                #     )
 
                 flash('Your loan application has been submitted successfully! We will contact you via email.', 'success')
                 return redirect(url_for('home'))
@@ -1242,7 +1246,7 @@ def admin_loan_requests():
         Loan.application_date.desc()
     ).all()
     print(len(loans))
-    
+    print(loans)
     return render_template('admin_loan_requests.html', loans=loans)
 
 @app.route('/admin/reject_loan/<int:loan_id>', methods=['GET'])
@@ -1297,6 +1301,130 @@ def approve_loan(loan_id):
     
     return redirect(url_for('admin_loan_requests'))
 
+@app.route('/admin/users')
+@login_required
+@admin_required
+def manage_users():
+    users = User.query.all()
+    return render_template('admin_users_list.html', users=users)
+
+@app.route('/admin/users/<int:user_id>')
+@login_required
+@admin_required
+def view_user(user_id):
+    user = User.query.get_or_404(user_id)
+    
+    # Get total contributions
+    total_contributions = db.session.query(
+        func.sum(Contribution.amount)
+    ).filter(Contribution.user_id == user_id).scalar() or 0
+    
+    # Get active loan
+    active_loan = Loan.get_active_loan(user_id)
+    
+    return render_template('admin_user_detail.html',
+                         user=user,
+                         total_contributions=total_contributions,
+                         active_loan=active_loan)
+
+@app.route('/admin/users/<int:user_id>/toggle-status', methods=['POST'])
+@login_required
+@admin_required
+def toggle_user_status(user_id):
+    user = User.query.get_or_404(user_id)
+    
+    if user.is_admin:
+        return jsonify({'success': False, 'message': 'Cannot modify admin status'}), 400
+    
+    user.is_verified = not user.is_verified
+    db.session.commit()
+    
+    return jsonify({'success': True})
+
+@app.route('/admin/users/<int:user_id>/delete', methods=['DELETE'])
+@login_required
+@admin_required
+def delete_user(user_id):
+    user = User.query.get_or_404(user_id)
+    
+    if user.is_admin:
+        return jsonify({'success': False, 'message': 'Cannot delete admin user'}), 400
+    
+    # Check if user has active loans
+    active_loan = Loan.get_active_loan(user_id)
+    if active_loan:
+        return jsonify({
+            'success': False,
+            'message': 'Cannot delete user with active loans'
+        }), 400
+    
+    # Delete user's contributions
+    Contribution.query.filter_by(user_id=user_id).delete()
+    
+    # Delete user's loans
+    Loan.query.filter(
+        (Loan.user_id == user_id) | (Loan.guarantor_id == user_id)
+    ).delete()
+    
+    # Delete the user
+    db.session.delete(user)
+    db.session.commit()
+    
+    return jsonify({'success': True})
+
+from werkzeug.utils import secure_filename
+from flask import abort, current_app, flash, redirect, url_for, send_file
+import os
+
+@app.route('/admin/users/<int:user_id>/document/<doc_type>')
+@login_required
+def view_document(user_id, doc_type):
+    if current_user.id != user_id and not current_user.is_admin:
+        abort(403)
+
+    user = User.query.get_or_404(user_id)
+
+    try:
+        if doc_type == 'national_id':
+            filename = user.national_id_file
+        elif doc_type == 'passport':
+            filename = user.passport_photo
+        else:
+            abort(404)
+
+        if not filename:
+            flash(f"No {doc_type.replace('_', ' ')} uploaded", 'error')
+            return redirect(url_for('view_user', user_id=user_id))
+
+        # Construct file path
+        file_path = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
+        file_path = os.path.normpath(file_path)
+
+        # Debug logs
+        current_app.logger.info(f"Attempting to serve file: {file_path}")
+        if not os.path.exists(file_path):
+            current_app.logger.error(f"File not found: {file_path}")
+            abort(404)
+
+        return send_file(file_path)
+
+    except Exception as e:
+        current_app.logger.error(f"Error serving file: {e}")
+        abort(500)
+
+    return redirect(url_for('view_user', user_id=user_id))
+
+# Custom template filters
+@app.template_filter('formatdate')
+def format_date(value):
+    if isinstance(value, datetime):
+        return value.strftime('%B %d, %Y')
+    return value
+
+@app.template_filter('format_currency')
+def format_currency(value):
+    return f"GHS {value:,.2f}"
+
 
 if __name__ == '__main__':
-    app.run(debug=False)
+    app.run(debug=True)
