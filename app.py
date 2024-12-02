@@ -1063,7 +1063,6 @@ def undo_loan_payment(loan_id):
 def guest_loan_application():
     if request.method == 'POST':
         try:
-            # Get form data
             email = request.form.get('email')
             first_name = request.form.get('first_name')
             last_name = request.form.get('last_name')
@@ -1082,8 +1081,33 @@ def guest_loan_application():
             purpose = request.form.get('purpose')
             income = float(request.form.get('income'))
             term = int(request.form.get('term'))
+            # New fields for guarantor
+            guarantor_fullname = request.form.get('guarantor_fullname')
+            guarantor_account_number = request.form.get('guarantor_account_number')
+            guarantor_phone = request.form.get('guarantor_phone')
 
-            # Validate required fields
+            # Validate guarantor information
+            if not all([guarantor_fullname, guarantor_account_number, guarantor_phone]):
+                flash('Please provide complete guarantor information.', 'error')
+                return redirect(url_for('guest_loan_application'))
+
+            # Find guarantor by account number
+            guarantor = User.query.filter_by(
+                account_number=guarantor_account_number, 
+                is_verified=True
+            ).first()
+
+            # Validate guarantor exists and matches details
+            if not guarantor:
+                flash('Guarantor not found or is not an active member.', 'error')
+                return redirect(url_for('guest_loan_application'))
+
+            # Additional validation: Check if guarantor details match
+            full_name = f"{guarantor.first_name} {guarantor.last_name}"
+            if (guarantor.phone_number != guarantor_phone):
+                flash('Guarantor details do not match our records.', 'error')
+                return redirect(url_for('guest_loan_application'))
+
             if not all([email, first_name, last_name, national_id, date_of_birth_str]):
                 flash('Please fill in all required fields.', 'error')
                 return redirect(url_for('guest_loan_application'))
@@ -1142,45 +1166,26 @@ def guest_loan_application():
             if national_id_file:
                 user.national_id_file = national_id_file
 
-            # Create loan application
+            # When creating the loan, use the found guarantor's ID
             loan = Loan(
                 amount=amount,
                 purpose=purpose,
                 term=term,
                 income=income,
-                status='pending'
+                status='pending',
+                guarantor_id=guarantor.id  # Use the validated guarantor's ID
             )
 
+            # Rest of the existing code remains the same
             try:
                 if not existing_user:
                     db.session.add(user)
                     db.session.flush()  # Get user ID without committing
                 
                 loan.user_id = user.id
-                loan.guarantor_id = User.query.filter_by(is_admin=True).first().id  # Assign admin as guarantor
                 
                 db.session.add(loan)
                 db.session.commit()
-
-                # Send notification emails
-                # send_email(
-                #     'Non-Member Loan Application Received',
-                #     user.email,
-                #     'guest_loan_application',
-                #     user=user,
-                #     loan=loan
-                # )
-
-                # # Notify admin
-                # admin_users = User.query.filter_by(is_admin=True).all()
-                # for admin in admin_users:
-                #     send_email(
-                #         'New Non-Member Loan Application',
-                #         admin.email,
-                #         'admin_guest_loan_notification',
-                #         user=user,
-                #         loan=loan
-                #     )
 
                 flash('Your loan application has been submitted successfully! We will contact you via email.', 'success')
                 return redirect(url_for('home'))
@@ -1229,6 +1234,76 @@ def admin_dashboard():
                            pending_verifications=pending_verifications, 
                            pending_loans=pending_loans, 
                            recent_activities=recent_activities)
+
+@app.route('/admin/special')
+@login_required
+def admin_special():
+    # Check admin permissions
+    if not current_user.is_admin:
+        flash('You do not have permission to access this page.', 'error')
+        return redirect(url_for('home'))
+
+    # Financial Aggregates
+    total_contributions = db.session.query(
+        func.coalesce(func.sum(Contribution.amount), 0)
+    ).scalar()
+
+    # Total loans
+    total_loans_amount = db.session.query(
+        func.coalesce(func.sum(Loan.amount), 0)
+    ).scalar()
+
+    total_loans_paid = db.session.query(
+        func.coalesce(func.sum(Loan.amount_paid), 0)
+    ).scalar()
+
+    # Loan statistics
+    loan_stats = {
+        'pending_loans': Loan.query.filter_by(status='pending').count(),
+        'approved_loans': Loan.query.filter_by(status='approved').count(),
+        'rejected_loans': Loan.query.filter_by(status='rejected').count(),
+        'paid_loans': Loan.query.filter_by(status='paid').count()
+    }
+
+    # Member statistics
+    member_stats = {
+        'total_members': User.query.filter_by(is_guest=False).count(),
+        'verified_members': User.query.filter_by(is_verified=True, is_guest=False).count(),
+        'guest_users': User.query.filter_by(is_guest=True).count()
+    }
+
+    # Monthly contribution trends (SQLite-compatible version)
+    monthly_contributions = db.session.query(
+        func.strftime('%Y-%m-01', Contribution.date).label('month'),
+        func.sum(Contribution.amount).label('total_amount')
+    ).group_by(func.strftime('%Y-%m-01', Contribution.date)).order_by('month').all()
+
+    # Recent loan applications
+    recent_loans = Loan.query.order_by(Loan.application_date.desc()).limit(10).all()
+
+    # Financial health indicators
+    total_active_loans = db.session.query(
+        func.coalesce(func.sum(Loan.remaining_amount), 0)
+    ).filter(Loan.status == 'approved').scalar()
+
+    financial_health = {
+        'total_contributions': total_contributions,
+        'total_loans_amount': total_loans_amount,
+        'total_loans_paid': total_loans_paid,
+        'active_loan_balance': total_active_loans,
+        'net_position': total_contributions - total_active_loans
+    }
+
+    return render_template(
+        'admin_special.html',
+        total_contributions=total_contributions,
+        total_loans_amount=total_loans_amount,
+        loan_stats=loan_stats,
+        member_stats=member_stats,
+        monthly_contributions=monthly_contributions,
+        recent_loans=recent_loans,
+        financial_health=financial_health
+    )
 
 @app.route('/admin/loan_requests')
 @login_required
@@ -1414,6 +1489,10 @@ def view_document(user_id, doc_type):
 
     return redirect(url_for('view_user', user_id=user_id))
 
+@app.route('/about_us')
+def about_us():
+    return render_template('about_us.html')
+
 # Custom template filters
 @app.template_filter('formatdate')
 def format_date(value):
@@ -1427,4 +1506,4 @@ def format_currency(value):
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=False)

@@ -1,0 +1,232 @@
+{% extends "base.html" %} {% block title %}About Us - UCU Credit Union{%
+endblock %} {% block content %}
+<!-- Hero Section -->
+<div class="relative overflow-hidden bg-primary-600 py-24 sm:py-32">
+  <div class="mx-auto max-w-7xl px-6 lg:px-8">
+    <div class="mx-auto max-w-2xl text-center" data-aos="fade-up">
+      <h1 class="text-4xl font-bold tracking-tight text-white sm:text-6xl">
+        About Unity Credit Union
+      </h1>
+      <p class="mt-6 text-lg leading-8 text-primary-100">
+        Empowering our community through innovative financial solutions and
+        personalized service.
+      </p>
+    </div>
+  </div>
+</div>
+
+<!-- Mission Section -->
+<div class="py-24 sm:py-32">
+  <div class="mx-auto max-w-7xl px-6 lg:px-8">
+    <div class="mx-auto max-w-3xl text-center" data-aos="fade-up">
+      <h2 class="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
+        Our Mission
+      </h2>
+      <p class="mt-6 text-lg leading-8 text-gray-600">
+        At Unity Credit Union (UCU), we are committed to empowering our
+        community through innovative financial solutions and personalized
+        service. Our goal is to help every member achieve their financial dreams
+        with integrity, transparency, and compassion.
+      </p>
+    </div>
+  </div>
+</div>
+
+<!-- Leadership Team Section -->
+<div class="bg-primary-50 py-24 sm:py-32">
+  <div class="mx-auto max-w-7xl px-6 lg:px-8">
+    <div class="mx-auto max-w-2xl text-center" data-aos="fade-up">
+      <h2 class="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
+        Our Leadership Team
+      </h2>
+      <p class="mt-6 text-lg leading-8 text-gray-600">
+        Meet the dedicated professionals driving UCU's vision and success.
+      </p>
+    </div>
+    <div
+      class="mx-auto mt-16 grid max-w-7xl grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4"
+    >
+      <!-- Executive 1 -->
+      <div
+        class="flex flex-col items-center bg-white p-8 rounded-2xl shadow-lg"
+        data-aos="fade-up"
+        data-aos-delay="100"
+      >
+        <div class="h-32 w-32 rounded-full mb-6 overflow-hidden">
+          <img
+            src="{{ url_for('static', filename='images/emma.jpg') }}"
+            alt="Agyare Emmanuel"
+            class="h-full w-full object-cover"
+          />
+        </div>
+        <h3 class="text-xl font-semibold text-gray-900">Mr.Agyare Emmanuel</h3>
+        <p class="text-gray-600 mb-4">Chairman</p>
+        <p class="text-center text-gray-600 text-sm">
+          Strategic leader with 20+ years of financial services experience,
+          driving UCU's innovative vision.
+        </p>
+      </div>
+
+      <!-- Executive 2 -->
+      <div
+        class="flex flex-col items-center bg-white p-8 rounded-2xl shadow-lg"
+        data-aos="fade-up"
+        data-aos-delay="200"
+      >
+        <div class="h-32 w-32 rounded-full mb-6 overflow-hidden">
+          <img
+            src="{{ url_for('static', filename='images/theresa.jpg') }}"
+            alt="Theresa Oppong"
+            class="h-full w-full object-cover"
+          />
+        </div>
+        <h3 class="text-xl font-semibold text-gray-900">Mrs.Theresa Oppong</h3>
+        <p class="text-gray-600 mb-4">Secretary</p>
+        <p class="text-center text-gray-600 text-sm">
+          Organizational expert ensuring smooth operations and member
+          communication.
+        </p>
+      </div>
+
+      <!-- Executive 3 -->
+      <div
+        class="flex flex-col items-center bg-white p-8 rounded-2xl shadow-lg"
+        data-aos="fade-up"
+        data-aos-delay="300"
+      >
+        <div class="h-32 w-32 rounded-full mb-6 overflow-hidden">
+          <img
+            src="{{ url_for('static', filename='images/patricia.jpg') }}"
+            alt="Patricia Konadu"
+            class="h-full w-full object-cover"
+          />
+        </div>
+        <h3 class="text-xl font-semibold text-gray-900">Mrs.Patricia Konadu</h3>
+        <p class="text-gray-600 mb-4">Loan/Credit Officer</p>
+        <p class="text-center text-gray-600 text-sm">
+          Dedicated to fair, transparent lending with a focus on member
+          financial well-being.
+        </p>
+      </div>
+
+      <!-- Executive 4 -->
+      <div
+        class="flex flex-col items-center bg-white p-8 rounded-2xl shadow-lg"
+        data-aos="fade-up"
+        data-aos-delay="300"
+      >
+        <div class="h-32 w-32 rounded-full mb-6 overflow-hidden">
+          <img
+            src="{{ url_for('static', filename='images/felix.jpg') }}"
+            alt="Patricia Konadu"
+            class="h-full w-full object-cover"
+          />
+        </div>
+        <h3 class="text-xl font-semibold text-gray-900">Mr.Felix Boakye</h3>
+        <p class="text-gray-600 mb-4">Finance director</p>
+        <p class="text-center text-gray-600 text-sm">
+          Seasoned financial expert ensuring fiscal stability and strategic
+          financial planning for UCU.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Values Section -->
+<div class="py-24 sm:py-32">
+  <div class="mx-auto max-w-7xl px-6 lg:px-8">
+    <div class="mx-auto max-w-2xl text-center" data-aos="fade-up">
+      <h2 class="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
+        Our Core Values
+      </h2>
+      <p class="mt-6 text-lg leading-8 text-gray-600">
+        The principles that guide everything we do at Unity Credit Union.
+      </p>
+    </div>
+    <div class="mx-auto mt-16 max-w-7xl">
+      <div class="grid grid-cols-1 gap-12 sm:grid-cols-2 lg:grid-cols-4">
+        <div class="text-center" data-aos="fade-up" data-aos-delay="100">
+          <div
+            class="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-primary-100"
+          >
+            <i class="fas fa-users text-3xl text-primary-600"></i>
+          </div>
+          <h3 class="mt-6 text-xl font-semibold text-gray-900">
+            Community-First
+          </h3>
+          <p class="mt-4 text-gray-600">
+            We prioritize the financial well-being of our members above all
+            else.
+          </p>
+        </div>
+        <div class="text-center" data-aos="fade-up" data-aos-delay="200">
+          <div
+            class="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-primary-100"
+          >
+            <i class="fas fa-shield-alt text-3xl text-primary-600"></i>
+          </div>
+          <h3 class="mt-6 text-xl font-semibold text-gray-900">Transparency</h3>
+          <p class="mt-4 text-gray-600">
+            Clear, honest communication is at the heart of everything we do.
+          </p>
+        </div>
+        <div class="text-center" data-aos="fade-up" data-aos-delay="300">
+          <div
+            class="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-primary-100"
+          >
+            <i class="fas fa-lightbulb text-3xl text-primary-600"></i>
+          </div>
+          <h3 class="mt-6 text-xl font-semibold text-gray-900">Innovation</h3>
+          <p class="mt-4 text-gray-600">
+            We continuously seek new ways to improve our services.
+          </p>
+        </div>
+        <div class="text-center" data-aos="fade-up" data-aos-delay="400">
+          <div
+            class="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-primary-100"
+          >
+            <i class="fas fa-globe text-3xl text-primary-600"></i>
+          </div>
+          <h3 class="mt-6 text-xl font-semibold text-gray-900">Inclusivity</h3>
+          <p class="mt-4 text-gray-600">
+            Financial services accessible to everyone, regardless of background.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Contact Section -->
+<div class="bg-primary-600 py-24 sm:py-32">
+  <div class="mx-auto max-w-7xl px-6 lg:px-8">
+    <div class="mx-auto max-w-2xl text-center" data-aos="fade-up">
+      <h2 class="text-3xl font-bold tracking-tight text-white sm:text-4xl">
+        Get In Touch
+      </h2>
+      <p class="mt-6 text-lg leading-8 text-primary-100">
+        We're always here to help. Reach out to learn more about our services.
+      </p>
+      <div class="mt-10 flex items-center justify-center gap-x-6">
+        <a
+          href="https://wa.me/233247767438"
+          class="rounded-md bg-white px-6 py-3 text-lg font-semibold text-primary-600 shadow-sm hover:bg-primary-50"
+        >
+          Send us a message
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- AOS Animation Script -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+<script>
+  AOS.init({
+    duration: 1000,
+    easing: "ease-out",
+    once: true,
+  });
+</script>
+{% endblock %}

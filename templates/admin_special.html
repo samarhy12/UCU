@@ -1,0 +1,147 @@
+{% extends "base.html" %} {% block content %}
+<div class="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
+  <div class="max-w-7xl mx-auto">
+    <h1 class="text-3xl font-bold text-gray-900 mb-8">Admin Dashboard</h1>
+
+    <!-- Financial Overview Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+      <!-- Total Contributions Card -->
+      <div class="bg-white shadow rounded-lg p-6">
+        <h2 class="text-lg font-semibold text-gray-800 mb-4">
+          Total Contributions
+        </h2>
+        <div class="text-3xl font-bold text-green-600">
+          GHS {{ "{:,.2f}".format(total_contributions) }}
+        </div>
+      </div>
+
+      <!-- Total Loans Card -->
+      <div class="bg-white shadow rounded-lg p-6">
+        <h2 class="text-lg font-semibold text-gray-800 mb-4">
+          Total Loans Issued
+        </h2>
+        <div class="text-3xl font-bold text-blue-600">
+          GHS {{ "{:,.2f}".format(total_loans_amount) }}
+        </div>
+      </div>
+
+      <!-- Financial Health Card -->
+      <div class="bg-white shadow rounded-lg p-6">
+        <h2 class="text-lg font-semibold text-gray-800 mb-4">
+          Net Financial Position
+        </h2>
+        <div
+          class="text-3xl font-bold {{ 'text-green-600' if financial_health.net_position > 0 else 'text-red-600' }}"
+        >
+          GHS {{ "{:,.2f}".format(financial_health.net_position) }}
+        </div>
+      </div>
+    </div>
+
+    <!-- Detailed Statistics -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <!-- Loan Statistics -->
+      <div class="bg-white shadow rounded-lg p-6">
+        <h2 class="text-xl font-semibold text-gray-900 mb-4">
+          Loan Statistics
+        </h2>
+        <div class="space-y-3">
+          <div class="flex justify-between">
+            <span>Pending Loans</span>
+            <span class="font-bold text-yellow-600"
+              >{{ loan_stats.pending_loans }}</span
+            >
+          </div>
+          <div class="flex justify-between">
+            <span>Approved Loans</span>
+            <span class="font-bold text-green-600"
+              >{{ loan_stats.approved_loans }}</span
+            >
+          </div>
+          <div class="flex justify-between">
+            <span>Rejected Loans</span>
+            <span class="font-bold text-red-600"
+              >{{ loan_stats.rejected_loans }}</span
+            >
+          </div>
+          <div class="flex justify-between">
+            <span>Paid Loans</span>
+            <span class="font-bold text-blue-600"
+              >{{ loan_stats.paid_loans }}</span
+            >
+          </div>
+        </div>
+      </div>
+
+      <!-- Member Statistics -->
+      <div class="bg-white shadow rounded-lg p-6">
+        <h2 class="text-xl font-semibold text-gray-900 mb-4">
+          Member Statistics
+        </h2>
+        <div class="space-y-3">
+          <div class="flex justify-between">
+            <span>Total Members</span>
+            <span class="font-bold">{{ member_stats.total_members }}</span>
+          </div>
+          <div class="flex justify-between">
+            <span>Verified Members</span>
+            <span class="font-bold text-green-600"
+              >{{ member_stats.verified_members }}</span
+            >
+          </div>
+          <div class="flex justify-between">
+            <span>Guest Users</span>
+            <span class="font-bold text-yellow-600"
+              >{{ member_stats.guest_users }}</span
+            >
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent Loan Applications -->
+    <div class="bg-white shadow rounded-lg p-6 mt-6">
+      <h2 class="text-xl font-semibold text-gray-900 mb-4">
+        Recent Loan Applications
+      </h2>
+      <table class="w-full text-sm text-left">
+        <thead>
+          <tr class="border-b">
+            <th class="py-2">Applicant</th>
+            <th class="py-2">Amount</th>
+            <th class="py-2">Purpose</th>
+            <th class="py-2">Status</th>
+            <th class="py-2">Application Date</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for loan in recent_loans %}
+          <tr class="border-b">
+            <td class="py-2">
+              {{ loan.user.first_name }} {{ loan.user.last_name }}
+            </td>
+            <td class="py-2">GHS {{ "{:,.2f}".format(loan.amount) }}</td>
+            <td class="py-2">{{ loan.purpose }}</td>
+            <td class="py-2">
+              <span
+                class="{{ 
+                'text-yellow-600' if loan.status == 'pending' else 
+                'text-green-600' if loan.status == 'approved' else 
+                'text-red-600' if loan.status == 'rejected' else 
+                'text-blue-600' 
+              }}"
+              >
+                {{ loan.status.capitalize() }}
+              </span>
+            </td>
+            <td class="py-2">
+              {{ loan.application_date.strftime('%Y-%m-%d') }}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

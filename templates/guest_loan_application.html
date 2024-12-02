@@ -389,6 +389,75 @@
         </div>
       </div>
 
+      <!-- Guarantor Information Section -->
+      <div
+        class="bg-white shadow sm:rounded-lg overflow-hidden p-6 border-b border-gray-200"
+      >
+        <h2 class="text-xl font-semibold text-gray-900 mb-6 flex items-center">
+          <svg
+            class="w-6 h-6 mr-2 text-blue-500"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"
+            />
+          </svg>
+          Guarantor Information
+        </h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label
+              for="guarantor_fullname"
+              class="block text-sm font-medium text-gray-700"
+            >
+              Guarantor Full Name *
+            </label>
+            <input
+              type="text"
+              id="guarantor_fullname"
+              name="guarantor_fullname"
+              required
+              class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+            />
+          </div>
+          <div>
+            <label
+              for="guarantor_account_number"
+              class="block text-sm font-medium text-gray-700"
+            >
+              Guarantor UCU Account Number *
+            </label>
+            <input
+              type="text"
+              id="guarantor_account_number"
+              name="guarantor_account_number"
+              required
+              class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+            />
+          </div>
+          <div>
+            <label
+              for="guarantor_phone"
+              class="block text-sm font-medium text-gray-700"
+            >
+              Guarantor Phone Number *
+            </label>
+            <input
+              type="tel"
+              id="guarantor_phone"
+              name="guarantor_phone"
+              required
+              class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+            />
+          </div>
+        </div>
+      </div>
+
       <!-- Submit Button -->
       <div class="flex justify-end">
         <button
@@ -401,125 +470,4 @@
     </form>
   </div>
 </div>
-
-<!-- <script>
-  document
-    .getElementById("loanForm")
-    .addEventListener("submit", function (event) {
-      event.preventDefault();
-
-      // Basic form validation
-      const requiredFields = this.querySelectorAll("[required]");
-      let isValid = true;
-
-      // Remove existing error messages
-      const existingErrors = document.querySelectorAll(".error-message");
-      existingErrors.forEach((error) => error.remove());
-
-      // Reset border colors
-      requiredFields.forEach((field) => {
-        field.classList.remove("border-red-500");
-      });
-
-      // Validate each required field
-      requiredFields.forEach((field) => {
-        if (!field.value) {
-          isValid = false;
-          field.classList.add("border-red-500");
-
-          const errorMessage = document.createElement("p");
-          errorMessage.className = "error-message text-red-500 text-xs mt-1";
-          errorMessage.textContent = "This field is required";
-          field.parentNode.appendChild(errorMessage);
-        }
-      });
-
-      // Specific validations
-      const email = document.getElementById("email");
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (email.value && !emailRegex.test(email.value)) {
-        isValid = false;
-        email.classList.add("border-red-500");
-        const errorMessage = document.createElement("p");
-        errorMessage.className = "error-message text-red-500 text-xs mt-1";
-        errorMessage.textContent = "Please enter a valid email address";
-        email.parentNode.appendChild(errorMessage);
-      }
-
-      // Phone number validation
-      const phone = document.getElementById("phone_number");
-      const phoneRegex = /^\+?[\d\s-]{10,}$/;
-      if (phone.value && !phoneRegex.test(phone.value)) {
-        isValid = false;
-        phone.classList.add("border-red-500");
-        const errorMessage = document.createElement("p");
-        errorMessage.className = "error-message text-red-500 text-xs mt-1";
-        errorMessage.textContent = "Please enter a valid phone number";
-        phone.parentNode.appendChild(errorMessage);
-      }
-
-      // File size validation
-      const maxFileSize = 10 * 1024 * 1024; // 10MB in bytes
-      const fileInputs = ["passport_photo", "national_id_upload"];
-
-      fileInputs.forEach((inputId) => {
-        const fileInput = document.getElementById(inputId);
-        if (fileInput.files.length > 0) {
-          const file = fileInput.files[0];
-          if (file.size > maxFileSize) {
-            isValid = false;
-            fileInput.classList.add("border-red-500");
-            const errorMessage = document.createElement("p");
-            errorMessage.className = "error-message text-red-500 text-xs mt-1";
-            errorMessage.textContent = "File size must be less than 10MB";
-            fileInput.parentNode.appendChild(errorMessage);
-          }
-        }
-      });
-
-      // Amount and income validation
-      const amount = document.getElementById("amount");
-      const income = document.getElementById("income");
-
-      if (parseFloat(amount.value) <= 0) {
-        isValid = false;
-        amount.classList.add("border-red-500");
-        const errorMessage = document.createElement("p");
-        errorMessage.className = "error-message text-red-500 text-xs mt-1";
-        errorMessage.textContent = "Amount must be greater than 0";
-        amount.parentNode.appendChild(errorMessage);
-      }
-
-      if (parseFloat(income.value) <= 0) {
-        isValid = false;
-        income.classList.add("border-red-500");
-        const errorMessage = document.createElement("p");
-        errorMessage.className = "error-message text-red-500 text-xs mt-1";
-        errorMessage.textContent = "Income must be greater than 0";
-        income.parentNode.appendChild(errorMessage);
-      }
-
-      // If form is valid, submit it
-      if (isValid) {
-        // Show loading state
-        const submitButton = this.querySelector('button[type="submit"]');
-        const originalText = submitButton.textContent;
-        submitButton.disabled = true;
-        submitButton.textContent = "Submitting...";
-        // Here you would typically send the form data to your server
-        // For demonstration, we'll use a setTimeout to simulate an API call
-      }
-    });
-
-  // Add input event listeners to remove error styling when user starts typing
-  document.querySelectorAll("input, select, textarea").forEach((field) => {
-    field.addEventListener("input", function () {
-      this.classList.remove("border-red-500");
-      const errorMessage = this.parentNode.querySelector(".error-message");
-      if (errorMessage) {
-        errorMessage.remove();
-      }
-    });
-  });
-</script> -->
 {% endblock %}

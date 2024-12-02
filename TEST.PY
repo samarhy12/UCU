@@ -841,6 +841,150 @@ def approve_loan(loan_id):
     
     return redirect(url_for('admin_loan_requests'))
 
+@app.route('/guest-loan-application', methods=['GET', 'POST'])
+def guest_loan_application():
+    if request.method == 'POST':
+        try:
+            email = request.form.get('email')
+            first_name = request.form.get('first_name')
+            last_name = request.form.get('last_name')
+            other_names = request.form.get('other_names')
+            national_id = request.form.get('national_id')
+            date_of_birth_str = request.form.get('date_of_birth')
+            occupation = request.form.get('occupation')
+            phone_number = request.form.get('phone_number')
+            address = request.form.get('address')
+            city = request.form.get('city')
+            state = request.form.get('state')
+            country = request.form.get('country')
+            
+            # Loan specific data
+            amount = float(request.form.get('amount'))
+            purpose = request.form.get('purpose')
+            income = float(request.form.get('income'))
+            term = int(request.form.get('term'))
+            # New fields for guarantor
+            guarantor_fullname = request.form.get('guarantor_fullname')
+            guarantor_account_number = request.form.get('guarantor_account_number')
+            guarantor_phone = request.form.get('guarantor_phone')
+
+            # Validate guarantor information
+            if not all([guarantor_fullname, guarantor_account_number, guarantor_phone]):
+                flash('Please provide complete guarantor information.', 'error')
+                return redirect(url_for('guest_loan_application'))
+
+            # Find guarantor by account number
+            guarantor = User.query.filter_by(
+                account_number=guarantor_account_number, 
+                is_verified=True
+            ).first()
+
+            # Validate guarantor exists and matches details
+            if not guarantor:
+                flash('Guarantor not found or is not an active member.', 'error')
+                return redirect(url_for('guest_loan_application'))
+
+            # Additional validation: Check if guarantor details match
+            full_name = f"{guarantor.first_name} {guarantor.last_name}"
+            if (full_name.lower() != guarantor_fullname.lower() or 
+                guarantor.phone_number != guarantor_phone):
+                flash('Guarantor details do not match our records.', 'error')
+                return redirect(url_for('guest_loan_application'))
+
+            if not all([email, first_name, last_name, national_id, date_of_birth_str]):
+                flash('Please fill in all required fields.', 'error')
+                return redirect(url_for('guest_loan_application'))
+
+            # Check if user already exists
+            existing_user = User.query.filter_by(email=email).first()
+            if existing_user and not existing_user.is_guest:
+                flash('This email is already registered as a member. Please login to apply for a loan.', 'error')
+                return redirect(url_for('login'))
+
+            try:
+                date_of_birth = datetime.strptime(date_of_birth_str, '%Y-%m-%d').date()
+            except ValueError:
+                flash('Invalid date format.', 'error')
+                return redirect(url_for('guest_loan_application'))
+
+            # Handle file uploads
+            passport_photo = None
+            national_id_file = None
+
+            if 'passport_photo' in request.files:
+                photo = request.files['passport_photo']
+                if photo and photo.filename and allowed_file(photo.filename):
+                    passport_photo = generate_unique_filename(photo.filename, email)
+                    photo.save(os.path.join(app.config['UPLOAD_FOLDER'], passport_photo))
+
+            if 'national_id_upload' in request.files:
+                id_file = request.files['national_id_upload']
+                if id_file and id_file.filename and allowed_file(id_file.filename):
+                    national_id_file = generate_unique_filename(id_file.filename, email)
+                    id_file.save(os.path.join(app.config['UPLOAD_FOLDER'], national_id_file))
+
+            # Create or update guest user
+            if existing_user:
+                user = existing_user
+            else:
+                user = User(
+                    email=email,
+                    first_name=first_name,
+                    last_name=last_name,
+                    other_names=other_names,
+                    national_id=national_id,
+                    date_of_birth=date_of_birth,
+                    occupation=occupation,
+                    phone_number=phone_number,
+                    address=address,
+                    city=city,
+                    state=state,
+                    country=country,
+                    is_guest=True,
+                    is_verified=False
+                )
+
+            if passport_photo:
+                user.passport_photo = passport_photo
+            if national_id_file:
+                user.national_id_file = national_id_file
+
+            # When creating the loan, use the found guarantor's ID
+            loan = Loan(
+                amount=amount,
+                purpose=purpose,
+                term=term,
+                income=income,
+                status='pending',
+                guarantor_id=guarantor.id  # Use the validated guarantor's ID
+            )
+
+            # Rest of the existing code remains the same
+            try:
+                if not existing_user:
+                    db.session.add(user)
+                    db.session.flush()  # Get user ID without committing
+                
+                loan.user_id = user.id
+                
+                db.session.add(loan)
+                db.session.commit()
+
+                flash('Your loan application has been submitted successfully! We will contact you via email.', 'success')
+                return redirect(url_for('home'))
+
+            except Exception as e:
+                db.session.rollback()
+                flash('An error occurred while submitting your application. Please try again.', 'error')
+                app.logger.error(f'Error during guest loan application: {e}')
+                return redirect(url_for('guest_loan_application'))
+
+        except Exception as e:
+            app.logger.error(f"Guest loan application error: {str(e)}")
+            flash('An error occurred during application submission. Please try again.', 'error')
+            return redirect(url_for('guest_loan_application'))
+
+    return render_template('guest_loan_application.html')
 
 if __name__ == '__main__':
     app.run(debug=False)
