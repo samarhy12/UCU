@@ -3,6 +3,26 @@
 <div class="container mx-auto px-4 py-8">
   <h1 class="text-2xl font-bold mb-6">Manage Monthly Contributions</h1>
 
+  <!-- Search Section -->
+  <div class="mb-6 bg-white p-4 rounded-lg shadow">
+    <div class="flex items-center space-x-4">
+      <div class="flex-1">
+        <input
+          type="text"
+          id="searchInput"
+          placeholder="Search by name or account number..."
+          class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+      </div>
+      <button
+        onclick="clearSearch()"
+        class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600"
+      >
+        Clear
+      </button>
+    </div>
+  </div>
+
   <div class="overflow-x-auto">
     <table class="min-w-full bg-white border border-gray-300">
       <thead>
@@ -14,9 +34,13 @@
           <th class="px-6 py-3 bg-gray-100 text-center">Actions</th>
         </tr>
       </thead>
-      <tbody>
+      <tbody id="userTableBody">
         {% for data in user_data %}
-        <tr class="border-t border-gray-300">
+        <tr
+          class="border-t border-gray-300 user-row"
+          data-user-name="{{ data.user.first_name }} {{ data.user.last_name }}"
+          data-account-number="{{ data.user.account_number }}"
+        >
           <td class="px-6 py-4">
             {{ data.user.first_name }} {{ data.user.last_name }}
           </td>
@@ -133,6 +157,11 @@
       </tbody>
     </table>
   </div>
+
+  <!-- No Results Message -->
+  <div id="noResults" class="hidden text-center py-8 text-gray-500">
+    <p class="text-lg">No users found matching your search.</p>
+  </div>
 </div>
 
 <!-- Set Monthly Target Modal -->
@@ -223,6 +252,49 @@
 </div>
 
 <script>
+  // Search functionality
+  const searchInput = document.getElementById("searchInput");
+  const userRows = document.querySelectorAll(".user-row");
+  const noResults = document.getElementById("noResults");
+  const tableBody = document.getElementById("userTableBody");
+
+  searchInput.addEventListener("input", function () {
+    const searchTerm = this.value.toLowerCase().trim();
+    let visibleCount = 0;
+
+    userRows.forEach((row) => {
+      const userName = row.getAttribute("data-user-name").toLowerCase();
+      const accountNumber = row
+        .getAttribute("data-account-number")
+        .toLowerCase();
+
+      if (userName.includes(searchTerm) || accountNumber.includes(searchTerm)) {
+        row.style.display = "";
+        visibleCount++;
+      } else {
+        row.style.display = "none";
+      }
+    });
+
+    // Show/hide no results message
+    if (visibleCount === 0 && searchTerm !== "") {
+      noResults.classList.remove("hidden");
+      tableBody.parentElement.style.display = "none";
+    } else {
+      noResults.classList.add("hidden");
+      tableBody.parentElement.style.display = "";
+    }
+  });
+
+  function clearSearch() {
+    searchInput.value = "";
+    userRows.forEach((row) => {
+      row.style.display = "";
+    });
+    noResults.classList.add("hidden");
+    tableBody.parentElement.style.display = "";
+  }
+
   function showTargetModal(userId) {
     const modal = document.getElementById("targetModal");
     const form = document.getElementById("targetForm");
