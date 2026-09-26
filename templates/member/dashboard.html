@@ -1,0 +1,105 @@
+{% extends "layout_app.html" %}
+{% from "partials/_macros.html" import icon, status_badge %}
+{% block title %}Dashboard - Unity Credit Union{% endblock %}
+{% block page_title %}Hello, {{ current_user.first_name }}{% endblock %}
+{% block page_sub %}
+<div class="flex items-center gap-3 text-xs text-ink-400 mt-0.5">
+  <span>Cycle {{ cycle_label }}</span><span class="text-line hidden sm:inline">|</span>
+  <span id="live-datetime" class="hidden sm:inline font-mono text-gold-500 font-semibold"></span>
+</div>
+{% endblock %}
+
+{% block content %}
+{% if not current_user.can_use_member_services %}
+<div class="card card-pad mb-6 border-l-4 !border-l-gold-500">
+  <h3 class="text-base mb-1">Your membership is waiting for verification</h3>
+  <p class="text-sm text-ink-600">The administrator is checking your details. You will receive an email with your UCU account number as soon as it is done. Until then you can look around, but savings and loans are not open yet.</p>
+</div>
+{% endif %}
+
+{% if adverts %}
+<div class="mb-6 card overflow-hidden" x-data="{ i: 0, n: {{ adverts|length }}, t: null }"
+     x-init="if (n > 1) t = setInterval(() => i = (i + 1) % n, 6000)">
+  {% for a in adverts %}
+  <div x-show="i === {{ loop.index0 }}" {% if not loop.first %}x-cloak{% endif %} x-transition.opacity class="flex flex-col sm:flex-row">
+    {% if a.image %}<img src="{{ url_for('static', filename='uploads/adverts/' + a.image) }}" alt="" class="sm:w-64 h-40 sm:h-auto object-cover bg-cream-200" loading="lazy">{% endif %}
+    <div class="p-5 sm:p-6 flex-1 min-w-0 bg-navy-900 text-white flex flex-col justify-center">
+      <div class="text-[10.5px] uppercase tracking-[0.18em] text-gold-400 font-bold mb-1.5">Announcement</div>
+      <h3 class="!text-white text-lg">{{ a.title }}</h3>
+      {% if a.body %}<p class="text-sm text-white/75 mt-1.5 leading-relaxed">{{ a.body }}</p>{% endif %}
+      {% if a.link_url %}<a href="{{ a.link_url }}" class="btn btn-gold btn-sm mt-4 self-start" {% if a.link_url.startswith('http') %}target="_blank" rel="noopener"{% endif %}>Learn more</a>{% endif %}
+    </div>
+  </div>
+  {% endfor %}
+  {% if adverts|length > 1 %}
+  <div class="flex justify-center gap-2 py-2.5 bg-white border-t border-line">
+    {% for a in adverts %}<button type="button" class="w-2.5 h-2.5 rounded-full" :class="i === {{ loop.index0 }} ? 'bg-gold-500' : 'bg-line'" @click="i = {{ loop.index0 }}" aria-label="Show announcement {{ loop.index }}"></button>{% endfor %}
+  </div>
+  {% endif %}
+</div>
+{% endif %}
+
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+  {% if current_user.can_use_member_services %}
+  <div class="stat-card"><div class="stat-label">Total savings</div><div class="stat-value">GHS {{ total_savings|money }}</div><div class="stat-foot">Since you joined</div></div>
+  <div class="stat-card"><div class="stat-label">This cycle ({{ cycle_label }})</div><div class="stat-value">GHS {{ cycle_savings|money }}</div><div class="stat-foot">1 Sep to 31 Aug</div></div>
+  <div class="stat-card"><div class="stat-label">{{ this_month_label }}</div><div class="stat-value">GHS {{ paid_this_month|money }}</div>
+    <div class="stat-foot">{% if target %}Monthly target: GHS {{ target|money }}{% else %}No monthly target set{% endif %}</div></div>
+  <div class="stat-card {{ 'warn' if active_loan and active_loan.is_overdue }}"><div class="stat-label">Loan balance</div>
+    <div class="stat-value">GHS {{ (active_loan.remaining_amount if active_loan else 0)|money }}</div>
+    <div class="stat-foot">{% if active_loan %}Due {{ active_loan.repayment_date|dmy }}{% elif open_loan %}Application waiting{% else %}No loan running{% endif %}</div></div>
+  {% endif %}
+  <div class="stat-card"><div class="stat-label">Members in UCU</div><div class="stat-value">{{ total_members }}</div><div class="stat-foot">Active, verified members</div></div>
+  <div class="stat-card"><div class="stat-label">Total sign-ups</div><div class="stat-value">{{ total_signups }}</div><div class="stat-foot">Everyone who has registered</div></div>
+</div>
+
+{% if current_user.can_use_member_services %}
+<div class="grid grid-cols-1 lg:grid-cols-[1.3fr_1fr] gap-5 items-start">
+  <div class="card w-full min-w-0">
+    <div class="card-header"><h3>Recent contributions</h3><a href="{{ url_for('member.contributions') }}" class="btn btn-outline btn-sm">See all</a></div>
+    {% if recent_contributions %}
+    <div class="tx-list">
+      {% for c in recent_contributions %}
+      <div class="tx-row">
+        <div class="tx-icon in">{{ icon('check', 'w-[18px] h-[18px]') }}</div>
+        <div class="tx-body"><div class="tx-title">{{ c.month|month_label }}</div><div class="tx-sub">{{ c.date|dmy }}{% if c.receipt_no %} &middot; {{ c.receipt_no }}{% endif %}</div></div>
+        <div class="tx-amount in">+{{ c.amount|money }}</div>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}<div class="empty-state"><h4>No contributions yet</h4><p>Your payments will show here after the administrator records them.</p></div>{% endif %}
+  </div>
+
+  <div class="card card-pad w-full min-w-0">
+    <h3 class="mb-4">Quick actions</h3>
+    <div class="flex flex-col gap-2.5">
+      <a href="{{ url_for('loans.new_loan') }}" class="btn btn-gold btn-block">+ Request a new loan</a>
+      <a href="{{ url_for('loans.portal') }}" class="btn btn-primary btn-block">My loans</a>
+      <a href="{{ url_for('member.contributions') }}" class="btn btn-outline btn-block">My contributions</a>
+      <a href="{{ url_for('loans.verify') }}" class="btn btn-outline btn-block">Verify a loan</a>
+    </div>
+    {% if active_loan %}
+    <div class="mt-6">
+      <div class="flex justify-between text-sm mb-1.5"><span class="text-ink-400">Loan repaid</span><span class="font-mono font-semibold">{{ active_loan.progress_percent }}%</span></div>
+      <div class="progress-track"><div class="progress-fill" style="width: {{ active_loan.progress_percent }}%"></div></div>
+      <a class="row-link text-sm mt-3 inline-block" href="{{ url_for('loans.view_loan', loan_id=active_loan.id) }}">{{ active_loan.reference }} - view loan</a>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endif %}
+
+{% if executives %}
+<div class="mt-8">
+  <div class="flex items-center justify-between mb-3"><h3>Our executives</h3><a href="{{ url_for('public.about') }}" class="text-sm text-navy-800 font-semibold underline hover:text-gold-500">More</a></div>
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+    {% for e in executives[:8] %}
+    <div class="card overflow-hidden">
+      {% if e.photo %}<img class="exec-photo" loading="lazy" src="{{ url_for('static', filename='uploads/executives/' + e.photo) }}" alt="{{ e.display_name }}">{% endif %}
+      <div class="p-3"><div class="font-semibold text-[13px] text-navy-800">{{ e.display_name }}</div><div class="text-[11px] text-gold-500 font-semibold uppercase tracking-wide">{{ e.position }}</div></div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endif %}
+{% endblock %}

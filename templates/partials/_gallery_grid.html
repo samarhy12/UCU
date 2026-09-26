@@ -1,0 +1,36 @@
+{# Photo gallery with a full-screen viewer. Expects: photos (list of GalleryPhoto) #}
+{% from "partials/_macros.html" import icon %}
+{% set items = [] %}
+{% for p in photos %}{% set _ = items.append({"src": url_for('static', filename='uploads/gallery/' + p.photo), "title": p.title, "caption": p.caption or ""}) %}{% endfor %}
+
+<div x-data="galleryLightbox({{ items|tojson|forceescape }})" @keydown.escape.window="close()" @keydown.arrow-right.window="open && next()" @keydown.arrow-left.window="open && prev()">
+  <div class="g-grid {{ 'g-few' if photos|length < 3 else 'g-feature' }}" data-stagger="110">
+    {% for p in photos %}
+    <button type="button" class="g-item text-left" @click="show({{ loop.index0 }})" aria-label="Open photo: {{ p.title }}">
+      <img src="{{ url_for('static', filename='uploads/gallery/' + p.photo) }}" alt="{{ p.title }}" loading="lazy">
+      <span class="g-zoom">{{ icon('search', 'w-4 h-4') }}</span>
+      <span class="g-cap"><span class="block font-semibold text-sm">{{ p.title }}</span>{% if p.caption %}<span class="block text-xs text-white/75 mt-0.5">{{ p.caption }}</span>{% endif %}</span>
+    </button>
+    {% endfor %}
+  </div>
+
+  <div x-show="open" x-cloak x-transition.opacity.duration.250ms class="fixed inset-0 z-[120] bg-navy-900/95 backdrop-blur-sm flex flex-col"
+       @touchstart="start($event)" @touchend="end($event)" role="dialog" aria-modal="true" aria-label="Photo viewer">
+    <div class="flex items-center justify-between px-4 sm:px-8 py-4 text-white">
+      <span class="text-xs tracking-wide text-white/60" x-text="(i + 1) + ' / ' + items.length"></span>
+      <button type="button" @click="close()" class="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 transition-colors inline-flex items-center justify-center" aria-label="Close">{{ icon('x', 'w-5 h-5') }}</button>
+    </div>
+    <div class="flex-1 min-h-0 flex items-center justify-center px-2 sm:px-16 relative" @click.self="close()">
+      <button type="button" x-show="items.length > 1" @click="prev()" class="absolute left-2 sm:left-6 w-11 h-11 rounded-full bg-white/10 hover:bg-gold-500 text-white transition-colors inline-flex items-center justify-center z-10" aria-label="Previous photo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-5 h-5"><path d="M15 18l-6-6 6-6"/></svg></button>
+      <template x-for="(item, idx) in items" :key="idx">
+        <img x-show="i === idx" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100"
+             :src="item.src" :alt="item.title" class="max-h-[calc(100vh-11rem)] max-w-full object-contain rounded-md shadow-2xl">
+      </template>
+      <button type="button" x-show="items.length > 1" @click="next()" class="absolute right-2 sm:right-6 w-11 h-11 rounded-full bg-white/10 hover:bg-gold-500 text-white transition-colors inline-flex items-center justify-center z-10" aria-label="Next photo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-5 h-5"><path d="M9 18l6-6-6-6"/></svg></button>
+    </div>
+    <div class="px-6 py-5 text-center text-white">
+      <div class="font-display text-lg" x-text="current.title"></div>
+      <div class="text-sm text-white/65 mt-1" x-text="current.caption" x-show="current.caption"></div>
+    </div>
+  </div>
+</div>

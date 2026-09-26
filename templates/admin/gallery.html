@@ -1,0 +1,26 @@
+{% extends "layout_app.html" %}
+{% from "partials/_macros.html" import empty %}
+{% block title %}Gallery - Unity Credit Union{% endblock %}
+{% block page_title %}Gallery{% endblock %}
+{% block page_sub %}<div class="text-xs text-ink-400 mt-0.5">Photos shown on the home page and the Gallery page</div>{% endblock %}
+{% block content %}
+<div class="flex justify-end mb-4"><a href="{{ url_for('admin.gallery_new') }}" class="btn btn-gold">+ Add photo</a></div>
+{% if items %}
+<div class="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4" data-stagger="70">
+  {% for g in items %}
+  <div class="card overflow-hidden card-lift {{ 'opacity-60' if not g.is_active }}">
+    <img src="{{ url_for('static', filename='uploads/gallery/' + g.photo) }}" alt="" class="w-full h-44 object-cover bg-cream-200" loading="lazy">
+    <div class="p-4">
+      <div class="font-semibold text-navy-800 truncate">{{ g.title }}</div>
+      <div class="text-xs text-ink-400 mt-0.5 truncate">{{ g.caption or 'No caption' }}</div>
+      {% if not g.is_active %}<span class="badge badge-gray mt-2">hidden</span>{% endif %}
+      <div class="flex gap-2 mt-3">
+        <a href="{{ url_for('admin.gallery_edit', item_id=g.id) }}" class="btn btn-outline btn-sm">Edit</a>
+        <form method="POST" action="{{ url_for('admin.gallery_delete', item_id=g.id) }}" data-confirm="Remove this photo from the gallery?">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" /><button class="btn btn-danger-outline btn-sm" type="submit">Remove</button></form>
+      </div>
+    </div>
+  </div>{% endfor %}
+</div>
+{% else %}<div class="card">{{ empty("No photos yet", "Add the first photo to show it on the website.") }}</div>{% endif %}
+{% endblock %}

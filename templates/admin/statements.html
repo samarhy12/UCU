@@ -1,0 +1,23 @@
+{% extends "layout_app.html" %}
+{% from "partials/_macros.html" import icon, empty %}
+{% block title %}Monthly files - Unity Credit Union{% endblock %}
+{% block page_title %}Monthly files{% endblock %}
+{% block page_sub %}<div class="text-xs text-ink-400 mt-0.5">Excel sheets kept for each month</div>{% endblock %}
+{% block content %}
+<div class="card card-pad mb-6 max-w-2xl">
+  <h3 class="mb-3">Upload a file</h3>
+  <form method="POST" action="{{ url_for('admin.statement_upload') }}" enctype="multipart/form-data" class="grid sm:grid-cols-[180px_1fr_auto] gap-3 sm:items-end">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+    <div class="field"><label for="month">Month</label><input type="month" id="month" name="month" value="{{ default_month }}" required></div>
+    <div class="field"><label for="transaction_file">Excel file (.xlsx, .xls)</label><input type="file" id="transaction_file" name="transaction_file" accept=".xlsx,.xls" required class="!p-2"></div>
+    <button class="btn btn-gold" type="submit">Upload</button>
+  </form>
+</div>
+<div class="card w-full">
+  {% if items %}<div class="overflow-x-auto"><table class="data-table"><thead><tr><th>Month</th><th>Uploaded</th><th></th></tr></thead><tbody>
+    {% for i in items %}<tr><td class="font-semibold">{{ i.month|month_label }}</td><td>{{ i.upload_date|dmyhm }}</td>
+      <td class="text-right whitespace-nowrap"><a class="btn btn-outline btn-sm" href="{{ url_for('admin.statement_download', item_id=i.id) }}">{{ icon('download', 'w-4 h-4') }} Download</a>
+      <form method="POST" action="{{ url_for('admin.statement_delete', item_id=i.id) }}" class="inline" data-confirm="Delete this file?"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}" /><button class="btn btn-danger-outline btn-sm" type="submit">Delete</button></form></td></tr>{% endfor %}</tbody></table></div>
+  {% else %}{{ empty("No files yet") }}{% endif %}
+</div>
+{% endblock %}

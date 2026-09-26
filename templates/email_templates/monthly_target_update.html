@@ -1,0 +1,4 @@
+{% extends "email_templates/base_email.html" %}
+{% block content %}
+<p>Hello {{ user.first_name }},</p><p>Your monthly savings target has been set.</p><div style="background:#F6F4EF;border:1px solid #DEDACC;border-radius:4px;padding:14px 16px;margin:16px 0;"><div style="font-size:12px;color:#4B5364;">Monthly target</div><div style="font-size:26px;font-weight:bold;color:#0A1220;">GHS {{ "{:,.2f}".format(target_amount) }}</div></div><p>Thank you for saving with us.</p>
+{% endblock %}

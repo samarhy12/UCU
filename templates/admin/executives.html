@@ -1,0 +1,28 @@
+{% extends "layout_app.html" %}
+{% from "partials/_macros.html" import icon, empty %}
+{% block title %}Executives - Unity Credit Union{% endblock %}
+{% block page_title %}Executives{% endblock %}
+{% block page_sub %}<div class="text-xs text-ink-400 mt-0.5">Shown on the About page, the home page and member dashboards</div>{% endblock %}
+{% block content %}
+<div class="flex justify-end mb-4"><a href="{{ url_for('admin.executive_new') }}" class="btn btn-gold">+ Add executive</a></div>
+{% if vacant %}<div class="mb-5 p-3 rounded bg-cream-200 border border-line text-sm text-ink-600">Positions with nobody yet:
+  {% for p in vacant %}<a class="inline-block ml-2 underline font-semibold text-navy-800" href="{{ url_for('admin.executive_new', position=p) }}">{{ p }}</a>{% endfor %}</div>{% endif %}
+{% if items %}
+<div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+  {% for e in items %}
+  <div class="card p-4 flex gap-4 {{ 'opacity-60' if not e.is_active }}">
+    {% if e.photo %}<img class="w-20 h-24 object-cover rounded flex-shrink-0 bg-cream-200" src="{{ url_for('static', filename='uploads/executives/' + e.photo) }}" alt="">{% else %}<span class="avatar w-20 h-24 !rounded text-2xl">{{ e.full_name[:1] }}</span>{% endif %}
+    <div class="min-w-0 flex-1">
+      <div class="font-semibold text-navy-800 truncate">{{ e.display_name }}</div>
+      <div class="text-xs text-gold-500 font-semibold uppercase tracking-wide">{{ e.position }}</div>
+      {% if not e.is_active %}<span class="badge badge-gray mt-1">hidden</span>{% endif %}
+      <div class="flex gap-2 mt-3">
+        <a href="{{ url_for('admin.executive_edit', item_id=e.id) }}" class="btn btn-outline btn-sm">Edit</a>
+        <form method="POST" action="{{ url_for('admin.executive_delete', item_id=e.id) }}" data-confirm="Remove {{ e.full_name }} from the list?">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" /><button class="btn btn-danger-outline btn-sm" type="submit">Remove</button></form>
+      </div>
+    </div>
+  </div>{% endfor %}
+</div>
+{% else %}<div class="card">{{ empty("No executives yet") }}</div>{% endif %}
+{% endblock %}

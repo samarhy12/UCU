@@ -1,0 +1,52 @@
+{% extends "layout_public.html" %}
+{% from "partials/_macros.html" import icon %}
+{% block title %}Services - Unity Credit Union{% endblock %}
+{% block page_title %}Our services{% endblock %}
+{% block page_sub %}<p class="text-white/70 mt-2 max-w-2xl text-sm sm:text-base">Monthly savings, low-rate loans and a yearly dividend.</p>{% endblock %}
+
+{% block content %}
+<section class="max-w-6xl mx-auto px-5 sm:px-8 py-12">
+  <div class="section-eyebrow">Savings</div>
+  <h2 class="text-2xl mb-4">Monthly contributions</h2>
+  <div class="grid md:grid-cols-3 gap-4" data-stagger="100">
+    <div class="card card-pad card-lift"><h3 class="text-base mb-1.5">Save every month</h3><p class="text-sm text-ink-600 leading-relaxed">Your contribution is recorded by the administrator and you get an email receipt with your total savings.</p></div>
+    <div class="card card-pad card-lift"><h3 class="text-base mb-1.5">Yearly cycle and dividend</h3><p class="text-sm text-ink-600 leading-relaxed">A new cycle opens each 1 September and closes on 31 August. Members receive interest or a dividend at the end of every 12 months.</p></div>
+    <div class="card card-pad card-lift"><h3 class="text-base mb-1.5">Free to exit</h3><p class="text-sm text-ink-600 leading-relaxed">No partial withdrawals are allowed, but you are always free to exit the union.</p></div>
+  </div>
+</section>
+
+<section class="bg-white border-y border-line">
+  <div class="max-w-6xl mx-auto px-5 sm:px-8 py-12">
+    <div class="section-eyebrow">Loans for members</div>
+    <h2 class="text-2xl mb-6">Member loans</h2>
+    <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4" data-stagger="90">
+      {% for key in rules.MEMBER_LOAN_TYPES %}{% set t = rules.LOAN_TYPES[key] %}
+      <div class="card card-pad card-lift">
+        <div class="font-display text-4xl font-bold text-navy-800">{{ '%g' % t.rate }}%</div>
+        <h3 class="text-base mt-2">{{ t.label }}</h3>
+        <p class="text-sm text-ink-600 mt-1">{{ t.days }} days. {{ t.description }}</p>
+        {% if t.seasonal %}<span class="badge badge-amber mt-3">Opens in season</span>{% endif %}
+      </div>
+      {% endfor %}
+    </div>
+
+    <div class="section-eyebrow mt-12">Loans for non-members</div>
+    <h2 class="text-2xl mb-6">Non-member loans (NMLOAN)</h2>
+    <div class="grid sm:grid-cols-2 gap-4 max-w-3xl" data-stagger="90">
+      {% for key in rules.GUEST_LOAN_TYPES %}{% set t = rules.LOAN_TYPES[key] %}
+      <div class="card card-pad card-lift">
+        <div class="font-display text-4xl font-bold text-navy-800">{{ '%g' % t.rate }}%</div>
+        <h3 class="text-base mt-2">{{ t.label }}</h3>
+        <p class="text-sm text-ink-600 mt-1">{{ t.days }} days</p>
+      </div>
+      {% endfor %}
+    </div>
+    <p class="text-sm text-ink-600 mt-5 max-w-2xl">Every loan needs a guarantor, who must be a UCU member. If your loan is more than two thirds of your guarantor's total yearly earnings, you add a second guarantor.</p>
+    <div class="mt-6 flex flex-col sm:flex-row gap-3">
+      <a href="{{ url_for('auth.register') }}" class="btn btn-gold">Become a member</a>
+      <a href="{{ url_for('loans.non_member_loan') }}" class="btn btn-primary">Apply with NMLOAN</a>
+      <a href="{{ url_for('loans.verify') }}" class="btn btn-outline">Verify a loan</a>
+    </div>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,28 @@
+{% extends "layout_app.html" %}
+{% from "partials/_macros.html" import icon, pager, empty %}
+{% block title %}Contribution log - Unity Credit Union{% endblock %}
+{% block page_title %}Contribution log{% endblock %}
+{% block page_sub %}<div class="text-xs text-ink-400 mt-0.5">{{ pagination.total }} payments</div>{% endblock %}
+
+{% block content %}
+<form method="GET" class="flex flex-col sm:flex-row gap-3 mb-4">
+  <div class="search-box">{{ icon('search') }}<input type="text" name="q" value="{{ q }}" placeholder="Search name, UCU number or receipt" autocomplete="off"></div>
+  <select name="month" onchange="this.form.submit()" class="sm:!w-52"><option value="">All months</option>{% for value, label in all_months %}<option value="{{ value }}" {{ 'selected' if value == month }}>{{ label }}</option>{% endfor %}</select>
+  <button class="btn btn-primary" type="submit">Search</button>
+</form>
+<div class="card w-full">
+  {% if items %}
+  <div class="overflow-x-auto"><table class="data-table">
+    <thead><tr><th>Date</th><th>Member</th><th>Month</th><th>Receipt</th><th class="text-right">Amount</th><th></th></tr></thead>
+    <tbody>{% for c in items %}<tr>
+      <td class="whitespace-nowrap">{{ c.date|dmy }}</td>
+      <td><a class="row-link" href="{{ url_for('admin.member_detail', user_id=c.user_id) }}">{{ c.user.display_name }}</a><div class="text-xs text-ink-400 font-mono">{{ c.user.account_number }}</div></td>
+      <td>{{ c.month|month_label }}</td><td class="num text-xs">{{ c.receipt_no or '-' }}</td><td class="num text-right">{{ c.amount|money }}</td>
+      <td class="text-right"><form method="POST" action="{{ url_for('admin.reverse_contribution', contribution_id=c.id) }}" data-confirm="Reverse this payment of GHS {{ c.amount|money }} for {{ c.user.display_name }}? The member will be told by email.">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" /><input type="hidden" name="next" value="{{ request.full_path.rstrip('?') }}" />
+        <button class="btn btn-danger-outline btn-sm" type="submit">Reverse</button></form></td></tr>{% endfor %}</tbody>
+  </table></div>
+  {% else %}{{ empty("No payments found") }}{% endif %}
+</div>
+{{ pager(pagination, 'admin.contribution_log', query_params) }}
+{% endblock %}

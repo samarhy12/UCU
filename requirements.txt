@@ -1,0 +1,11 @@
+Flask
+Flask-SQLAlchemy
+SQLAlchemy
+Flask-Migrate
+Flask-Login
+Flask-Mail
+Werkzeug
+Pillow
+python-dotenv
+pymysql
+

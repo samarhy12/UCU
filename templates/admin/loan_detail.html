@@ -1,0 +1,101 @@
+{% extends "layout_app.html" %}
+{% from "partials/_macros.html" import icon, status_badge %}
+{% block title %}Loan {{ loan.reference }} - Unity Credit Union{% endblock %}
+{% block page_title %}Loan {{ loan.reference }}{% endblock %}
+{% block page_sub %}<div class="mt-0.5">{{ status_badge(loan.display_status) }}</div>{% endblock %}
+{% block breadcrumbs %}<nav class="breadcrumb"><a href="{{ url_for('admin.dashboard') }}">Dashboard</a><span class="sep">/</span><a href="{{ url_for('admin.loans_list') }}">Loans</a><span class="sep">/</span><span class="current">{{ loan.reference }}</span></nav>{% endblock %}
+
+{% block content %}
+<div class="grid lg:grid-cols-[1.2fr_1fr] gap-5 items-start" x-data="{ reject: false }">
+  <div class="space-y-5 min-w-0">
+    {% if loan.status == 'pending' %}
+    <div class="card card-pad">
+      <h3 class="mb-3">Verification checklist</h3>
+      <ul class="space-y-2">
+        {% for item in checklist %}
+        <li class="flex items-start gap-2.5 text-sm"><span class="mt-0.5 flex-shrink-0 {{ 'text-green-700' if item.ok else 'text-red-700' }}">{{ icon('check' if item.ok else 'alert', 'w-[18px] h-[18px]') }}</span><span>{{ item.text }}</span></li>
+        {% endfor %}
+      </ul>
+      <div class="mt-5 flex flex-col sm:flex-row gap-2">
+        <form method="POST" action="{{ url_for('admin.approve_loan', loan_id=loan.id) }}" data-confirm="Verify and approve this loan of GHS {{ loan.amount|money }}? The applicant will be told by email.">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" /><button type="submit" class="btn btn-gold w-full">{{ icon('verify', 'w-4 h-4') }} Verify &amp; approve</button></form>
+        <button type="button" class="btn btn-danger-outline" @click="reject = true">Reject</button>
+        <form method="POST" action="{{ url_for('admin.cancel_loan', loan_id=loan.id) }}" data-confirm="Cancel this application?">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" /><button type="submit" class="btn btn-outline w-full">Cancel loan</button></form>
+      </div>
+      {% if blocking %}<p class="text-xs text-red-700 mt-3">Some checks did not pass. Please look at them before you approve.</p>{% endif %}
+    </div>
+    {% endif %}
+
+    <div class="card card-pad">
+      <h3 class="mb-2">Loan details</h3>
+      <dl>
+        <div class="kv"><dt>Borrower</dt><dd><a class="row-link" href="{{ url_for('admin.member_detail', user_id=loan.user_id) }}">{{ loan.user.display_name }}</a>{% if loan.user.is_guest %} <span class="badge badge-blue ml-1">non-member</span>{% endif %}</dd></div>
+        <div class="kv"><dt>Loan type</dt><dd>{{ loan.type_label }}</dd></div>
+        <div class="kv"><dt>Amount</dt><dd class="font-mono">GHS {{ loan.amount|money }}</dd></div>
+        <div class="kv"><dt>Interest</dt><dd>{{ loan.rate_percent if loan.rate_percent is not none else '-' }}%</dd></div>
+        <div class="kv"><dt>Total to repay</dt><dd class="font-mono">GHS {{ (loan.total_amount or 0)|money }}</dd></div>
+        <div class="kv"><dt>Paid so far</dt><dd class="font-mono">GHS {{ (loan.amount_paid or 0)|money }}</dd></div>
+        <div class="kv"><dt>Balance</dt><dd class="font-mono font-semibold">GHS {{ (loan.remaining_amount or 0)|money }}</dd></div>
+        <div class="kv"><dt>Term</dt><dd>{{ loan.term }} days</dd></div>
+        <div class="kv"><dt>Applicant's monthly income</dt><dd class="font-mono">GHS {{ loan.income|money }}</dd></div>
+        <div class="kv"><dt>Applied on</dt><dd>{{ loan.application_date|dmy }}</dd></div>
+        {% if loan.status in ('approved','paid') %}<div class="kv"><dt>Approved on</dt><dd>{{ loan.approval_date|dmy }}</dd></div><div class="kv"><dt>Due date</dt><dd>{{ loan.repayment_date|dmy }}</dd></div>{% endif %}
+        {% if loan.paid_date %}<div class="kv"><dt>Fully paid on</dt><dd>{{ loan.paid_date|dmy }}</dd></div>{% endif %}
+        <div class="kv"><dt>Purpose</dt><dd>{{ loan.purpose }}</dd></div>
+        {% if loan.decision_note %}<div class="kv"><dt>Reason given</dt><dd>{{ loan.decision_note }}</dd></div>{% endif %}
+      </dl>
+    </div>
+
+    <div class="card card-pad">
+      <h3 class="mb-2">Guarantors</h3>
+      {% for g, earnings in [(loan.guarantor, loan.guarantor_earnings), (loan.guarantor2, loan.guarantor2_earnings)] if g %}
+      <div class="py-3 {{ 'border-t border-cream-200' if not loop.first }}">
+        <div class="text-xs uppercase tracking-wide text-ink-400 mb-1">{{ 'Guarantor' if loop.first else 'Second guarantor' }}</div>
+        <a class="row-link" href="{{ url_for('admin.member_detail', user_id=g.id) }}">{{ g.display_name }}</a> <span class="font-mono text-xs text-ink-400">{{ g.account_number }}</span>
+        <div class="text-sm text-ink-600">{{ g.phone_number }} &middot; {{ g.email }}</div>
+        {% if earnings %}<div class="text-sm text-ink-600">Yearly earnings: GHS {{ earnings|money }}</div>{% endif %}
+      </div>
+      {% else %}<p class="text-sm text-ink-400">No guarantor on record (the guarantor may have been removed).</p>{% endfor %}
+    </div>
+  </div>
+
+  <div class="space-y-5 min-w-0">
+    {% if loan.status == 'approved' %}
+    <div class="card card-pad">
+      <h3 class="mb-3">Record a payment</h3>
+      <form method="POST" action="{{ url_for('admin.record_payment', loan_id=loan.id) }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+        <div class="field mb-3"><label for="amount">Amount (GHS)</label><input type="number" id="amount" name="amount" step="0.01" min="0.01" max="{{ loan.remaining_amount }}" inputmode="decimal" required>
+          <span class="hint">Balance: GHS {{ loan.remaining_amount|money }}</span></div>
+        <div class="field mb-4"><label for="note">Note <span class="font-normal text-ink-400">(optional)</span></label><input type="text" id="note" name="note" maxlength="200"></div>
+        <button type="submit" class="btn btn-gold btn-block">Record payment and email receipt</button>
+      </form>
+    </div>
+    {% endif %}
+
+    <div class="card">
+      <div class="card-header"><h3>Payments</h3></div>
+      {% if loan.payments %}<div class="tx-list">{% for p in loan.payments %}
+        <div class="tx-row {{ 'opacity-50' if p.is_reversed }}">
+          <div class="tx-icon {{ 'out' if p.is_reversed else 'in' }}">{{ icon('x' if p.is_reversed else 'check', 'w-[18px] h-[18px]') }}</div>
+          <div class="tx-body"><div class="tx-title {{ 'line-through' if p.is_reversed }}">GHS {{ p.amount|money }}</div><div class="tx-sub">{{ p.date|dmy }} &middot; {{ p.receipt_no }}{% if p.is_reversed %} &middot; reversed{% endif %}</div></div>
+          {% if not p.is_reversed %}<form method="POST" action="{{ url_for('admin.reverse_payment', loan_id=loan.id, payment_id=p.id) }}" data-confirm="Reverse this payment of GHS {{ p.amount|money }}?" class="tx-actions">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" /><button class="btn btn-danger-outline btn-sm" type="submit">Reverse</button></form>{% endif %}
+        </div>{% endfor %}</div>
+      {% else %}<div class="empty-state !py-8"><p>No payments recorded here.</p>{% if loan.amount_paid %}<p class="text-xs mt-1">Older payments of GHS {{ loan.amount_paid|money }} were saved as a total.</p>{% endif %}</div>{% endif %}
+    </div>
+  </div>
+
+  <div x-show="reject" x-cloak class="fixed inset-0 z-[90] flex items-center justify-center p-4 bg-navy-900/60" @keydown.escape.window="reject = false">
+    <div class="card card-pad max-w-md w-full" @click.outside="reject = false">
+      <h3 class="text-lg mb-2">Reject this loan?</h3>
+      <form method="POST" action="{{ url_for('admin.reject_loan', loan_id=loan.id) }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+        <div class="field mb-4"><label for="reason">Reason (shown to the applicant)</label><textarea id="reason" name="reason" rows="3" maxlength="255"></textarea></div>
+        <div class="flex justify-end gap-2"><button type="button" class="btn btn-outline" @click="reject = false">Back</button><button type="submit" class="btn btn-danger">Reject loan</button></div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

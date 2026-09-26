@@ -1,0 +1,25 @@
+{% extends "layout_public.html" %}
+{% block title %}Sign in - Unity Credit Union{% endblock %}
+{% block content %}
+<div class="px-4 sm:px-6 py-10 sm:py-16">
+  <div class="max-w-4xl mx-auto grid md:grid-cols-[1fr_1.05fr] rounded-2xl overflow-hidden shadow-pop border border-line bg-white reveal reveal-zoom">
+    <div class="auth-art hidden md:flex flex-col justify-between p-10 text-white">
+      <div class="hero-orb bg-gold-400/30 w-64 h-64 -top-16 -left-16"></div>
+      <img src="{{ url_for('static', filename='icons/logo-mark.png') }}" alt="" class="relative w-16 h-16 object-contain">
+      <div class="relative">
+        <h2 class="!text-white font-display text-3xl leading-tight">Your membership,<br><span class="text-shine">our proud concern.</span></h2>
+        <ul class="mt-7 space-y-3 text-sm text-white/75">
+          <li class="flex gap-3"><span class="mt-1.5 w-1.5 h-1.5 rounded-full bg-gold-300 flex-shrink-0"></span>See every contribution and receipt</li>
+          <li class="flex gap-3"><span class="mt-1.5 w-1.5 h-1.5 rounded-full bg-gold-300 flex-shrink-0"></span>Request and follow your loans</li>
+          <li class="flex gap-3"><span class="mt-1.5 w-1.5 h-1.5 rounded-full bg-gold-300 flex-shrink-0"></span>Stay up to date with union announcements</li>
+        </ul>
+      </div>
+    </div>
+    <div class="p-7 sm:p-10">
+      <h1 class="text-2xl mb-1.5">Welcome back</h1>
+      <p class="text-ink-400 text-sm mb-7">Members and the administrator sign in here.</p>
+      {% include "auth/_login_form.html" %}
+    </div>
+  </div>
+</div>
+{% endblock %}

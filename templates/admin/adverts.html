@@ -1,0 +1,26 @@
+{% extends "layout_app.html" %}
+{% from "partials/_macros.html" import empty %}
+{% block title %}Adverts - Unity Credit Union{% endblock %}
+{% block page_title %}Adverts{% endblock %}
+{% block page_sub %}<div class="text-xs text-ink-400 mt-0.5">Shown one after another on the member dashboard</div>{% endblock %}
+{% block content %}
+<div class="flex justify-end mb-4"><a href="{{ url_for('admin.advert_new') }}" class="btn btn-gold">+ New advert</a></div>
+<div class="card w-full">
+  {% if items %}
+  <div class="tx-list">{% for a in items %}
+    <div class="px-4 sm:px-6 py-4 flex flex-col sm:flex-row sm:items-center gap-3">
+      {% if a.image %}<img src="{{ url_for('static', filename='uploads/adverts/' + a.image) }}" alt="" class="w-full sm:w-24 h-24 sm:h-16 object-cover rounded bg-cream-200">{% endif %}
+      <div class="flex-1 min-w-0">
+        <div class="font-semibold text-navy-800">{{ a.title }}</div>
+        <div class="text-xs text-ink-400 mt-0.5">{{ a.start_date|dmy or 'from now' }} to {{ a.end_date|dmy or 'no end date' }}</div>
+        <span class="{{ 'badge badge-green' if a.is_running else 'badge badge-gray' }} mt-1.5">{{ 'showing now' if a.is_running else 'not showing' }}</span>
+      </div>
+      <div class="flex gap-2 flex-wrap">
+        <form method="POST" action="{{ url_for('admin.advert_toggle', item_id=a.id) }}"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}" /><button class="btn btn-outline btn-sm" type="submit">{{ 'Switch off' if a.is_active else 'Switch on' }}</button></form>
+        <a class="btn btn-outline btn-sm" href="{{ url_for('admin.advert_edit', item_id=a.id) }}">Edit</a>
+        <form method="POST" action="{{ url_for('admin.advert_delete', item_id=a.id) }}" data-confirm="Delete this advert?"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}" /><button class="btn btn-danger-outline btn-sm" type="submit">Delete</button></form>
+      </div>
+    </div>{% endfor %}</div>
+  {% else %}{{ empty("No adverts yet", "Add one to show it on every member's dashboard.") }}{% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,39 @@
+{# Home page carousel. Expects: slides #}
+{% from "partials/_macros.html" import icon %}
+<div x-data="heroCarousel({{ slides|length }}, 6500)" @mouseenter="hold()" @mouseleave="release()" @focusin="hold()" @focusout="release()"
+     @touchstart.passive="start($event)" @touchend.passive="end($event)" @keydown.arrow-left="prev()" @keydown.arrow-right="next()"
+     role="region" aria-roledescription="carousel" aria-label="Union highlights" tabindex="0">
+<div class="c-frame group" :class="{ 'is-paused': paused }" style="--dur: 6500ms">
+  {% for s in slides %}
+  <figure class="c-slide {{ 'active' if loop.first }}" :class="{ 'active': i === {{ loop.index0 }} }" aria-hidden="{{ 'false' if loop.first else 'true' }}" :aria-hidden="i !== {{ loop.index0 }}">
+    <img class="c-bg" src="{{ url_for('static', filename='uploads/carousel/' + s.image) }}" alt="" aria-hidden="true" {{ 'loading=lazy' if not loop.first }}>
+    {% if s.link_url %}<a href="{{ s.link_url }}" class="block absolute inset-0 z-[1]" aria-label="{{ s.title }}"></a>{% endif %}
+    <img class="c-img" src="{{ url_for('static', filename='uploads/carousel/' + s.image) }}" alt="{{ s.title }}" {{ 'loading=lazy' if not loop.first }}>
+    <figcaption class="c-cap">
+      <div class="font-display text-lg sm:text-2xl font-bold leading-tight">{{ s.title }}</div>
+      {% if s.caption %}<div class="text-sm sm:text-[15px] text-white/80 mt-1 max-w-2xl">{{ s.caption }}</div>{% endif %}
+    </figcaption>
+  </figure>
+  {% endfor %}
+
+  {% if slides|length > 1 %}
+  <button type="button" class="c-nav left-3 sm:left-5" @click="prev()" aria-label="Previous slide"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5"><path d="M15 18l-6-6 6-6"/></svg></button>
+  <button type="button" class="c-nav right-3 sm:right-5" @click="next()" aria-label="Next slide"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5"><path d="M9 18l6-6-6-6"/></svg></button>
+  <div class="c-dots">
+    {% for s in slides %}
+    <button type="button" class="c-dot" :class="{ 'active': i === {{ loop.index0 }}, 'done': i > {{ loop.index0 }} }" @click="go({{ loop.index0 }})" aria-label="Show slide {{ loop.index }}"><span></span></button>
+    {% endfor %}
+  </div>
+  {% endif %}
+</div>
+
+  {# On phones the words sit under the picture so they never cover it #}
+  <div class="sm:hidden mt-4 text-center min-h-[3.6rem]">
+    {% for s in slides %}
+    <div x-show="i === {{ loop.index0 }}" {% if not loop.first %}x-cloak{% endif %} x-transition.opacity.duration.400ms>
+      <div class="font-display text-lg font-bold text-navy-800 leading-snug">{{ s.title }}</div>
+      {% if s.caption %}<div class="text-sm text-ink-600 mt-0.5">{{ s.caption }}</div>{% endif %}
+    </div>
+    {% endfor %}
+  </div>
+</div>

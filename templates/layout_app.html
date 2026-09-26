@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+{% from "partials/_macros.html" import icon %}
+
+{% macro nav(endpoint, label, icon_name, active_in=None, badge=0) %}
+{% set names = active_in or [endpoint] %}
+<a class="nav-link {{ 'active' if request.endpoint in names }}" href="{{ url_for(endpoint) }}">
+  {{ icon(icon_name) }}<span class="flex-1">{{ label }}</span>
+  {% if badge %}<span class="ml-auto min-w-[20px] h-5 px-1.5 rounded-full bg-ucu-red text-white text-[11px] font-bold inline-flex items-center justify-center">{{ badge }}</span>{% endif %}
+</a>
+{% endmacro %}
+
+{% block body %}
+<div class="lg:grid lg:grid-cols-[260px_1fr] min-h-screen app-shell-grid" x-data="{ sidebarOpen: false }">
+  <div x-show="sidebarOpen" x-transition.opacity @click="sidebarOpen = false"
+       class="fixed inset-0 bg-navy-900/50 z-40 lg:hidden no-print" style="display: none"></div>
+
+  <aside class="bg-navy-900 text-white/90 p-6 flex flex-col fixed inset-y-0 left-0 w-[260px] z-50 overflow-y-auto transition-transform duration-200 -translate-x-full lg:translate-x-0 lg:static lg:h-screen lg:sticky lg:top-0 no-print"
+         :class="sidebarOpen ? 'translate-x-0 shadow-pop' : '-translate-x-full'">
+    <a href="{{ url_for('public.home') }}" class="flex items-center gap-3 pb-6 mb-5 border-b border-white/10">
+      <img src="{{ url_for('static', filename='icons/logo-mark.png') }}" alt="UCU" class="w-11 h-11 object-contain flex-shrink-0" />
+      <div>
+        <div class="font-display text-base font-semibold text-white leading-tight">Unity</div>
+        <div class="text-[10.5px] tracking-wide text-gold-400 uppercase">Credit Union</div>
+      </div>
+    </a>
+
+    <nav class="flex-1">
+      {% if current_user.is_admin %}
+      <div class="text-[10.5px] uppercase tracking-wider text-white/40 mt-1 mb-2 px-2">Overview</div>
+      {{ nav('admin.dashboard', 'Dashboard', 'home') }}
+      {{ nav('admin.reports', 'Reports', 'chart') }}
+
+      <div class="text-[10.5px] uppercase tracking-wider text-white/40 mt-4 mb-2 px-2">Membership</div>
+      {{ nav('admin.members_list', 'Members', 'users', ['admin.members_list','admin.member_detail','admin.member_edit'], pending_members_badge) }}
+      {{ nav('admin.member_new', 'Add member', 'user-plus') }}
+
+      <div class="text-[10.5px] uppercase tracking-wider text-white/40 mt-4 mb-2 px-2">Money</div>
+      {{ nav('admin.contributions', 'Record contributions', 'wallet') }}
+      {{ nav('admin.contribution_log', 'Contribution log', 'list') }}
+      {{ nav('admin.loans_list', 'Loans', 'loan', ['admin.loans_list','admin.loan_detail'], pending_loans_badge) }}
+      {{ nav('admin.cycles', 'Cycles &amp; dividends'|safe, 'cycle', ['admin.cycles','admin.cycle_detail']) }}
+
+      <div class="text-[10.5px] uppercase tracking-wider text-white/40 mt-4 mb-2 px-2">Website</div>
+      {{ nav('admin.executives', 'Executives', 'star', ['admin.executives','admin.executive_new','admin.executive_edit']) }}
+      {{ nav('admin.carousel', 'Home carousel', 'image', ['admin.carousel','admin.carousel_new','admin.carousel_edit']) }}
+      {{ nav('admin.greeting', 'Season greeting', 'star') }}
+      {{ nav('admin.adverts', 'Adverts', 'megaphone', ['admin.adverts','admin.advert_new','admin.advert_edit']) }}
+      {{ nav('admin.gallery', 'Gallery', 'image', ['admin.gallery','admin.gallery_new','admin.gallery_edit']) }}
+      {{ nav('admin.statements', 'Monthly files', 'file') }}
+
+      <div class="text-[10.5px] uppercase tracking-wider text-white/40 mt-4 mb-2 px-2">System</div>
+      {{ nav('admin.settings', 'Settings', 'settings') }}
+      {{ nav('admin.audit', 'Activity log', 'shield') }}
+      {% else %}
+      <div class="text-[10.5px] uppercase tracking-wider text-white/40 mt-1 mb-2 px-2">My account</div>
+      {{ nav('member.dashboard', 'Dashboard', 'home') }}
+      {% if current_user.can_use_member_services %}
+      {{ nav('member.contributions', 'My contributions', 'wallet') }}
+      {{ nav('loans.portal', 'Loans', 'loan', ['loans.portal','loans.new_loan','loans.view_loan','loans.history','loans.verify']) }}
+      {% endif %}
+      {{ nav('member.profile', 'My profile', 'user') }}
+
+      <div class="text-[10.5px] uppercase tracking-wider text-white/40 mt-4 mb-2 px-2">Union</div>
+      <a class="nav-link" href="{{ url_for('public.about') }}">{{ icon('star') }}Executives &amp; about</a>
+      <a class="nav-link" href="{{ url_for('public.faqs') }}">{{ icon('info') }}FAQs</a>
+      <a class="nav-link" href="{{ url_for('public.contact') }}">{{ icon('mail') }}Contact us</a>
+      {% endif %}
+    </nav>
+
+    <div class="mt-auto pt-4 border-t border-white/10">
+      <div class="flex items-center gap-2.5 p-2 rounded-md">
+        <div class="w-[34px] h-[34px] rounded-full bg-navy-600 text-gold-400 flex items-center justify-center font-bold text-[13px] flex-shrink-0">{{ current_user.initials }}</div>
+        <div class="min-w-0">
+          <div class="text-[13px] font-semibold text-white truncate">{{ current_user.display_name }}</div>
+          <div class="text-[11px] text-white/55">{{ current_user.role_label }}{% if current_user.account_number and not current_user.is_admin %} &middot; {{ current_user.account_number }}{% endif %}</div>
+        </div>
+      </div>
+      <a href="{{ url_for('auth.change_password') }}" class="nav-link mt-2">{{ icon('lock') }}Change password</a>
+      <a href="{{ url_for('auth.logout') }}" class="nav-link">{{ icon('logout') }}Sign out</a>
+    </div>
+  </aside>
+
+  <div class="flex flex-col min-h-screen w-full min-w-0">
+    <header class="site-header border-b border-line px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between gap-4 sticky top-0 z-20 no-print">
+      <div class="flex items-center gap-3 sm:gap-4 min-w-0">
+        <button @click="sidebarOpen = true" aria-label="Open menu" class="lg:hidden inline-flex items-center justify-center w-10 h-10 rounded-md border border-line bg-white flex-shrink-0">
+          {{ icon('menu', 'w-5 h-5') }}
+        </button>
+        <div class="min-w-0">
+          <h1 class="text-lg sm:text-xl truncate">{% block page_title %}{% endblock %}</h1>
+          {% block page_sub %}{% endblock %}
+        </div>
+      </div>
+      <div class="hidden sm:flex items-center gap-3 flex-shrink-0">
+        {% if current_user.is_admin %}
+        <div class="flex items-center gap-2 bg-navy-800 text-white px-4 py-2 rounded text-[13px]">
+          <span class="text-white/55 text-[11px] uppercase tracking-wide">Cycle</span>
+          <span class="font-mono font-semibold text-gold-400">{{ current_cycle_label }}</span>
+        </div>
+        {% elif current_user.account_number %}
+        <div class="flex items-center gap-2 bg-navy-800 text-white px-4 py-2 rounded text-[13px]">
+          <span class="text-white/55 text-[11px] uppercase tracking-wide">Account</span>
+          <span class="font-mono font-semibold text-gold-400">{{ current_user.account_number }}</span>
+        </div>
+        {% endif %}
+      </div>
+    </header>
+
+    <main class="p-4 sm:p-6 lg:p-8 flex-1 w-full min-w-0">
+      {% block breadcrumbs %}{% endblock %}
+      {% block content %}{% endblock %}
+    </main>
+
+    <footer class="border-t border-line bg-white px-4 sm:px-8 py-4 text-xs text-ink-400 flex flex-col sm:flex-row gap-2 sm:items-center sm:justify-between no-print">
+      <span>&copy; {{ current_year }} {{ org.name }}</span>
+      <span class="flex flex-wrap gap-x-4 gap-y-1">
+        <a class="hover:text-gold-500" href="mailto:{{ org.email }}">{{ org.email }}</a>
+        <a class="hover:text-gold-500" href="tel:{{ org.phone }}">{{ org.phone }}</a>
+      </span>
+    </footer>
+  </div>
+</div>
+{% endblock %}

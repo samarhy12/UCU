@@ -1,0 +1,45 @@
+{# Season greeting. Expects: greeting (dict from get_greeting) #}
+{% from "partials/_macros.html" import icon %}
+<section class="max-w-6xl mx-auto px-5 sm:px-8 py-20" x-data="{ poster: false }" @keydown.escape.window="poster = false">
+  <div class="max-w-2xl reveal">
+    <div class="section-eyebrow text-gold-500 text-[11px] uppercase tracking-[0.18em] font-bold mb-3">Season greetings</div>
+    <h2 class="section-title">A message from the executives</h2>
+  </div>
+
+  <div class="mt-10 grid gap-10 lg:gap-14 {{ 'lg:grid-cols-[1fr_320px]' if greeting.image else '' }} items-center">
+    <div class="greet-card reveal reveal-left">
+      <div class="relative text-center max-w-2xl mx-auto">
+        <img src="{{ url_for('static', filename='icons/logo-mark.png') }}" alt="" class="w-14 h-14 object-contain mx-auto mb-4">
+        <h3 class="font-display text-2xl sm:text-[2rem] font-bold text-gold-500 leading-tight">{{ greeting.title }}</h3>
+        {% for para in greeting.paragraphs %}<p class="text-[15px] sm:text-base text-ink-800 leading-relaxed mt-5">{{ para }}</p>{% endfor %}
+        {% if greeting.callout %}<div class="greet-callout mt-6 text-[15px] sm:text-base leading-relaxed">{{ greeting.callout }}</div>{% endif %}
+        {% if greeting.closing or greeting.date %}
+        <p class="text-[15px] sm:text-base text-ink-800 leading-relaxed mt-6">{{ greeting.closing }}</p>
+        {% if greeting.date %}<div class="font-display text-2xl sm:text-3xl font-bold text-gold-500 mt-1">{{ greeting.date }}</div>{% endif %}
+        {% endif %}
+        <div class="mt-7 pt-5 border-t border-gold-400/30">
+          {% if greeting.signoff %}<div class="font-semibold text-navy-800">{{ greeting.signoff }}</div>{% endif %}
+          <div class="text-sm italic text-ink-600 mt-1">{{ org.motto }}</div>
+        </div>
+      </div>
+    </div>
+
+    {% if greeting.image %}
+    <div class="reveal reveal-right px-3 lg:px-0 max-w-[280px] mx-auto lg:max-w-none w-full">
+      <button type="button" class="poster-frame w-full" @click="poster = true" aria-label="View the greeting poster full size">
+        <img src="{{ url_for('static', filename='uploads/greeting/' + greeting.image) }}" alt="Season greeting poster" loading="lazy">
+      </button>
+      <p class="text-center text-xs text-ink-400 mt-5">Tap the poster to view it full size</p>
+    </div>
+    {% endif %}
+  </div>
+
+  {% if greeting.image %}
+  <div x-show="poster" x-cloak x-transition.opacity.duration.250ms class="fixed inset-0 z-[120] bg-navy-900/95 backdrop-blur-sm flex flex-col" role="dialog" aria-modal="true" aria-label="Season greeting poster">
+    <div class="flex justify-end px-4 sm:px-8 py-4"><button type="button" @click="poster = false" class="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors inline-flex items-center justify-center" aria-label="Close">{{ icon('x', 'w-5 h-5') }}</button></div>
+    <div class="flex-1 min-h-0 flex items-center justify-center px-4 pb-6" @click.self="poster = false">
+      <img src="{{ url_for('static', filename='uploads/greeting/' + greeting.image) }}" alt="Season greeting poster" class="max-h-[calc(100vh-6rem)] max-w-full object-contain rounded-md shadow-2xl">
+    </div>
+  </div>
+  {% endif %}
+</section>

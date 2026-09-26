@@ -1,0 +1,85 @@
+{# Small building blocks used by many pages #}
+
+{% macro icon(name, cls="w-[18px] h-[18px]") %}
+{%- set paths = {
+  "home": '<rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/>',
+  "users": '<circle cx="9" cy="8" r="3.2"/><path d="M2.5 20c0-3.6 2.9-6.2 6.5-6.2s6.5 2.6 6.5 6.2"/><circle cx="17.5" cy="7.5" r="2.5"/><path d="M15.5 13.4c2.7.3 4.9 2.6 5 5.6"/>',
+  "user": '<circle cx="12" cy="8" r="4"/><path d="M4 20c.5-3.8 3.7-6 8-6s7.5 2.2 8 6"/>',
+  "user-plus": '<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.6 2.9-6.2 6.5-6.2s6.5 2.6 6.5 6.2M19 8v6M16 11h6"/>',
+  "wallet": '<rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18M16 14.5h2"/>',
+  "loan": '<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 10h18M7 15h4"/>',
+  "list": '<path d="M4 6h16M4 12h16M4 18h10"/>',
+  "cycle": '<path d="M21 12a9 9 0 11-3-6.7"/><path d="M21 4v5h-5"/>',
+  "chart": '<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>',
+  "arrow": '<path d="M5 12h14M13 6l6 6-6 6"/>',
+  "image": '<rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="1.8"/><path d="M21 16l-5-5-8 8"/>',
+  "star": '<path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/>',
+  "megaphone": '<path d="M3 11v2a1 1 0 001 1h2l5 4V6L6 10H4a1 1 0 00-1 1z"/><path d="M15 9a4 4 0 010 6M18 6.5a8 8 0 010 11"/>',
+  "file": '<path d="M14 3H7a2 2 0 00-2 2v14a2 2 0 002 2h10a2 2 0 002-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h6"/>',
+  "settings": '<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 00.3 1.8l.1.1a2 2 0 11-2.8 2.8l-.1-.1a1.7 1.7 0 00-1.8-.3 1.7 1.7 0 00-1 1.5V21a2 2 0 01-4 0v-.1a1.7 1.7 0 00-1.1-1.5 1.7 1.7 0 00-1.8.3l-.1.1a2 2 0 11-2.8-2.8l.1-.1a1.7 1.7 0 00.3-1.8 1.7 1.7 0 00-1.5-1H3a2 2 0 010-4h.1a1.7 1.7 0 001.5-1.1 1.7 1.7 0 00-.3-1.8l-.1-.1a2 2 0 112.8-2.8l.1.1a1.7 1.7 0 001.8.3H9a1.7 1.7 0 001-1.5V3a2 2 0 014 0v.1a1.7 1.7 0 001 1.5 1.7 1.7 0 001.8-.3l.1-.1a2 2 0 112.8 2.8l-.1.1a1.7 1.7 0 00-.3 1.8V9a1.7 1.7 0 001.5 1H21a2 2 0 010 4h-.1a1.7 1.7 0 00-1.5 1z"/>',
+  "shield": '<path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><path d="M9 12l2 2 4-4"/>',
+  "lock": '<rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 118 0v3"/>',
+  "logout": '<path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><path d="M16 17l5-5-5-5M21 12H9"/>',
+  "search": '<circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/>',
+  "plus": '<path d="M12 5v14M5 12h14"/>',
+  "check": '<path d="M20 6L9 17l-5-5"/>',
+  "x": '<path d="M18 6L6 18M6 6l12 12"/>',
+  "menu": '<path d="M3 6h18M3 12h18M3 18h18"/>',
+  "phone": '<path d="M5 4h4l2 5-2.5 1.5a11 11 0 005 5L15 13l5 2v4a2 2 0 01-2 2A16 16 0 013 6a2 2 0 012-2z"/>',
+  "mail": '<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/>',
+  "clock": '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/>',
+  "download": '<path d="M12 3v12M7 10l5 5 5-5M4 19h16"/>',
+  "trash": '<path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/>',
+  "edit": '<path d="M4 20h4L19 9a2.1 2.1 0 00-4-4L4 16z"/>',
+  "print": '<path d="M6 9V3h12v6M6 18H4v-6a2 2 0 012-2h12a2 2 0 012 2v6h-2M8 14h8v7H8z"/>',
+  "info": '<circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v5h1"/>',
+  "alert": '<path d="M12 3l10 18H2z"/><path d="M12 10v5M12 18h.01"/>',
+  "key": '<circle cx="8" cy="15" r="4"/><path d="M10.8 12.2L20 3M16 7l3 3"/>',
+  "verify": '<path d="M12 3l2.4 1.9 3-.3.9 2.9 2.7 1.5-1 2.8 1 2.8-2.7 1.5-.9 2.9-3-.3L12 21l-2.4-1.9-3 .3-.9-2.9L3 14.9l1-2.8-1-2.8 2.7-1.5.9-2.9 3 .3z"/><path d="M9 12l2 2 4-4"/>'
+} -%}
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="{{ cls }}" aria-hidden="true">{{ paths.get(name, '')|safe }}</svg>
+{%- endmacro %}
+
+{% macro social_icon(name, cls="w-5 h-5") %}
+{%- if name == "facebook" -%}
+<svg viewBox="0 0 24 24" fill="currentColor" class="{{ cls }}" aria-hidden="true"><path d="M22 12a10 10 0 10-11.6 9.9v-7H7.9V12h2.5V9.8c0-2.5 1.5-3.9 3.8-3.9 1.1 0 2.2.2 2.2.2v2.5h-1.3c-1.2 0-1.6.8-1.6 1.6V12h2.8l-.4 2.9h-2.3v7A10 10 0 0022 12z"/></svg>
+{%- elif name == "whatsapp" -%}
+<svg viewBox="0 0 24 24" fill="currentColor" class="{{ cls }}" aria-hidden="true"><path d="M12.04 2a9.9 9.9 0 00-8.5 15l-1.4 5 5.2-1.4A9.9 9.9 0 1012.04 2zm5.8 14.1c-.25.7-1.4 1.3-1.9 1.4-.5.1-1.1.1-1.8-.1a16 16 0 01-1.7-.6c-3-1.3-4.9-4.3-5-4.5-.15-.2-1.2-1.6-1.2-3s.75-2.1 1-2.4c.25-.3.55-.35.75-.35h.55c.2 0 .4 0 .6.45.2.5.8 1.9.85 2 .1.15.1.3 0 .5-.1.15-.15.3-.3.45l-.4.5c-.15.15-.3.3-.15.6.15.3.7 1.2 1.55 1.9 1.05.95 1.95 1.25 2.25 1.4.3.15.45.1.6-.05.2-.2.7-.8.9-1.1.2-.3.4-.25.65-.15.3.1 1.7.8 2 .95.3.15.5.2.55.3.1.1.1.6-.15 1.3z"/></svg>
+{%- elif name == "tiktok" -%}
+<svg viewBox="0 0 24 24" fill="currentColor" class="{{ cls }}" aria-hidden="true"><path d="M19.6 6.7a5.5 5.5 0 01-3.4-1.9A5.5 5.5 0 0114.9 2h-3.3v13.4a2.8 2.8 0 11-2-2.7V9.3a6.1 6.1 0 00-1-.1 6.1 6.1 0 106.1 6.1V9a8.7 8.7 0 005 1.6V7.2c-.2 0-.4-.1-.6-.1z"/></svg>
+{%- endif -%}
+{%- endmacro %}
+
+{% macro status_badge(status) %}
+{%- set styles = {
+  "active": "badge badge-green", "pending": "badge badge-amber", "inactive": "badge badge-gray",
+  "guest": "badge badge-blue", "admin": "badge badge-navy",
+  "approved": "badge badge-blue", "paid": "badge badge-green", "rejected": "badge badge-red",
+  "cancelled": "badge badge-gray", "overdue": "badge badge-red", "open": "badge badge-green",
+  "closed": "badge badge-gray"
+} -%}
+{%- set labels = {"approved": "running", "inactive": "exited", "pending": "waiting", "guest": "non-member"} -%}
+<span class="{{ styles.get(status, 'badge badge-gray') }}">{{ labels.get(status, status) }}</span>
+{%- endmacro %}
+
+{% macro pager(p, endpoint, params) %}
+{% if p.pages > 1 %}
+<div class="mt-5 flex flex-wrap items-center justify-center gap-2">
+  {% if p.has_prev %}<a href="{{ url_for(endpoint, page=p.prev_num, **params) }}" class="btn btn-outline btn-sm">&larr; Prev</a>{% endif %}
+  <span class="text-xs text-ink-400 px-2">Page {{ p.page }} of {{ p.pages }} &middot; {{ p.total }} in all</span>
+  {% if p.has_next %}<a href="{{ url_for(endpoint, page=p.next_num, **params) }}" class="btn btn-outline btn-sm">Next &rarr;</a>{% endif %}
+</div>
+{% endif %}
+{% endmacro %}
+
+{% macro empty(title, text="") %}
+<div class="empty-state"><h4>{{ title }}</h4>{% if text %}<p>{{ text }}</p>{% endif %}</div>
+{% endmacro %}
+
+{% macro person_photo(user, size="w-10 h-10", text="text-sm") %}
+{% if user.passport_photo %}
+<img src="{{ url_for('member.document', user_id=user.id, doc_type='passport') }}" alt="" class="{{ size }} rounded-full object-cover flex-shrink-0 bg-cream-200" loading="lazy">
+{% else %}
+<span class="avatar {{ size }} {{ text }}">{{ user.initials }}</span>
+{% endif %}
+{% endmacro %}

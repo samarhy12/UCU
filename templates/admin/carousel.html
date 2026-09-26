@@ -1,0 +1,29 @@
+{% extends "layout_app.html" %}
+{% from "partials/_macros.html" import empty %}
+{% block title %}Home carousel - Unity Credit Union{% endblock %}
+{% block page_title %}Home carousel{% endblock %}
+{% block page_sub %}<div class="text-xs text-ink-400 mt-0.5">Pictures that slide across the top of the home page</div>{% endblock %}
+{% block content %}
+<div class="flex justify-end mb-4"><a href="{{ url_for('admin.carousel_new') }}" class="btn btn-gold">+ Add slide</a></div>
+{% if items %}
+<div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4" data-stagger="80">
+  {% for g in items %}
+  <div class="card overflow-hidden card-lift {{ 'opacity-60' if not g.is_active }}">
+    <div class="h-40 bg-navy-900 relative overflow-hidden">
+      <img src="{{ url_for('static', filename='uploads/carousel/' + g.image) }}" alt="" class="absolute inset-0 w-full h-full object-cover blur-xl opacity-60 scale-110" loading="lazy">
+      <img src="{{ url_for('static', filename='uploads/carousel/' + g.image) }}" alt="" class="relative w-full h-full object-contain" loading="lazy">
+    </div>
+    <div class="p-4">
+      <div class="font-semibold text-navy-800 truncate">{{ g.title }}</div>
+      <div class="text-xs text-ink-400 mt-0.5 truncate">{{ g.caption or 'No caption' }}</div>
+      <div class="text-[11px] text-ink-400 mt-1">Order {{ g.display_order }}{% if not g.is_active %} &middot; hidden{% endif %}</div>
+      <div class="flex gap-2 mt-3">
+        <a href="{{ url_for('admin.carousel_edit', item_id=g.id) }}" class="btn btn-outline btn-sm">Edit</a>
+        <form method="POST" action="{{ url_for('admin.carousel_delete', item_id=g.id) }}" data-confirm="Remove this slide?">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" /><button class="btn btn-danger-outline btn-sm" type="submit">Remove</button></form>
+      </div>
+    </div>
+  </div>{% endfor %}
+</div>
+{% else %}<div class="card">{{ empty("No slides yet", "Add a picture to show the carousel on the home page.") }}</div>{% endif %}
+{% endblock %}

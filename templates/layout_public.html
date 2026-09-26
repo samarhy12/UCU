@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% from "partials/_macros.html" import icon %}
+{% block body %}
+<div class="min-h-screen flex flex-col">
+  <header id="site-header" class="site-header border-b border-line/70 sticky top-0 z-40 no-print" x-data="{ open: false }">
+    <div class="flag-stripe"></div>
+    <div class="max-w-6xl mx-auto px-4 sm:px-8 h-16 flex items-center justify-between gap-3">
+      <a href="{{ url_for('public.home') }}" class="group flex items-center gap-3 min-w-0">
+        <img src="{{ url_for('static', filename='icons/logo-mark.png') }}" alt="" class="w-10 h-10 object-contain flex-shrink-0 transition-transform duration-500 group-hover:rotate-[8deg] group-hover:scale-105" />
+        <span class="leading-tight min-w-0"><span class="block font-display text-[17px] font-bold text-navy-800 truncate">Unity Credit Union</span><span class="hidden sm:block text-[10px] uppercase tracking-[0.16em] text-gold-500 font-semibold">{{ org.motto }}</span></span>
+      </a>
+
+      <nav class="hidden md:flex items-center gap-1" aria-label="Main">
+        <a class="pub-link {{ 'active' if request.endpoint == 'public.home' }}" href="{{ url_for('public.home') }}">Home</a>
+        <a class="pub-link {{ 'active' if request.endpoint == 'public.about' }}" href="{{ url_for('public.about') }}">About</a>
+        <a class="pub-link {{ 'active' if request.endpoint == 'public.services' }}" href="{{ url_for('public.services') }}">Services</a>
+        <a class="pub-link {{ 'active' if request.endpoint == 'public.gallery' }}" href="{{ url_for('public.gallery') }}">Gallery</a>
+        <a class="pub-link {{ 'active' if request.endpoint == 'public.faqs' }}" href="{{ url_for('public.faqs') }}">FAQs</a>
+        <a class="pub-link {{ 'active' if request.endpoint == 'public.contact' }}" href="{{ url_for('public.contact') }}">Contact</a>
+      </nav>
+
+      <div class="hidden md:flex items-center gap-2">
+        {% if current_user.is_authenticated %}
+        <a href="{{ url_for('member.dashboard') }}" class="btn btn-primary btn-sm">My dashboard</a>
+        <a href="{{ url_for('auth.logout') }}" class="btn btn-outline btn-sm">Sign out</a>
+        {% else %}
+        <a href="{{ url_for('auth.login') }}" class="btn btn-outline btn-sm">Sign in</a>
+        <a href="{{ url_for('auth.register') }}" class="btn btn-gold btn-sm">Register</a>
+        {% endif %}
+      </div>
+
+      <button @click="open = !open" class="md:hidden inline-flex items-center justify-center w-10 h-10 rounded-md border border-line bg-white" :aria-expanded="open" aria-label="Menu">
+        <span x-show="!open">{{ icon('menu', 'w-5 h-5') }}</span>
+        <span x-show="open" x-cloak>{{ icon('x', 'w-5 h-5') }}</span>
+      </button>
+    </div>
+
+    <div x-show="open" x-cloak x-transition class="md:hidden border-t border-line bg-white px-4 pb-4">
+      <nav class="flex flex-col py-2" aria-label="Mobile">
+        <a class="py-3 text-[15px] font-medium border-b border-cream-200" href="{{ url_for('public.home') }}">Home</a>
+        <a class="py-3 text-[15px] font-medium border-b border-cream-200" href="{{ url_for('public.about') }}">About us</a>
+        <a class="py-3 text-[15px] font-medium border-b border-cream-200" href="{{ url_for('public.services') }}">Services</a>
+        <a class="py-3 text-[15px] font-medium border-b border-cream-200" href="{{ url_for('public.gallery') }}">Gallery</a>
+        <a class="py-3 text-[15px] font-medium border-b border-cream-200" href="{{ url_for('public.faqs') }}">FAQs</a>
+        <a class="py-3 text-[15px] font-medium border-b border-cream-200" href="{{ url_for('public.contact') }}">Contact</a>
+        <a class="py-3 text-[15px] font-medium" href="{{ url_for('loans.non_member_loan') }}">Non-member loan (NMLOAN)</a>
+      </nav>
+      <div class="grid grid-cols-2 gap-2 pt-2">
+        {% if current_user.is_authenticated %}
+        <a href="{{ url_for('member.dashboard') }}" class="btn btn-primary">My dashboard</a>
+        <a href="{{ url_for('auth.logout') }}" class="btn btn-outline">Sign out</a>
+        {% else %}
+        <a href="{{ url_for('auth.login') }}" class="btn btn-outline">Sign in</a>
+        <a href="{{ url_for('auth.register') }}" class="btn btn-gold">Register</a>
+        {% endif %}
+      </div>
+    </div>
+  </header>
+
+  {% block hero %}
+  {% set heading %}{% block page_title %}{% endblock %}{% endset %}
+  {% if heading|trim %}
+  <div class="hero-panel px-5 sm:px-8 py-14 sm:py-20 no-print">
+    <div class="hero-orb bg-gold-400/25 w-80 h-80 -top-28 -right-16"></div>
+    <div class="relative max-w-6xl mx-auto">
+      <div class="section-eyebrow text-gold-300 fade-up">Unity Credit Union</div>
+      <h1 class="!text-white text-3xl sm:text-5xl fade-up" style="--d:100ms">{{ heading }}</h1>
+      {% block page_sub %}{% endblock %}
+    </div>
+  </div>
+  {% endif %}
+  {% endblock %}
+
+  <main class="flex-1">
+    {% block breadcrumbs %}{% endblock %}
+    {% block content %}{% endblock %}
+  </main>
+
+  {% include "partials/_footer.html" %}
+</div>
+{% endblock %}

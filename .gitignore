@@ -1,0 +1,29 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Secrets and private data - never put these on GitHub
+.env
+.env.*
+!.env.example
+instance/
+*.db
+*.sqlite3
+/uploads/
+static/uploads/adverts/
+static/uploads/executives/
+static/uploads/gallery/
+static/uploads/carousel/
+static/uploads/greeting/
+*.log
+
+# Node
+node_modules/
+
+# Editor / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

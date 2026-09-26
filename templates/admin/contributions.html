@@ -1,0 +1,53 @@
+{% extends "layout_app.html" %}
+{% from "partials/_macros.html" import icon, pager, empty, person_photo %}
+{% block title %}Record contributions - Unity Credit Union{% endblock %}
+{% block page_title %}Record contributions{% endblock %}
+{% block page_sub %}<div class="text-xs text-ink-400 mt-0.5">Cycle {{ cycle_label }} &middot; total recorded this month GHS {{ month_total|money }}</div>{% endblock %}
+
+{% block content %}
+{% if locked %}<div class="mb-4 p-3 rounded bg-amber-50 border border-amber-200 text-amber-900 text-sm">Dividends were already declared for this cycle, so its contributions are closed.</div>{% endif %}
+
+<form method="GET" class="flex flex-col lg:flex-row lg:items-end gap-3 mb-4">
+  <div class="field lg:w-56"><label for="month">Month</label>
+    <select id="month" name="month" onchange="this.form.submit()">{% for value, label in months %}<option value="{{ value }}" {{ 'selected' if value == month }}>{{ label }}</option>{% endfor %}</select></div>
+  <div class="search-box max-w-none lg:max-w-sm">{{ icon('search') }}<input type="text" name="q" value="{{ q }}" placeholder="Search name, phone or UCU number" autocomplete="off"></div>
+  <div class="field lg:w-44"><label for="show">Show</label>
+    <select id="show" name="show" onchange="this.form.submit()"><option value="all" {{ 'selected' if show == 'all' }}>All members</option><option value="unpaid" {{ 'selected' if show == 'unpaid' }}>Not paid this month</option></select></div>
+  <button class="btn btn-primary" type="submit">Search</button>
+</form>
+
+<div class="card w-full">
+  {% if rows %}
+  <div class="tx-list">
+    {% for r in rows %}
+    <div class="px-4 sm:px-6 py-4 flex flex-col lg:flex-row lg:items-center gap-3 lg:gap-6">
+      <div class="flex items-center gap-3 flex-1 min-w-0">
+        {{ person_photo(r.user, "w-10 h-10") }}
+        <div class="min-w-0">
+          <a class="row-link block truncate" href="{{ url_for('admin.member_detail', user_id=r.user.id) }}">{{ r.user.full_name }}</a>
+          <div class="text-xs text-ink-400 font-mono">{{ r.user.account_number }}</div>
+        </div>
+      </div>
+      <div class="grid grid-cols-3 gap-4 lg:w-[360px] text-sm">
+        <div><div class="text-[11px] uppercase tracking-wide text-ink-400">Target</div><div class="font-mono">{{ r.target|money if r.target else '-' }}</div></div>
+        <div><div class="text-[11px] uppercase tracking-wide text-ink-400">Paid</div>
+          <div class="font-mono {{ 'text-green-700 font-semibold' if r.paid and (not r.target or r.paid >= r.target) else ('text-amber-700 font-semibold' if r.paid else 'text-ink-400') }}">{{ r.paid|money if r.paid else '0.00' }}</div></div>
+        <div><div class="text-[11px] uppercase tracking-wide text-ink-400">Cycle total</div><div class="font-mono">{{ r.cycle_total|money }}</div></div>
+      </div>
+      {% if not locked %}
+      <form method="POST" action="{{ url_for('admin.record_contribution', user_id=r.user.id) }}" class="flex gap-2 lg:w-64">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+        <input type="hidden" name="month" value="{{ month }}" />
+        <input type="hidden" name="next" value="{{ request.full_path.rstrip('?') }}" />
+        <input type="number" name="amount" step="0.01" min="0.01" inputmode="decimal" placeholder="Amount" required aria-label="Amount for {{ r.user.display_name }}" class="!w-full">
+        <button class="btn btn-gold flex-shrink-0" type="submit">Record</button>
+      </form>
+      {% endif %}
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}{{ empty("No members found", "Try another search or filter.") }}{% endif %}
+</div>
+{{ pager(pagination, 'admin.contributions', query_params) }}
+<p class="text-xs text-ink-400 mt-4">A member can pay in more than one part in a month. Every payment gets its own receipt by email. To fix a mistake, use the <a class="underline" href="{{ url_for('admin.contribution_log') }}">contribution log</a>.</p>
+{% endblock %}

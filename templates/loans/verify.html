@@ -1,0 +1,43 @@
+{% extends "layout_public.html" %}
+{% from "partials/_macros.html" import status_badge %}
+{% block title %}Verify a loan - Unity Credit Union{% endblock %}
+{% block page_title %}Verify a loan{% endblock %}
+{% block page_sub %}<p class="text-white/70 mt-2 text-sm sm:text-base">Check the status and balance of a loan with its reference number.</p>{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 sm:px-6 py-10 grid md:grid-cols-[1fr_1.2fr] gap-6 items-start">
+  <form method="POST" class="card card-pad" novalidate>
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+    <div class="field mb-4"><label for="reference">Loan reference</label>
+      <input type="text" id="reference" name="reference" value="{{ reference }}" placeholder="LN260012" autocapitalize="characters" required>
+      <span class="hint">You get it by email when you apply.</span></div>
+    <div class="field mb-5"><label for="contact">Your email or phone number</label>
+      <input type="text" id="contact" name="contact" required autocomplete="off"><span class="hint">The one you used on the loan application.</span></div>
+    <button type="submit" class="btn btn-gold btn-block">Verify loan</button>
+  </form>
+
+  {% if result %}
+  <div class="card card-pad">
+    <div class="flex items-center justify-between gap-3 mb-3"><h3>{{ result.reference }}</h3>{{ status_badge(result.display_status) }}</div>
+    <dl>
+      <div class="kv"><dt>Applicant</dt><dd>{{ result.user.first_name }} {{ result.user.last_name[:1] }}.</dd></div>
+      <div class="kv"><dt>Loan type</dt><dd>{{ result.type_label }}</dd></div>
+      <div class="kv"><dt>Amount</dt><dd class="font-mono">GHS {{ result.amount|money }}</dd></div>
+      <div class="kv"><dt>Applied on</dt><dd>{{ result.application_date|dmy }}</dd></div>
+      {% if result.status in ('approved', 'paid') %}
+      <div class="kv"><dt>Total to repay</dt><dd class="font-mono">GHS {{ (result.total_amount or 0)|money }}</dd></div>
+      <div class="kv"><dt>Paid so far</dt><dd class="font-mono">GHS {{ (result.amount_paid or 0)|money }}</dd></div>
+      <div class="kv"><dt>Balance</dt><dd class="font-mono font-semibold">GHS {{ (result.remaining_amount or 0)|money }}</dd></div>
+      <div class="kv"><dt>Due date</dt><dd>{{ result.repayment_date|dmy }}</dd></div>
+      {% endif %}
+    </dl>
+  </div>
+  {% else %}
+  <div class="text-sm text-ink-600 leading-relaxed">
+    <h3 class="text-base mb-2">How it works</h3>
+    <p>Type the reference number from your loan email together with the email or phone number on the application. We will show the current status of the loan.</p>
+    <p class="mt-3">Not a member yet? <a class="underline font-semibold text-navy-800" href="{{ url_for('loans.non_member_loan') }}">Apply with NMLOAN</a>.</p>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

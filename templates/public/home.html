@@ -1,0 +1,175 @@
+{% extends "layout_public.html" %}
+{% from "partials/_macros.html" import icon %}
+{% block title %}Unity Credit Union - Save together, borrow with confidence{% endblock %}
+
+{% block hero %}
+<section class="hero-panel">
+  <div class="hero-orb bg-gold-400/30 w-[26rem] h-[26rem] -top-32 -left-20"></div>
+  <div class="hero-orb bg-ucu-green/20 w-80 h-80 bottom-0 right-1/3" style="animation-delay:-5s"></div>
+
+  <div class="relative max-w-6xl mx-auto px-5 sm:px-8 pt-12 pb-20 lg:pt-20 lg:pb-28 grid lg:grid-cols-[1.25fr_0.75fr] gap-10 lg:gap-14 items-center">
+    <div>
+      <div class="section-eyebrow text-gold-300 fade-up" style="--d:60ms">Susu savings &amp; credit union</div>
+      <h1 class="!text-white text-[2.5rem] sm:text-5xl lg:text-[3.35rem] leading-[1.08] fade-up" style="--d:140ms">
+        Save together.<span class="block text-shine pb-1">Borrow with confidence.</span>
+      </h1>
+      <p class="text-white/70 mt-6 max-w-xl text-[15px] sm:text-[17px] leading-relaxed fade-up" style="--d:240ms">
+        Unity Credit Union brings members together to save every month, borrow at fair rates and share in a dividend at the end of every year.
+      </p>
+      <div class="mt-8 flex flex-col sm:flex-row gap-3 fade-up" style="--d:340ms">
+        <a href="{{ url_for('auth.register') }}" class="btn btn-gold px-7 py-3.5 text-[15px]">Become a member</a>
+        <a href="{{ url_for('loans.non_member_loan') }}" class="btn border-white/25 text-white hover:border-gold-300 hover:text-gold-300 px-7 py-3.5 text-[15px]">Non-member loan</a>
+      </div>
+
+      <dl class="mt-12 grid grid-cols-3 gap-3 sm:gap-4 max-w-lg fade-up" style="--d:460ms">
+        <div class="glass px-4 py-3.5"><dd class="font-display text-2xl sm:text-3xl text-white font-bold" data-count>{{ total_members }}</dd><dt class="text-[11px] uppercase tracking-[0.12em] text-white/55 mt-1">Members</dt></div>
+        <div class="glass px-4 py-3.5"><dd class="font-display text-2xl sm:text-3xl text-white font-bold" data-count>10+</dd><dt class="text-[11px] uppercase tracking-[0.12em] text-white/55 mt-1">Years</dt></div>
+        <div class="glass px-4 py-3.5"><dd class="font-display text-2xl sm:text-3xl text-white font-bold" data-count>3%</dd><dt class="text-[11px] uppercase tracking-[0.12em] text-white/55 mt-1">Loans from</dt></div>
+      </dl>
+    </div>
+
+    <div class="fade-up" style="--d:300ms">
+      <div class="login-card bg-cream-100 text-ink-900 p-6 sm:p-8">
+        {% if current_user.is_authenticated %}
+        <div class="avatar w-14 h-14 text-lg mb-4">{{ current_user.initials }}</div>
+        <h2 class="text-2xl mb-1">Welcome back, {{ current_user.first_name }}</h2>
+        <p class="text-sm text-ink-400 mb-6">You are signed in as {{ current_user.role_label|lower }}.</p>
+        <a href="{{ url_for('member.dashboard') }}" class="btn btn-primary btn-block mb-2.5">Go to my dashboard</a>
+        <a href="{{ url_for('auth.logout') }}" class="btn btn-outline btn-block">Sign out</a>
+        {% else %}
+        <h2 class="text-2xl mb-1">Sign in</h2>
+        <p class="text-sm text-ink-400 mb-6">Members and administrators use the same page.</p>
+        {% with prefix="home" %}{% include "auth/_login_form.html" %}{% endwith %}
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+{% block content %}
+<!-- Current cycle -->
+{% include "partials/_cycle_band.html" %}
+
+<!-- Carousel -->
+{% if slides %}
+<section class="max-w-6xl mx-auto px-5 sm:px-8 pt-12">
+  <div class="reveal reveal-zoom">{% with slides=slides %}{% include "partials/_carousel.html" %}{% endwith %}</div>
+</section>
+{% endif %}
+
+<!-- Season greeting -->
+{% if greeting %}{% include "partials/_greeting.html" %}{% endif %}
+
+<!-- How it works -->
+<section class="max-w-6xl mx-auto px-5 sm:px-8 py-20">
+  <div class="max-w-2xl reveal">
+    <div class="section-eyebrow text-gold-500 text-[11px] uppercase tracking-[0.18em] font-bold mb-3">How it works</div>
+    <h2 class="section-title">A simple, transparent way to grow your money</h2>
+  </div>
+  <div class="step-rail grid gap-10 sm:grid-cols-2 lg:grid-cols-4 mt-14" data-stagger="120">
+    {% for icon_name, title, text in [
+      ("user-plus", "Sign up", "Register with your Ghana Card details. The administrator checks them and sends your UCU account number."),
+      ("wallet", "Save every month", "Pay your monthly contribution. Each payment is recorded and receipted by email with your total savings."),
+      ("loan", "Borrow when you need", "Members borrow at low rates. Non-members can borrow too, with a UCU member as guarantor."),
+      ("cycle", "Share the dividend", "Our year runs September to August. At the end of it, members receive their interest or dividend.") ] %}
+    <div class="step-item text-center sm:text-left">
+      <div class="step-dot mx-auto sm:mx-0">{{ icon(icon_name, 'w-6 h-6') }}</div>
+      <h3 class="text-lg mt-5 mb-2">{{ title }}</h3>
+      <p class="text-sm text-ink-600 leading-relaxed">{{ text }}</p>
+    </div>
+    {% endfor %}
+  </div>
+  <p class="mt-12 text-sm text-ink-600 max-w-2xl reveal">To keep the union strong for everyone, partial withdrawals are not allowed. Members are always free to exit.</p>
+</section>
+
+<!-- Loans -->
+<section class="bg-white border-y border-line">
+  <div class="max-w-6xl mx-auto px-5 sm:px-8 py-20 grid lg:grid-cols-[0.8fr_1.2fr] gap-12 lg:gap-16 items-start" x-data="{ tab: 'member' }">
+    <div class="reveal reveal-left lg:sticky lg:top-28">
+      <div class="section-eyebrow text-gold-500 text-[11px] uppercase tracking-[0.18em] font-bold mb-3">Loans</div>
+      <h2 class="section-title">Fair rates, clear terms</h2>
+      <p class="text-ink-600 mt-4 leading-relaxed">Interest is a flat rate on the amount you borrow. Every loan is supported by a UCU member as guarantor, and you always know the total before you apply.</p>
+      <div class="mt-7 inline-flex p-1 rounded-full bg-cream-200 border border-line">
+        <button type="button" @click="tab = 'member'" class="px-5 py-2 rounded-full text-sm font-semibold transition-all duration-300" :class="tab === 'member' ? 'bg-navy-800 text-white shadow' : 'text-ink-600 hover:text-navy-800'">Members</button>
+        <button type="button" @click="tab = 'guest'" class="px-5 py-2 rounded-full text-sm font-semibold transition-all duration-300" :class="tab === 'guest' ? 'bg-navy-800 text-white shadow' : 'text-ink-600 hover:text-navy-800'">Non-members</button>
+      </div>
+      <div class="mt-8 flex flex-wrap gap-3">
+        <a href="{{ url_for('auth.register') }}" class="btn btn-gold">Become a member</a>
+        <a href="{{ url_for('loans.non_member_loan') }}" class="btn btn-outline">Apply as non-member</a>
+      </div>
+    </div>
+
+    <div class="reveal reveal-right card overflow-hidden">
+      <div x-show="tab === 'member'" x-transition:enter="transition ease-out duration-400" x-transition:enter-start="opacity-0 translate-y-3" x-transition:enter-end="opacity-100 translate-y-0">
+        {% for key in rules.MEMBER_LOAN_TYPES %}{% set t = rules.LOAN_TYPES[key] %}
+        <div class="rate-row">
+          <div><div class="font-semibold text-navy-800">{{ t.label }}{% if t.seasonal %} <span class="badge badge-amber ml-1.5">Seasonal</span>{% endif %}</div>
+            <div class="text-sm text-ink-600 mt-0.5">Repay within {{ t.days }} days</div></div>
+          <div class="rate-pct">{{ '%g' % t.rate }}<span class="text-lg text-gold-500">%</span></div>
+        </div>{% endfor %}
+      </div>
+      <div x-show="tab === 'guest'" x-cloak x-transition:enter="transition ease-out duration-400" x-transition:enter-start="opacity-0 translate-y-3" x-transition:enter-end="opacity-100 translate-y-0">
+        {% for key in rules.GUEST_LOAN_TYPES %}{% set t = rules.LOAN_TYPES[key] %}
+        <div class="rate-row">
+          <div><div class="font-semibold text-navy-800">{{ t.label }}</div><div class="text-sm text-ink-600 mt-0.5">Repay within {{ t.days }} days</div></div>
+          <div class="rate-pct">{{ '%g' % t.rate }}<span class="text-lg text-gold-500">%</span></div>
+        </div>{% endfor %}
+        <div class="px-6 py-4 bg-cream-100 text-sm text-ink-600">A UCU member must guarantee your loan. Apply with the NMLOAN button.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Executives -->
+{% if executives %}
+<section class="max-w-6xl mx-auto px-5 sm:px-8 py-20">
+  <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 reveal">
+    <div><div class="section-eyebrow text-gold-500 text-[11px] uppercase tracking-[0.18em] font-bold mb-3">Leadership</div>
+      <h2 class="section-title">The people behind the union</h2></div>
+    <a href="{{ url_for('public.about') }}" class="group text-sm font-semibold text-navy-800 hover:text-gold-500 inline-flex items-center gap-1.5 transition-colors">About us {{ icon('arrow', 'w-4 h-4 transition-transform group-hover:translate-x-1') }}</a>
+  </div>
+  {% set n = executives[:10]|length %}
+  <div class="grid grid-cols-2 md:grid-cols-3 {{ 'lg:grid-cols-3 lg:max-w-4xl lg:mx-auto' if n in (3, 6, 9) else ('lg:grid-cols-4' if n in (4, 8) else 'lg:grid-cols-5') }} gap-4 sm:gap-5 mt-12" data-stagger="100">
+    {% for e in executives[:10] %}
+    <article class="exec-card" tabindex="0">
+      {% if e.photo %}<img loading="lazy" src="{{ url_for('static', filename='uploads/executives/' + e.photo) }}" alt="{{ e.display_name }}">
+      {% else %}<div class="aspect-[4/5] flex items-center justify-center bg-navy-800"><span class="font-display text-5xl text-gold-300">{{ e.full_name[:1] }}</span></div>{% endif %}
+      <div class="exec-meta">
+        <div class="text-[10px] uppercase tracking-[0.16em] text-gold-300 font-semibold">{{ e.position }}</div>
+        <div class="font-display text-[15px] sm:text-base font-semibold leading-snug mt-0.5">{{ e.display_name }}</div>
+        {% if e.bio %}<p class="exec-bio">{{ e.bio }}</p>{% endif %}
+      </div>
+    </article>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+
+<!-- Gallery -->
+{% if gallery %}
+<section class="bg-white border-y border-line">
+  <div class="max-w-6xl mx-auto px-5 sm:px-8 py-20">
+    <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 reveal">
+      <div><div class="section-eyebrow text-gold-500 text-[11px] uppercase tracking-[0.18em] font-bold mb-3">Gallery</div>
+        <h2 class="section-title">Moments from the union</h2>
+        <p class="text-ink-600 mt-3 max-w-xl text-[15px]">Meetings, visits and gatherings that show how we work together.</p></div>
+      {% if gallery_total > gallery|length %}<a href="{{ url_for('public.gallery') }}" class="group text-sm font-semibold text-navy-800 hover:text-gold-500 inline-flex items-center gap-1.5 transition-colors">View all photos {{ icon('arrow', 'w-4 h-4 transition-transform group-hover:translate-x-1') }}</a>{% endif %}
+    </div>
+    <div class="mt-12">{% with photos=gallery %}{% include "partials/_gallery_grid.html" %}{% endwith %}</div>
+  </div>
+</section>
+{% endif %}
+
+<!-- Call to action -->
+<section class="max-w-6xl mx-auto px-5 sm:px-8 py-20">
+  <div class="cta-band px-6 sm:px-14 py-12 sm:py-16 text-center reveal reveal-zoom">
+    <h2 class="!text-white font-display text-3xl sm:text-4xl leading-tight">Ready to grow with Unity?</h2>
+    <p class="text-white/70 mt-4 max-w-xl mx-auto">Join our members who save together and support one another. Registration takes a few minutes.</p>
+    <div class="mt-8 flex flex-col sm:flex-row gap-3 justify-center">
+      <a href="{{ url_for('auth.register') }}" class="btn btn-gold px-8 py-3.5">Become a member</a>
+      <a href="{{ url_for('public.contact') }}" class="btn border-white/25 text-white hover:border-gold-300 hover:text-gold-300 px-8 py-3.5">Talk to us</a>
+    </div>
+  </div>
+</section>
+{% endblock %}

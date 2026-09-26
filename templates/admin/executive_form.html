@@ -1,0 +1,30 @@
+{% extends "layout_app.html" %}
+{% import "partials/_forms.html" as f %}
+{% block title %}{{ 'Edit executive' if item else 'Add executive' }} - Unity Credit Union{% endblock %}
+{% block page_title %}{{ 'Edit executive' if item else 'Add executive' }}{% endblock %}
+{% block breadcrumbs %}<nav class="breadcrumb"><a href="{{ url_for('admin.executives') }}">Executives</a><span class="sep">/</span><span class="current">{{ 'Edit' if item else 'Add' }}</span></nav>{% endblock %}
+{% block content %}
+<div class="card card-pad w-full max-w-2xl">
+  <form method="POST" enctype="multipart/form-data" novalidate x-data="{ pos: '{{ form.get('position') or '' }}' }">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+    <div class="grid sm:grid-cols-2 gap-4 sm:gap-5">
+      <div class="field"><label for="position">Position</label>
+        <select id="position" name="position" x-model="pos" required>
+          <option value="" disabled>Select position</option>
+          {% for p in positions %}<option value="{{ p }}">{{ p }}</option>{% endfor %}
+          <option value="__other__">Other...</option>
+        </select></div>
+      <div class="field" x-show="pos === '__other__'" x-cloak><label for="other_position">Position name</label><input type="text" id="other_position" name="other_position" value="{{ form.get('other_position') or '' }}" maxlength="60"></div>
+      {{ f.text("title", "Title", form, required=False, placeholder="Mr., Mrs., Dr.") }}
+      {{ f.text("full_name", "Full name", form) }}
+      {{ f.text("phone", "Phone", form, type="tel", required=False) }}
+      {{ f.text("email", "Email", form, type="email", required=False) }}
+      {{ f.textarea("bio", "Short description", form, rows=3, hint="Up to 300 characters.") }}
+      {{ f.upload("photo", "Photo", "image/png,image/jpeg", "JPG or PNG", required=False, existing_url=(url_for('static', filename='uploads/executives/' + item.photo) if item and item.photo else '')) }}
+      {{ f.text("display_order", "Order on the page", form, type="number", required=False, hint="Smaller numbers come first.") }}
+      <label class="flex items-center gap-2 text-sm sm:col-span-2 cursor-pointer"><input type="checkbox" name="is_active" class="w-4 h-4 accent-gold-500" {{ 'checked' if form.get('is_active') }}> Show on the website</label>
+    </div>
+    <div class="mt-7 flex flex-col-reverse sm:flex-row sm:justify-between gap-3"><a href="{{ url_for('admin.executives') }}" class="btn btn-outline">Cancel</a><button class="btn btn-gold sm:min-w-[160px]" type="submit">Save</button></div>
+  </form>
+</div>
+{% endblock %}

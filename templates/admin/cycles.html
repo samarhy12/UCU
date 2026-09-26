@@ -1,0 +1,19 @@
+{% extends "layout_app.html" %}
+{% from "partials/_macros.html" import status_badge, empty %}
+{% block title %}Cycles and dividends - Unity Credit Union{% endblock %}
+{% block page_title %}Cycles &amp; dividends{% endblock %}
+{% block page_sub %}<div class="text-xs text-ink-400 mt-0.5">Each cycle runs from 1 September to 31 August. A new one opens by itself every September.</div>{% endblock %}
+{% block content %}
+<div class="card w-full">
+  {% if rows %}
+  <div class="overflow-x-auto"><table class="data-table">
+    <thead><tr><th>Cycle</th><th>Dates</th><th>Status</th><th class="text-right">Contributions</th><th>Dividend</th><th></th></tr></thead>
+    <tbody>{% for r in rows %}<tr>
+      <td class="font-semibold">{{ r.cycle.label }}</td><td class="whitespace-nowrap">{{ r.cycle.start_date|dmy }} to {{ r.cycle.end_date|dmy }}</td>
+      <td>{{ status_badge(r.cycle.status) }}</td><td class="num text-right">GHS {{ r.total|money }}</td>
+      <td>{% if r.cycle.dividend_declared_at %}{{ '%g' % r.cycle.dividend_rate }}% &middot; GHS {{ r.dividend_total|money }}{% else %}<span class="text-ink-400">Not declared</span>{% endif %}</td>
+      <td class="text-right"><a class="btn btn-outline btn-sm" href="{{ url_for('admin.cycle_detail', cycle_id=r.cycle.id) }}">Open</a></td></tr>{% endfor %}</tbody>
+  </table></div>
+  {% else %}{{ empty("No cycles yet") }}{% endif %}
+</div>
+{% endblock %}

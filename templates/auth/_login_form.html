@@ -1,0 +1,19 @@
+<form method="POST" action="{{ url_for('auth.login', next=request.args.get('next')) if request.args.get('next') else url_for('auth.login') }}" novalidate>
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+  <div class="field mb-4">
+    <label for="{{ prefix|default('lf') }}-email">Email</label>
+    <input type="email" id="{{ prefix|default('lf') }}-email" name="email" value="{{ email or '' }}" autocomplete="username" inputmode="email" required />
+  </div>
+  <div class="field mb-4">
+    <label for="{{ prefix|default('lf') }}-password">Password</label>
+    <input type="password" id="{{ prefix|default('lf') }}-password" name="password" autocomplete="current-password" required />
+  </div>
+  <div class="flex items-center justify-between gap-3 mb-5">
+    <label class="flex items-center gap-2 text-sm text-ink-600 cursor-pointer">
+      <input type="checkbox" name="remember" class="w-4 h-4 accent-gold-500" /> Keep me signed in
+    </label>
+    <a href="{{ url_for('auth.forgot_password') }}" class="text-sm text-gold-500 font-semibold hover:underline">Forgot password?</a>
+  </div>
+  <button type="submit" class="btn btn-gold btn-block">Sign in</button>
+  <p class="text-sm text-ink-600 text-center mt-4">Don't have an account? <a href="{{ url_for('auth.register') }}" class="text-navy-800 font-semibold hover:text-gold-500 underline">Click to register</a></p>
+</form>

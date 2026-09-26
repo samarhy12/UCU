@@ -1,0 +1,72 @@
+{% extends "layout_app.html" %}
+{% from "partials/_macros.html" import icon, status_badge, person_photo %}
+{% block title %}Admin dashboard - Unity Credit Union{% endblock %}
+{% block page_title %}Administrator dashboard{% endblock %}
+{% block page_sub %}
+<div class="flex items-center gap-3 text-xs text-ink-400 mt-0.5"><span>Cycle {{ cycle_label }} &middot; {{ stats.days_to_cycle_end }} days left</span><span class="text-line hidden sm:inline">|</span>
+<span id="live-datetime" class="hidden sm:inline font-mono text-gold-500 font-semibold"></span></div>{% endblock %}
+
+{% block content %}
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+  <div class="stat-card"><div class="stat-label">Active members</div><div class="stat-value">{{ stats.members }}</div><div class="stat-foot">{{ stats.signups }} sign-ups in all &middot; {{ stats.exited }} exited</div></div>
+  <a href="{{ url_for('admin.members_list', status='pending') }}" class="stat-card {{ 'warn' if stats.pending_members }} block"><div class="stat-label">To verify</div><div class="stat-value">{{ stats.pending_members }}</div><div class="stat-foot">New sign-ups waiting</div></a>
+  <a href="{{ url_for('admin.loans_list', status='pending') }}" class="stat-card {{ 'warn' if stats.pending_loans }} block"><div class="stat-label">Loans waiting</div><div class="stat-value">{{ stats.pending_loans }}</div><div class="stat-foot">Applications to verify</div></a>
+  <a href="{{ url_for('admin.loans_list', status='overdue') }}" class="stat-card {{ 'warn' if stats.overdue }} block"><div class="stat-label">Overdue loans</div><div class="stat-value">{{ stats.overdue }}</div><div class="stat-foot">Past the due date</div></a>
+</div>
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+  <div class="stat-card"><div class="stat-label">{{ this_month_label }}</div><div class="stat-value text-xl sm:text-2xl">GHS {{ stats.month_total|money }}</div><div class="stat-foot">Contributions this month</div></div>
+  <div class="stat-card"><div class="stat-label">Cycle {{ cycle_label }}</div><div class="stat-value text-xl sm:text-2xl">GHS {{ stats.cycle_total|money }}</div><div class="stat-foot">Contributions this cycle</div></div>
+  <div class="stat-card"><div class="stat-label">All-time savings</div><div class="stat-value text-xl sm:text-2xl">GHS {{ stats.all_time|money }}</div><div class="stat-foot">All members</div></div>
+  <div class="stat-card"><div class="stat-label">Loans owed to UCU</div><div class="stat-value text-xl sm:text-2xl">GHS {{ stats.loan_balance|money }}</div><div class="stat-foot">Balance on running loans</div></div>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-[1.3fr_1fr] gap-5 items-start">
+  <div class="space-y-5 min-w-0">
+    <div class="card">
+      <div class="card-header"><h3>Sign-ups waiting for verification</h3><a href="{{ url_for('admin.members_list', status='pending') }}" class="btn btn-outline btn-sm">See all</a></div>
+      {% if pending_members %}<div class="tx-list">{% for m in pending_members %}
+        <a href="{{ url_for('admin.member_detail', user_id=m.id) }}" class="tx-row hover:bg-cream-100">
+          {{ person_photo(m) }}<div class="tx-body"><div class="tx-title">{{ m.display_name }}</div><div class="tx-sub">{{ m.phone_number }} &middot; {{ m.created_at|dmy }}</div></div>
+          <span class="btn btn-gold btn-sm">Review</span></a>{% endfor %}</div>
+      {% else %}<div class="empty-state !py-8"><p>No sign-ups are waiting.</p></div>{% endif %}
+    </div>
+    <div class="card">
+      <div class="card-header"><h3>Loan applications waiting</h3><a href="{{ url_for('admin.loans_list', status='pending') }}" class="btn btn-outline btn-sm">See all</a></div>
+      {% if pending_loans %}<div class="tx-list">{% for l in pending_loans %}
+        <a href="{{ url_for('admin.loan_detail', loan_id=l.id) }}" class="tx-row hover:bg-cream-100">
+          <div class="tx-body"><div class="tx-title">{{ l.user.display_name }}{% if l.user.is_guest %} <span class="badge badge-blue ml-1">non-member</span>{% endif %}</div><div class="tx-sub">{{ l.reference }} &middot; {{ l.type_label }}</div></div>
+          <div class="tx-amount">GHS {{ l.amount|money }}</div></a>{% endfor %}</div>
+      {% else %}<div class="empty-state !py-8"><p>No loans are waiting.</p></div>{% endif %}
+    </div>
+  </div>
+
+  <div class="space-y-5 min-w-0">
+    <div class="card card-pad">
+      <h3 class="mb-4">Quick actions</h3>
+      <div class="flex flex-col gap-2.5">
+        <a href="{{ url_for('admin.contributions') }}" class="btn btn-gold btn-block">+ Record contributions</a>
+        <a href="{{ url_for('admin.member_new') }}" class="btn btn-primary btn-block">+ Add a member</a>
+        <a href="{{ url_for('admin.adverts') }}" class="btn btn-outline btn-block">Manage adverts</a>
+        <a href="{{ url_for('admin.reports') }}" class="btn btn-outline btn-block">View reports</a>
+      </div>
+    </div>
+    {% if overdue %}
+    <div class="card">
+      <div class="card-header"><h3>Overdue loans</h3></div>
+      <div class="tx-list">{% for l in overdue %}
+        <a href="{{ url_for('admin.loan_detail', loan_id=l.id) }}" class="tx-row hover:bg-cream-100"><div class="tx-icon out">{{ icon('alert', 'w-[18px] h-[18px]') }}</div>
+          <div class="tx-body"><div class="tx-title">{{ l.user.display_name }}</div><div class="tx-sub">Due {{ l.repayment_date|dmy }}</div></div>
+          <div class="tx-amount out">{{ l.remaining_amount|money }}</div></a>{% endfor %}</div>
+    </div>
+    {% endif %}
+    <div class="card">
+      <div class="card-header"><h3>Latest contributions</h3><a href="{{ url_for('admin.contribution_log') }}" class="btn btn-outline btn-sm">Log</a></div>
+      {% if recent %}<div class="tx-list">{% for c in recent %}
+        <div class="tx-row"><div class="tx-icon in">{{ icon('check', 'w-[18px] h-[18px]') }}</div>
+          <div class="tx-body"><div class="tx-title">{{ c.user.display_name }}</div><div class="tx-sub">{{ c.month|month_label }} &middot; {{ c.date|dmy }}</div></div>
+          <div class="tx-amount in">+{{ c.amount|money }}</div></div>{% endfor %}</div>
+      {% else %}<div class="empty-state !py-8"><p>Nothing recorded yet.</p></div>{% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

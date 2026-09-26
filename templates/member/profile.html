@@ -1,0 +1,50 @@
+{% extends "layout_app.html" %}
+{% import "partials/_forms.html" as f %}
+{% from "partials/_macros.html" import person_photo %}
+{% block title %}My profile - Unity Credit Union{% endblock %}
+{% block page_title %}My profile{% endblock %}
+
+{% block content %}
+<div class="grid lg:grid-cols-[320px_1fr] gap-5 items-start">
+  <div class="card card-pad text-center">
+    {{ person_photo(user, "w-24 h-24 mx-auto", "text-2xl") }}
+    <h3 class="mt-3">{{ user.full_name }}</h3>
+    <div class="text-sm text-ink-400">{{ user.role_label }}</div>
+    {% if user.account_number and not user.is_admin %}<div class="mt-3 inline-block bg-navy-800 text-gold-400 font-mono font-semibold px-3 py-1.5 rounded text-sm">{{ user.account_number }}</div>
+    <p class="text-xs text-ink-400 mt-2">Your UCU account number. Give it when you guarantee a loan.</p>{% endif %}
+    <dl class="text-left mt-5">
+      <div class="kv"><dt>Email</dt><dd>{{ user.email }}</dd></div>
+      {% if not user.is_admin %}
+      <div class="kv"><dt>Date of birth</dt><dd>{{ user.date_of_birth|dmy }}</dd></div>
+      <div class="kv"><dt>Ghana Card</dt><dd>{{ user.national_id }}</dd></div>
+      {% endif %}
+    </dl>
+    <p class="text-xs text-ink-400 mt-3">To change your name, email, date of birth or Ghana Card number, please contact the administrator.</p>
+  </div>
+
+  {% if editable %}
+  <form method="POST" class="card card-pad" novalidate>
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+    {% set data = form if form else {
+      "occupation": user.occupation, "phone_number": user.phone_number, "address": user.address, "hometown": user.hometown,
+      "city": user.city, "state": user.state, "country": user.country, "nok_name": user.nok_name,
+      "nok_phone": user.nok_phone, "nok_relationship": user.nok_relationship } %}
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
+      <div class="form-section-title">Contact details</div>
+      {{ f.text("phone_number", "Phone number", data, type="tel", inputmode="tel") }}
+      {{ f.text("occupation", "Occupation", data) }}
+      {{ f.text("address", "Address", data, span2=True) }}
+      {{ f.text("hometown", "Hometown", data) }}
+      {{ f.text("city", "Place of living", data) }}
+      {{ f.select("state", "Region", data, regions) }}
+      {{ f.text("country", "Country", data) }}
+      <div class="form-section-title">Next of kin</div>
+      {{ f.text("nok_name", "Full name", data) }}
+      {{ f.text("nok_phone", "Phone number", data, type="tel", inputmode="tel") }}
+      {{ f.text("nok_relationship", "Relationship", data) }}
+    </div>
+    <div class="mt-6"><button type="submit" class="btn btn-gold">Save changes</button></div>
+  </form>
+  {% endif %}
+</div>
+{% endblock %}

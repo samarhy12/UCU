@@ -1,0 +1,23 @@
+{% extends "layout_public.html" %}
+{% block title %}Register - Unity Credit Union{% endblock %}
+{% block content %}
+<div class="px-4 sm:px-6 py-8 sm:py-12">
+  <div class="w-full max-w-3xl mx-auto">
+    <h1 class="text-2xl sm:text-3xl mb-1.5">Become a member</h1>
+    <p class="text-ink-600 text-sm mb-6">Fill in the form below. The administrator will check your details and you will get an email when your membership is accepted. Already have an account? <a href="{{ url_for('auth.login') }}" class="text-navy-800 font-semibold underline">Sign in</a>.</p>
+
+    <div class="card card-pad">
+      <form method="POST" enctype="multipart/form-data" novalidate>
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
+          {% with show_password=true, docs_required=true %}{% include "partials/_member_fields.html" %}{% endwith %}
+        </div>
+        <div class="mt-7 flex flex-col-reverse sm:flex-row sm:justify-between gap-3">
+          <a href="{{ url_for('public.home') }}" class="btn btn-outline">Cancel</a>
+          <button type="submit" class="btn btn-gold sm:min-w-[200px]">Submit for verification</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

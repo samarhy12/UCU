@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Guarantor Agreement Form</title>
+    <style>
+        body {
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 12pt;
+            line-height: 1.6;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px;
+            background: white;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #000;
+            padding-bottom: 20px;
+        }
+        .header h1 {
+            font-size: 18pt;
+            margin: 0;
+            color: #000;
+        }
+        .header h2 {
+            font-size: 14pt;
+            margin: 10px 0 0 0;
+            color: #333;
+        }
+        .section {
+            margin-bottom: 25px;
+        }
+        .section-title {
+            font-weight: bold;
+            font-size: 14pt;
+            margin-bottom: 10px;
+            color: #000;
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 5px;
+        }
+        .form-field {
+            margin-bottom: 8px;
+        }
+        .form-field label {
+            font-weight: bold;
+            display: inline-block;
+            width: 200px;
+        }
+        .form-field .value {
+            display: inline-block;
+            border-bottom: 1px dotted #000;
+            padding: 0 5px;
+            min-width: 200px;
+        }
+        .agreement-box {
+            border: 2px solid #000;
+            padding: 20px;
+            margin: 20px 0;
+            background-color: #f9f9f9;
+        }
+        .agreement-box h3 {
+            margin-top: 0;
+            font-size: 14pt;
+        }
+        .signature-section {
+            margin-top: 40px;
+            display: flex;
+            justify-content: space-between;
+        }
+        .signature-block {
+            width: 45%;
+        }
+        .signature-line {
+            border-top: 1px solid #000;
+            margin-top: 60px;
+            margin-bottom: 10px;
+        }
+        .date-line {
+            border-top: 1px solid #000;
+            margin-top: 40px;
+        }
+        .warning {
+            background-color: #fff3cd;
+            border: 1px solid #ffc107;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        .warning h4 {
+            margin: 0 0 10px 0;
+            color: #856404;
+        }
+        .warning p {
+            margin: 0;
+            color: #856404;
+        }
+        @media print {
+            body {
+                padding: 20px;
+            }
+            .warning {
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+            .agreement-box {
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>UNITY CREDIT UNION</h1>
+        <h2>GUARANTOR AGREEMENT FORM</h2>
+    </div>
+
+    <div class="warning">
+        <h4>⚠️ IMPORTANT LEGAL DOCUMENT</h4>
+        <p>This is a legally binding agreement. By signing below, you acknowledge that you are personally liable for 50% of the outstanding loan balance if the primary applicant fails to repay.</p>
+    </div>
+
+    <div class="section">
+        <div class="section-title">PRIMARY APPLICANT DETAILS</div>
+        <div class="form-field">
+            <label>Full Name:</label>
+            <span class="value">{{ applicant_name }}</span>
+        </div>
+        <div class="form-field">
+            <label>Email:</label>
+            <span class="value">{{ applicant_email }}</span>
+        </div>
+        <div class="form-field">
+            <label>Phone:</label>
+            <span class="value">{{ applicant_phone }}</span>
+        </div>
+        <div class="form-field">
+            <label>Loan Amount:</label>
+            <span class="value">GHS {{ loan_amount }}</span>
+        </div>
+        <div class="form-field">
+            <label>Loan Purpose:</label>
+            <span class="value">{{ loan_purpose }}</span>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="section-title">GUARANTOR 1 (MEMBER)</div>
+        <div class="form-field">
+            <label>Full Name:</label>
+            <span class="value">{{ g1_name }}</span>
+        </div>
+        <div class="form-field">
+            <label>Email:</label>
+            <span class="value">{{ g1_email }}</span>
+        </div>
+        <div class="form-field">
+            <label>Phone:</label>
+            <span class="value">{{ g1_phone }}</span>
+        </div>
+        <div class="form-field">
+            <label>UCU Number:</label>
+            <span class="value">{{ g1_ucu_number }}</span>
+        </div>
+        <div class="form-field">
+            <label>Yearly Earnings:</label>
+            <span class="value">GHS {{ g1_earnings }}</span>
+        </div>
+    </div>
+
+    <div class="agreement-box">
+        <h3>GUARANTOR 1 LEGAL ACKNOWLEDGMENT</h3>
+        <p><strong>The Member Guarantor.</strong> I legally acknowledge that if the primary applicant fails to repay this loan, I am personally liable to pay 50% of the outstanding balance.</p>
+        <p>I understand that this liability continues until the loan is fully repaid, regardless of any changes in my relationship with the primary applicant.</p>
+    </div>
+
+    {% if g2_name %}
+    <div class="section">
+        <div class="section-title">GUARANTOR 2</div>
+        <div class="form-field">
+            <label>Full Name:</label>
+            <span class="value">{{ g2_name }}</span>
+        </div>
+        <div class="form-field">
+            <label>Email:</label>
+            <span class="value">{{ g2_email }}</span>
+        </div>
+        <div class="form-field">
+            <label>Phone:</label>
+            <span class="value">{{ g2_phone }}</span>
+        </div>
+        {% if g2_ucu_number %}
+        <div class="form-field">
+            <label>UCU Number:</label>
+            <span class="value">{{ g2_ucu_number }}</span>
+        </div>
+        {% endif %}
+        <div class="form-field">
+            <label>Yearly Earnings:</label>
+            <span class="value">GHS {{ g2_earnings }}</span>
+        </div>
+    </div>
+
+    <div class="agreement-box">
+        <h3>GUARANTOR 2 LEGAL ACKNOWLEDGMENT</h3>
+        <p><strong>The Second Guarantor.</strong> I legally acknowledge that if the primary applicant fails to repay this loan, I am personally liable to pay 50% of the outstanding balance.</p>
+        <p>I understand that this liability continues until the loan is fully repaid, regardless of any changes in my relationship with the primary applicant.</p>
+    </div>
+    {% endif %}
+
+    <div class="signature-section">
+        <div class="signature-block">
+            <h4>GUARANTOR 1 SIGNATURE</h4>
+            <div class="signature-line"></div>
+            <p>Date: <span class="value" style="min-width: 150px;"></span></p>
+            <div class="date-line"></div>
+        </div>
+        {% if g2_name %}
+        <div class="signature-block">
+            <h4>GUARANTOR 2 SIGNATURE</h4>
+            <div class="signature-line"></div>
+            <p>Date: <span class="value" style="min-width: 150px;"></span></p>
+            <div class="date-line"></div>
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="section" style="margin-top: 50px;">
+        <div class="section-title">WITNESS INFORMATION</div>
+        <div class="form-field">
+            <label>Witness Name:</label>
+            <span class="value"></span>
+        </div>
+        <div class="form-field">
+            <label>Witness Signature:</label>
+            <span class="value"></span>
+        </div>
+        <div class="form-field">
+            <label>Date:</label>
+            <span class="value"></span>
+        </div>
+    </div>
+
+    <div style="margin-top: 50px; font-size: 10pt; color: #666;">
+        <p><strong>Unity Credit Union</strong></p>
+        <p>This document is generated on {{ current_date }}.</p>
+        <p>For any questions, please contact Unity Credit Union administration.</p>
+    </div>
+</body>
+</html>

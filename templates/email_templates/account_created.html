@@ -1,0 +1,4 @@
+{% extends "email_templates/base_email.html" %}
+{% block content %}
+<p>Hello {{ user.first_name }},</p><p>Thank you for signing up with Unity Credit Union. Your details are <strong>waiting for verification</strong> by the administrator.</p><p>You will get another email as soon as your membership is accepted or if we need to correct something.</p><div style="background:#F6F4EF;border:1px solid #DEDACC;border-radius:4px;padding:14px 16px;margin:16px 0;"><strong>What happens next</strong><br>The administrator checks your Ghana Card and details. This usually takes a short time.</div>
+{% endblock %}

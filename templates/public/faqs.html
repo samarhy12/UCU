@@ -1,0 +1,25 @@
+{% extends "layout_public.html" %}
+{% from "partials/_macros.html" import icon %}
+{% block title %}FAQs - Unity Credit Union{% endblock %}
+{% block page_title %}Frequently asked questions{% endblock %}
+{% block page_sub %}<p class="text-white/70 mt-2 text-sm sm:text-base">Quick answers about saving, loans and your account.</p>{% endblock %}
+
+{% block content %}
+<section class="max-w-3xl mx-auto px-5 sm:px-8 py-12">
+  <div class="space-y-3" x-data="{ open: 0 }" data-stagger="70">
+    {% for q, a in faqs %}
+    <div class="faq-item">
+      <button type="button" class="w-full flex items-center justify-between gap-4 text-left px-5 py-4" @click="open = (open === {{ loop.index }} ? 0 : {{ loop.index }})" :aria-expanded="open === {{ loop.index }}">
+        <span class="font-semibold text-[15px] text-navy-800">{{ q }}</span>
+        <span class="flex-shrink-0 text-gold-500 transition-transform" :class="open === {{ loop.index }} ? 'rotate-45' : ''">{{ icon('plus', 'w-5 h-5') }}</span>
+      </button>
+      <div x-show="open === {{ loop.index }}" x-cloak x-transition class="px-5 pb-5 text-sm text-ink-600 leading-relaxed">{{ a }}</div>
+    </div>
+    {% endfor %}
+  </div>
+  <div class="mt-10 card card-pad flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+    <div><h3 class="text-base">Still have a question?</h3><p class="text-sm text-ink-600 mt-1">We are happy to help.</p></div>
+    <a href="{{ url_for('public.contact') }}" class="btn btn-gold">Contact us</a>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,25 @@
+{# Current annual cycle (1 September to 31 August). Expects: cycle #}
+<div class="max-w-6xl mx-auto px-5 sm:px-8 relative z-10 -mt-8 sm:-mt-10">
+  <div class="cyc-card reveal px-5 sm:px-8 py-6 sm:py-7 grid gap-6 lg:grid-cols-[auto_1fr_auto] lg:items-center">
+    <div>
+      <div class="flex items-center gap-2 text-[11px] uppercase tracking-[0.16em] font-bold text-ucu-green"><span class="pulse-dot"></span>Current savings cycle</div>
+      <div class="font-display text-3xl sm:text-4xl font-bold text-navy-800 mt-1.5 leading-none">{{ cycle.label }}</div>
+      <div class="text-[13px] text-ink-600 mt-2">{{ cycle.start|dmy }} &ndash; {{ cycle.end|dmy }}</div>
+    </div>
+
+    <div>
+      <div class="grid grid-cols-12 gap-1 sm:gap-1.5">
+        {% for m in cycle.months %}
+        <div class="cyc-m {{ m.state }}" style="--d: {{ loop.index0 * 70 }}ms; --p: {{ m.fill }}" title="{{ m.key|month_label }}">
+          <div class="cyc-bar"></div><div class="cyc-label"><span class="sm:hidden">{{ m.short[:1] }}</span><span class="hidden sm:inline">{{ m.short }}</span></div>
+        </div>{% endfor %}
+      </div>
+      <p class="text-[12.5px] text-ink-600 mt-3">Month {{ cycle.month_number }} of 12. A new cycle opens every 1 September and members receive their dividend when it closes.</p>
+    </div>
+
+    <div class="flex lg:flex-col items-baseline lg:items-end gap-2 lg:gap-0 lg:text-right">
+      <div class="font-display text-3xl sm:text-4xl font-bold text-navy-800 leading-none" data-count>{{ cycle.days_left }}</div>
+      <div class="text-[11px] uppercase tracking-[0.14em] text-ink-400 font-semibold lg:mt-1.5">days left</div>
+    </div>
+  </div>
+</div>

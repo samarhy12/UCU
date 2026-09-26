@@ -1,0 +1,32 @@
+{% extends "layout_public.html" %}
+{% from "partials/_macros.html" import icon, social_icon %}
+{% block title %}Contact us - Unity Credit Union{% endblock %}
+{% block page_title %}Contact us{% endblock %}
+{% block page_sub %}<p class="text-white/70 mt-2 text-sm sm:text-base">We are always here to help.</p>{% endblock %}
+
+{% block content %}
+<section class="max-w-5xl mx-auto px-5 sm:px-8 py-12 grid md:grid-cols-[1fr_1.2fr] gap-8">
+  <div class="space-y-4">
+    <div class="card card-pad">
+      <h3 class="text-base mb-4">Reach us directly</h3>
+      <ul class="space-y-4 text-sm">
+        <li class="flex items-start gap-3">{{ icon('mail', 'w-5 h-5 text-gold-500 mt-0.5') }}<a class="hover:text-gold-500 break-all" href="mailto:{{ org.email }}">{{ org.email }}</a></li>
+        <li class="flex items-start gap-3">{{ icon('phone', 'w-5 h-5 text-gold-500 mt-0.5') }}<a class="hover:text-gold-500" href="tel:{{ org.phone }}">{{ org.phone }}</a></li>
+      </ul>
+      <a href="{{ org.whatsapp }}" target="_blank" rel="noopener" class="btn btn-primary btn-block mt-5">{{ social_icon('whatsapp', 'w-5 h-5') }} Chat on WhatsApp</a>
+    </div>
+  </div>
+  <form method="POST" class="card card-pad" novalidate>
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+    <div class="hidden" aria-hidden="true"><label>Website <input type="text" name="website" tabindex="-1" autocomplete="off"></label></div>
+    <h3 class="text-base mb-4">Send us a message</h3>
+    <div class="grid gap-4">
+      <div class="field"><label for="full_name">Full name</label><input type="text" id="full_name" name="full_name" value="{{ form.get('full_name','') }}" required autocomplete="name"></div>
+      <div class="field"><label for="email">Email</label><input type="email" id="email" name="email" value="{{ form.get('email','') }}" required autocomplete="email" inputmode="email"></div>
+      <div class="field"><label for="phone">Phone <span class="font-normal text-ink-400">(optional)</span></label><input type="tel" id="phone" name="phone" value="{{ form.get('phone','') }}" autocomplete="tel"></div>
+      <div class="field"><label for="message">Message</label><textarea id="message" name="message" rows="5" required>{{ form.get('message','') }}</textarea></div>
+      <button type="submit" class="btn btn-gold">Send message</button>
+    </div>
+  </form>
+</section>
+{% endblock %}

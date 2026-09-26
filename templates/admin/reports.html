@@ -1,0 +1,44 @@
+{% extends "layout_app.html" %}
+{% from "partials/_macros.html" import icon %}
+{% block title %}Reports - Unity Credit Union{% endblock %}
+{% block page_title %}Reports{% endblock %}
+{% block page_sub %}<div class="text-xs text-ink-400 mt-0.5">Cycle {{ cycle_label }}</div>{% endblock %}
+{% block content %}
+<div class="flex items-center justify-between gap-3 mb-5 no-print">
+  <form method="GET" class="flex items-center gap-2"><label for="cycle" class="text-sm text-ink-600">Cycle</label>
+    <select id="cycle" name="cycle" onchange="this.form.submit()" class="!w-auto">{% for c in cycles %}<option value="{{ c.start_year }}" {{ 'selected' if c.start_year == start_year }}>{{ c.label }}</option>{% endfor %}</select></form>
+  <button onclick="window.print()" class="btn btn-outline btn-sm">{{ icon('print', 'w-4 h-4') }} Print</button>
+</div>
+
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+  <div class="stat-card"><div class="stat-label">Saved this cycle</div><div class="stat-value text-xl">GHS {{ cycle_total|money }}</div></div>
+  <div class="stat-card"><div class="stat-label">Members who paid</div><div class="stat-value text-xl">{{ payers }} of {{ members }}</div></div>
+  <div class="stat-card"><div class="stat-label">Lent out</div><div class="stat-value text-xl">GHS {{ loan_totals.lent|money }}</div><div class="stat-foot">All approved loans</div></div>
+  <div class="stat-card"><div class="stat-label">Still owed</div><div class="stat-value text-xl">GHS {{ loan_totals.outstanding|money }}</div><div class="stat-foot">Collected: GHS {{ loan_totals.collected|money }}</div></div>
+</div>
+
+<div class="card card-pad mb-6">
+  <h3 class="mb-4">Contributions by month</h3>
+  <div class="grid grid-cols-6 sm:grid-cols-12 gap-2">
+    {% for m in monthly %}
+    <div class="text-center" title="{{ m.full_label }}: GHS {{ m.total|money }}">
+      <div class="bar-track"><div class="bar-fill" style="height: {{ [m.percent, 2]|max if m.total else 0 }}%"></div></div>
+      <div class="text-[11px] text-ink-400 mt-1.5">{{ m.label }}</div>
+      <div class="font-mono text-[10.5px] text-ink-600">{{ '{:,.0f}'.format(m.total) }}</div>
+    </div>{% endfor %}
+  </div>
+</div>
+
+<div class="card w-full mb-6">
+  <div class="card-header"><h3>Loans by type</h3></div>
+  <div class="overflow-x-auto"><table class="data-table"><thead><tr><th>Loan type</th><th class="text-right">Loans</th><th class="text-right">Lent</th><th class="text-right">Collected</th><th class="text-right">Owed</th></tr></thead><tbody>
+    {% for t in by_type %}<tr><td>{{ t.label }}</td><td class="num text-right">{{ t.count }}</td><td class="num text-right">{{ t.lent|money }}</td><td class="num text-right">{{ t.paid|money }}</td><td class="num text-right">{{ t.owed|money }}</td></tr>{% endfor %}</tbody></table></div>
+</div>
+
+<div class="grid sm:grid-cols-2 gap-5">
+  <div class="card card-pad"><h3 class="mb-2">Loan status</h3><dl>
+    {% for s in ['pending','approved','paid','rejected','cancelled'] %}<div class="kv"><dt>{{ {'approved': 'Running'}.get(s, s|capitalize) }}</dt><dd>{{ status_counts.get(s, 0) }}</dd></div>{% endfor %}</dl></div>
+  <div class="card card-pad"><h3 class="mb-2">People</h3><dl>
+    <div class="kv"><dt>Active members</dt><dd>{{ members }}</dd></div><div class="kv"><dt>Non-member borrowers</dt><dd>{{ guests }}</dd></div></dl></div>
+</div>
+{% endblock %}

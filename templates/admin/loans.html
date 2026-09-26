@@ -1,0 +1,31 @@
+{% extends "layout_app.html" %}
+{% from "partials/_macros.html" import icon, status_badge, pager, empty %}
+{% block title %}Loans - Unity Credit Union{% endblock %}
+{% block page_title %}Loans{% endblock %}
+{% block page_sub %}<div class="text-xs text-ink-400 mt-0.5">{{ pagination.total }} loan{{ 's' if pagination.total != 1 }}</div>{% endblock %}
+
+{% block content %}
+<form method="GET" class="flex flex-col lg:flex-row gap-3 mb-4">
+  <input type="hidden" name="status" value="{{ status }}">
+  <div class="search-box">{{ icon('search') }}<input type="text" name="q" value="{{ q }}" placeholder="Search name, UCU number, phone or reference" autocomplete="off"></div>
+  <select name="type" onchange="this.form.submit()" class="lg:!w-64"><option value="">All loan types</option>{% for key, t in types.items() %}<option value="{{ key }}" {{ 'selected' if key == loan_type }}>{{ t.label }}</option>{% endfor %}</select>
+  <button class="btn btn-primary" type="submit">Search</button>
+</form>
+<div class="flex flex-wrap gap-2 mb-4">
+  {% for key, label in filters %}<a href="{{ url_for('admin.loans_list', status=key, type=loan_type or None, q=q or None) }}" class="btn btn-sm {{ 'btn-primary' if status == key else 'btn-outline' }}">{{ label }}</a>{% endfor %}
+</div>
+<div class="card w-full">
+  {% if loans %}
+  <div class="overflow-x-auto"><table class="data-table">
+    <thead><tr><th>Reference</th><th>Borrower</th><th>Type</th><th class="text-right">Amount</th><th class="text-right">Balance</th><th>Status</th><th>Applied</th></tr></thead>
+    <tbody>{% for l in loans %}<tr>
+      <td><a class="row-link" href="{{ url_for('admin.loan_detail', loan_id=l.id) }}">{{ l.reference or l.id }}</a></td>
+      <td>{{ l.user.display_name }}{% if l.user.is_guest %} <span class="badge badge-blue ml-1">non-member</span>{% endif %}</td>
+      <td>{{ l.type_label }}</td><td class="num text-right">{{ l.amount|money }}</td>
+      <td class="num text-right">{{ (l.remaining_amount or 0)|money if l.status in ('approved','paid') else '-' }}</td>
+      <td>{{ status_badge(l.display_status) }}</td><td class="whitespace-nowrap">{{ l.application_date|dmy }}</td></tr>{% endfor %}</tbody>
+  </table></div>
+  {% else %}{{ empty("No loans found", "Try another filter.") }}{% endif %}
+</div>
+{{ pager(pagination, 'admin.loans_list', query_params) }}
+{% endblock %}

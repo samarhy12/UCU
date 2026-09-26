@@ -1,0 +1,20 @@
+{% extends "layout_app.html" %}
+{% block title %}Settings - Unity Credit Union{% endblock %}
+{% block page_title %}Settings{% endblock %}
+{% block content %}
+<div class="card card-pad max-w-xl">
+  <h3 class="mb-1">Seasonal loans</h3>
+  <p class="text-sm text-ink-600 mb-5">Members can apply for these loans only while they are switched on.</p>
+  <form method="POST" novalidate>
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+    <div class="space-y-3">
+      {% for key, t, is_open in seasonal %}
+      <label class="radio-card flex items-center gap-3 !p-4">
+        <input type="checkbox" name="open_{{ key }}" class="!static !opacity-100 w-5 h-5 accent-gold-500" {{ 'checked' if is_open }}>
+        <span><span class="rc-title block">{{ t.label }}</span><span class="rc-sub block">{{ '%g' % t.rate }}% &middot; {{ t.days }} days</span></span>
+      </label>{% endfor %}
+    </div>
+    <button type="submit" class="btn btn-gold mt-6">Save settings</button>
+  </form>
+</div>
+{% endblock %}

@@ -1,0 +1,69 @@
+{% extends "layout_app.html" %}
+{% from "partials/_macros.html" import icon, status_badge, empty %}
+{% block title %}Loans - Unity Credit Union{% endblock %}
+{% block page_title %}Loans{% endblock %}
+{% block page_sub %}<div class="text-xs text-ink-400 mt-0.5">Request a loan, follow its progress and see your history</div>{% endblock %}
+
+{% block content %}
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+  {% if open_loan and open_loan.status == 'pending' %}
+  <span class="btn btn-gold opacity-60 cursor-not-allowed" title="You already have a loan waiting for a decision">{{ icon('plus', 'w-4 h-4') }} Request new loan</span>
+  {% elif open_loan %}
+  <span class="btn btn-gold opacity-60 cursor-not-allowed" title="Finish paying your current loan first">{{ icon('plus', 'w-4 h-4') }} Request new loan</span>
+  {% else %}
+  <a href="{{ url_for('loans.new_loan') }}" class="btn btn-gold">{{ icon('plus', 'w-4 h-4') }} Request new loan</a>
+  {% endif %}
+  <a href="{{ url_for('loans.verify') }}" class="btn btn-primary">{{ icon('verify', 'w-4 h-4') }} Verify loan</a>
+  <a href="{{ url_for('loans.history') }}" class="btn btn-outline">{{ icon('clock', 'w-4 h-4') }} Paid loans</a>
+  <a href="{{ url_for('loans.non_member_loan') }}" class="btn btn-outline">NMLOAN (non-member)</a>
+</div>
+{% if open_loan %}
+<div class="mb-6 p-3 rounded bg-amber-50 border border-amber-200 text-amber-900 text-sm">
+  You have a loan ({{ open_loan.reference }}) that is {{ 'waiting for a decision' if open_loan.status == 'pending' else 'still being repaid' }}. You can apply again when it is finished.
+</div>
+{% endif %}
+
+<div class="card w-full mb-6">
+  <div class="card-header"><h3>My loans</h3></div>
+  {% if loans %}
+  <div class="tx-list">
+    {% for l in loans %}
+    <div class="px-4 sm:px-6 py-4 flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-5">
+      <div class="flex-1 min-w-0">
+        <div class="flex items-center gap-2 flex-wrap">
+          <a class="row-link" href="{{ url_for('loans.view_loan', loan_id=l.id) }}">{{ l.reference or ('Loan #' ~ l.id) }}</a>
+          {{ status_badge(l.display_status) }}
+        </div>
+        <div class="text-xs text-ink-400 mt-0.5">{{ l.type_label }} &middot; applied {{ l.application_date|dmy }}{% if l.status == 'approved' %} &middot; due {{ l.repayment_date|dmy }}{% endif %}</div>
+      </div>
+      <div class="sm:text-right">
+        <div class="font-mono font-semibold text-sm">GHS {{ l.amount|money }}</div>
+        {% if l.status == 'approved' %}<div class="text-xs text-ink-400">Balance GHS {{ l.remaining_amount|money }}</div>{% endif %}
+      </div>
+      <div class="flex gap-2">
+        <a href="{{ url_for('loans.view_loan', loan_id=l.id) }}" class="btn btn-outline btn-sm">View loan</a>
+        {% if l.status == 'pending' %}
+        <form method="POST" action="{{ url_for('loans.cancel_loan', loan_id=l.id) }}" data-confirm="Cancel this loan application?">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+          <button type="submit" class="btn btn-danger-outline btn-sm">Cancel loan</button>
+        </form>
+        {% endif %}
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}{{ empty("No loans yet", "When you request a loan it will appear here.") }}{% endif %}
+</div>
+
+<h3 class="mb-3">Loan types you can apply for</h3>
+<div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+  {% for key, t in types %}
+  <div class="card card-pad">
+    <div class="font-mono text-2xl text-navy-800">{{ '%g' % t.rate }}%</div>
+    <h4 class="text-base mt-1.5">{{ t.label }}</h4>
+    <p class="text-xs text-ink-600 mt-1">{{ t.days }} days</p>
+  </div>
+  {% endfor %}
+</div>
+<p class="text-xs text-ink-400 mt-3">The December Special and Easter Credit Aid loans only show here while they are open.</p>
+{% endblock %}

@@ -1,0 +1,46 @@
+{% extends "layout_app.html" %}
+{% from "partials/_macros.html" import status_badge, empty %}
+{% block title %}Cycle {{ cycle.label }} - Unity Credit Union{% endblock %}
+{% block page_title %}Cycle {{ cycle.label }}{% endblock %}
+{% block page_sub %}<div class="mt-0.5">{{ status_badge(cycle.status) }}</div>{% endblock %}
+{% block breadcrumbs %}<nav class="breadcrumb"><a href="{{ url_for('admin.cycles') }}">Cycles</a><span class="sep">/</span><span class="current">{{ cycle.label }}</span></nav>{% endblock %}
+
+{% block content %}
+<div class="grid sm:grid-cols-3 gap-4 mb-6">
+  <div class="stat-card"><div class="stat-label">Contributions</div><div class="stat-value text-xl">GHS {{ total|money }}</div><div class="stat-foot">{{ cycle.start_date|dmy }} to {{ cycle.end_date|dmy }}</div></div>
+  <div class="stat-card"><div class="stat-label">Dividend rate</div><div class="stat-value text-xl">{{ ('%g' % cycle.dividend_rate ~ '%') if cycle.dividend_declared_at else 'Not declared' }}</div></div>
+  <div class="stat-card"><div class="stat-label">Dividends to pay</div><div class="stat-value text-xl">GHS {{ dividend_total|money }}</div><div class="stat-foot">{{ paid_count }} of {{ dividends|length }} paid</div></div>
+</div>
+
+<div class="card card-pad mb-6 max-w-xl">
+  <h3 class="mb-2">Declare the dividend</h3>
+  {% if cycle.status != 'closed' %}
+  <p class="text-sm text-ink-600">This cycle is still open. You can declare the dividend after 31 August.</p>
+  {% elif paid_count %}
+  <p class="text-sm text-ink-600">Some dividends are already paid, so the rate can no longer be changed.</p>
+  {% else %}
+  <p class="text-sm text-ink-600 mb-4">Each active member gets this percentage of what they saved in the cycle. After you declare, contributions for this cycle can no longer be changed. You can declare again to change the rate until the first dividend is marked as paid.</p>
+  <form method="POST" action="{{ url_for('admin.declare_dividends', cycle_id=cycle.id) }}" class="flex flex-col sm:flex-row gap-3 sm:items-end"
+        data-confirm="Work out dividends for every active member at this rate? Contributions for this cycle will be closed.">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+    <div class="field flex-1"><label for="rate">Dividend rate (%)</label><input type="number" id="rate" name="rate" step="0.01" min="0.01" max="100" inputmode="decimal" value="{{ cycle.dividend_rate or '' }}" required></div>
+    <button type="submit" class="btn btn-gold">Declare dividend</button>
+  </form>
+  {% endif %}
+</div>
+
+{% if dividends %}
+<div class="card w-full">
+  <div class="card-header"><h3>Member dividends</h3></div>
+  <div class="overflow-x-auto"><table class="data-table">
+    <thead><tr><th>Member</th><th class="text-right">Saved</th><th class="text-right">Dividend</th><th>Status</th><th></th></tr></thead>
+    <tbody>{% for d in dividends %}<tr>
+      <td><a class="row-link" href="{{ url_for('admin.member_detail', user_id=d.user_id) }}">{{ d.user.display_name }}</a><div class="text-xs text-ink-400 font-mono">{{ d.user.account_number }}</div></td>
+      <td class="num text-right">{{ d.contribution_total|money }}</td><td class="num text-right font-semibold">{{ d.amount|money }}</td>
+      <td><span class="{{ 'badge badge-green' if d.status == 'paid' else 'badge badge-amber' }}">{{ 'paid' if d.status == 'paid' else 'to pay' }}</span></td>
+      <td class="text-right">{% if d.status != 'paid' %}<form method="POST" action="{{ url_for('admin.dividend_paid', dividend_id=d.id) }}" data-confirm="Mark GHS {{ d.amount|money }} as paid to {{ d.user.display_name }}? They will be told by email.">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" /><button class="btn btn-primary btn-sm" type="submit">Mark paid</button></form>{% endif %}</td></tr>{% endfor %}</tbody>
+  </table></div>
+</div>
+{% endif %}
+{% endblock %}

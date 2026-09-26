@@ -1,0 +1,54 @@
+{% extends "layout_app.html" %}
+{% from "partials/_macros.html" import icon %}
+{% block title %}My contributions - Unity Credit Union{% endblock %}
+{% block page_title %}My contributions{% endblock %}
+{% block page_sub %}<div class="text-xs text-ink-400 mt-0.5">Cycle {{ cycle_label }}</div>{% endblock %}
+
+{% block content %}
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+  <div class="stat-card"><div class="stat-label">This cycle</div><div class="stat-value">GHS {{ cycle_total|money }}</div><div class="stat-foot">{{ cycle_label }}</div></div>
+  <div class="stat-card"><div class="stat-label">All-time savings</div><div class="stat-value">GHS {{ all_time_total|money }}</div><div class="stat-foot">Since you joined</div></div>
+  <div class="stat-card"><div class="stat-label">Monthly target</div><div class="stat-value">{% if target %}GHS {{ target|money }}{% else %}Not set{% endif %}</div><div class="stat-foot">Set by the administrator</div></div>
+</div>
+
+{% if dividend %}
+<div class="card card-pad mb-6 border-l-4 !border-l-gold-500 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+  <div><h3 class="text-base">Dividend for {{ cycle_label }}</h3>
+    <p class="text-sm text-ink-600">{{ '%g' % dividend.rate }}% of your GHS {{ dividend.contribution_total|money }} savings.</p></div>
+  <div class="text-right"><div class="font-mono text-xl font-semibold text-navy-800">GHS {{ dividend.amount|money }}</div>
+    <span class="{{ 'badge badge-green' if dividend.status == 'paid' else 'badge badge-amber' }}">{{ 'Paid' if dividend.status == 'paid' else 'To be paid' }}</span></div>
+</div>
+{% endif %}
+
+<div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+  <form method="GET" class="flex items-center gap-2">
+    <label for="cycle" class="text-sm text-ink-600">Cycle</label>
+    <select id="cycle" name="cycle" onchange="this.form.submit()" class="!w-auto">
+      {% for y in cycle_choices %}<option value="{{ y }}" {{ 'selected' if y == start_year }}>{{ rules.cycle_label(y) }}</option>{% endfor %}
+    </select>
+  </form>
+  <button onclick="window.print()" class="btn btn-outline btn-sm">{{ icon('print', 'w-4 h-4') }} Print</button>
+</div>
+
+<div class="card w-full">
+  <div class="overflow-x-auto">
+    <table class="data-table">
+      <thead><tr><th>Month</th><th>Payments</th><th class="text-right">Paid</th><th class="text-right">Running total</th></tr></thead>
+      <tbody>
+        {% for m in months %}
+        <tr class="{{ 'opacity-50' if m.is_future }}">
+          <td class="font-semibold">{{ m.label }}</td>
+          <td class="text-[12.5px] text-ink-600">
+            {% for e in m.entries %}<div>{{ e.date|dmy }} &middot; GHS {{ e.amount|money }}{% if e.receipt_no %} <span class="text-ink-400">({{ e.receipt_no }})</span>{% endif %}</div>{% else %}<span class="text-ink-400">{{ '-' if m.is_future else 'No payment' }}</span>{% endfor %}
+          </td>
+          <td class="num text-right">{{ m.total|money if m.total else '-' }}</td>
+          <td class="num text-right font-semibold">{{ m.running|money }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+      <tfoot><tr><td colspan="2" class="px-4 py-3 font-semibold">Total for {{ cycle_label }}</td><td class="num text-right px-4 font-semibold">{{ cycle_total|money }}</td><td></td></tr></tfoot>
+    </table>
+  </div>
+</div>
+<p class="text-xs text-ink-400 mt-3">Each payment is also sent to your email as a receipt.</p>
+{% endblock %}

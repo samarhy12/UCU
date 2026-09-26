@@ -1,0 +1,53 @@
+{% extends "layout_public.html" %}
+{% block title %}About us - Unity Credit Union{% endblock %}
+{% block page_title %}About Unity Credit Union{% endblock %}
+{% block page_sub %}<p class="text-white/70 mt-2 max-w-2xl text-sm sm:text-base">A susu union built on trust. Ten years of saving and lending together.</p>{% endblock %}
+
+{% block content %}
+<section class="max-w-6xl mx-auto px-5 sm:px-8 py-16 grid lg:grid-cols-[1.3fr_1fr] gap-12">
+  <div class="reveal reveal-left">
+    <div class="section-eyebrow">Our story</div>
+    <h2 class="text-2xl mb-4">Small beginnings, strong together</h2>
+    <p class="text-ink-600 leading-relaxed mb-4">Unity Credit Union (UCU) began ten years ago with only four members. Today we serve {{ total_members }} active members who save every month and support each other with loans at fair rates.</p>
+    <p class="text-ink-600 leading-relaxed mb-4">We work as a susu union with our own way of operating. Members pay a monthly contribution. Our year runs from 1 September to 31 August, and at the end of each year members receive their interest or dividend.</p>
+    <p class="text-ink-600 leading-relaxed">To keep the union strong for everyone, partial withdrawals are not allowed. Members are always free to exit.</p>
+  </div>
+  <div class="card card-pad self-start reveal reveal-right">
+    <h3 class="mb-4">Our values</h3>
+    <dl class="space-y-4 text-sm">
+      <div><dt class="font-semibold text-navy-800">Community first</dt><dd class="text-ink-600">We put the well-being of members above all else.</dd></div>
+      <div><dt class="font-semibold text-navy-800">Transparency</dt><dd class="text-ink-600">Every payment gets a receipt and every member can see their records.</dd></div>
+      <div><dt class="font-semibold text-navy-800">Fairness</dt><dd class="text-ink-600">Loans follow clear rates and clear rules for everyone.</dd></div>
+      <div><dt class="font-semibold text-navy-800">Access</dt><dd class="text-ink-600">The service works on any phone, tablet or computer.</dd></div>
+    </dl>
+  </div>
+</section>
+
+<section class="bg-white border-y border-line">
+  <div class="max-w-6xl mx-auto px-5 sm:px-8 py-16">
+    <div class="reveal"><div class="section-eyebrow text-gold-500 text-[11px] uppercase tracking-[0.18em] font-bold mb-3">Leadership</div>
+    <h2 class="section-title">Our executives</h2></div>
+    {% if executives %}
+    {% set n = executives|length %}
+    <div class="grid grid-cols-2 md:grid-cols-3 {{ 'lg:grid-cols-3' if n in (3, 6, 9) else 'lg:grid-cols-4' }} gap-4 sm:gap-6 mt-10" data-stagger="100">
+      {% for e in executives %}
+      <article class="exec-card" tabindex="0">
+        {% if e.photo %}<img loading="lazy" src="{{ url_for('static', filename='uploads/executives/' + e.photo) }}" alt="{{ e.display_name }}">
+        {% else %}<div class="aspect-[4/5] flex items-center justify-center bg-navy-800"><span class="font-display text-5xl text-gold-300">{{ e.full_name[:1] }}</span></div>{% endif %}
+        <div class="exec-meta">
+          <div class="text-[10px] uppercase tracking-[0.16em] text-gold-300 font-semibold">{{ e.position }}</div>
+          <div class="font-display text-base font-semibold leading-snug mt-0.5">{{ e.display_name }}</div>
+          {% if e.bio %}<p class="exec-bio">{{ e.bio }}</p>{% endif %}
+        </div>
+      </article>
+      {% endfor %}
+    </div>
+    {% else %}<p class="text-ink-400 mt-8">Our executives will be listed here soon.</p>{% endif %}
+  </div>
+</section>
+
+<section class="max-w-6xl mx-auto px-5 sm:px-8 py-12 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+  <div><h2 class="text-xl">Want to know more?</h2><p class="text-sm text-ink-600 mt-1">Read our FAQs or send us a message.</p></div>
+  <div class="flex gap-3"><a href="{{ url_for('public.faqs') }}" class="btn btn-outline">FAQs</a><a href="{{ url_for('public.contact') }}" class="btn btn-gold">Contact us</a></div>
+</section>
+{% endblock %}

@@ -1,0 +1,16 @@
+{% extends "layout_app.html" %}
+{% from "partials/_macros.html" import empty %}
+{% block title %}Paid loans - Unity Credit Union{% endblock %}
+{% block page_title %}Paid loans{% endblock %}
+{% block content %}
+<div class="card w-full">
+  {% if loans %}
+  <div class="overflow-x-auto"><table class="data-table">
+    <thead><tr><th>Reference</th><th>Type</th><th class="text-right">Amount</th><th class="text-right">Repaid</th><th>Paid on</th></tr></thead>
+    <tbody>{% for l in loans %}<tr>
+      <td><a class="row-link" href="{{ url_for('loans.view_loan', loan_id=l.id) }}">{{ l.reference }}</a></td><td>{{ l.type_label }}</td>
+      <td class="num text-right">{{ l.amount|money }}</td><td class="num text-right">{{ (l.total_amount or 0)|money }}</td><td>{{ l.paid_date|dmy }}</td></tr>{% endfor %}</tbody>
+  </table></div>
+  {% else %}{{ empty("No paid loans yet") }}{% endif %}
+</div>
+{% endblock %}

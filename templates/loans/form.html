@@ -1,0 +1,105 @@
+{% extends "layout_public.html" if guest else "layout_app.html" %}
+{% import "partials/_forms.html" as f %}
+{% block title %}{{ 'Non-member loan' if guest else 'Request a loan' }} - Unity Credit Union{% endblock %}
+{% block page_title %}{{ 'Non-member loan (NMLOAN)' if guest else 'Request a new loan' }}{% endblock %}
+{% block page_sub %}<div class="text-xs {{ 'text-white/70 mt-2 text-sm' if guest else 'text-ink-400 mt-0.5' }}">
+  {{ 'For people who are not UCU members. Two guarantors required: one UCU member and one non-member (wife, family or close friend).' if guest else 'Every loan needs a guarantor who is a UCU member.' }}</div>{% endblock %}
+
+{% macro guarantor_block(prefix, title, form, required, optional_email=False, optional_ucu=False) %}
+<div class="form-section-title">{{ title }}</div>
+{{ f.text(prefix ~ "_name", "Guarantor full name", form, required=required) }}
+{{ f.text(prefix ~ "_email", "Email", form, type="email", inputmode="email", required=not optional_email) }}
+{{ f.text(prefix ~ "_phone", "Telephone", form, type="tel", inputmode="tel", required=required) }}
+<div class="field">
+  <label for="f-{{ prefix }}_ucu_number">UCU number{% if optional_ucu %} (Optional for non-member guarantors){% endif %}</label>
+  <input type="text" id="f-{{ prefix }}_ucu_number" name="{{ prefix }}_ucu_number" value="{{ form.get(prefix ~ '_ucu_number') or '' }}"
+         {% if required and not optional_ucu %}required{% endif %} placeholder="UCU240822" autocapitalize="characters" autocomplete="off"
+         {% if not optional_ucu %}data-ucu-check="#check-{{ prefix }}"{% endif %}>
+  <span class="hint" id="check-{{ prefix }}">{% if optional_ucu %}Leave blank if the guarantor is not a UCU member.{% else %}The guarantor's UCU account number (not their occupation).{% endif %}</span>
+</div>
+{{ f.text(prefix ~ "_earnings", "Guarantor's total yearly earnings (GHS)", form, type="number", inputmode="decimal", required=required, hint="Used to check that the guarantor can cover the loan.") }}
+<div class="field">
+  <label for="f-{{ prefix }}_acknowledgment">
+    {% if prefix == "g1" %}
+      The Member Guarantor. I legally acknowledge that if the primary applicant fails to repay this loan, I am personally liable to pay 50% of the outstanding balance.
+    {% else %}
+      The Second Guarantor. I legally acknowledge that if the primary applicant fails to repay this loan, I am personally liable to pay 50% of the outstanding balance.
+    {% endif %}
+  </label>
+  <input type="checkbox" id="f-{{ prefix }}_acknowledgment" name="{{ prefix }}_acknowledgment" {% if required %}required{% endif %}>
+</div>
+{% endmacro %}
+
+{% block content %}
+<div class="{{ 'max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-10' if guest else '' }}">
+<form method="POST" enctype="multipart/form-data" novalidate data-loan-form data-types='{{ types|tojson }}'
+      class="grid lg:grid-cols-[1fr_340px] gap-5 items-start {{ 'guest-loan' if guest else '' }}">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+
+  <div class="card card-pad min-w-0">
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
+      {% if guest %}
+      <div class="form-section-title">Your details</div>
+      {{ f.text("first_name", "First name", form, autocomplete="given-name", required=True) }}
+      {{ f.text("last_name", "Last name", form, autocomplete="family-name", required=True) }}
+      {{ f.text("other_names", "Other names", form, required=False) }}
+      {{ f.text("email", "Email", form, type="email", inputmode="email", autocomplete="email", required=True) }}
+      <div class="field"><label for="f-date_of_birth">Date of birth</label>
+        <input type="date" id="f-date_of_birth" name="date_of_birth" required value="{{ form.get('date_of_birth') or '' }}"></div>
+      {{ f.text("national_id", "Ghana Card number", form, placeholder="GHA-123456789-0", required=True) }}
+      {{ f.text("phone_number", "Phone number", form, type="tel", inputmode="tel", placeholder="0241234567", required=True) }}
+      {{ f.text("occupation", "Occupation", form, required=True) }}
+      {{ f.text("address", "Address", form, span2=True, required=True) }}
+      {{ f.text("city", "Place of living (town or city)", form, required=True) }}
+      {{ f.select("state", "Region", form, regions, placeholder="Select your region", required=True) }}
+      {{ f.text("country", "Country", {"country": form.get("country") or "Ghana"}, required=True) }}
+      {{ f.upload("national_id_upload", "Ghana Card (picture or PDF)", "image/png,image/jpeg,application/pdf", "JPG, PNG or PDF, up to 12 MB", required=True) }}
+      {{ f.upload("passport_photo", "Passport photo", "image/png,image/jpeg", "JPG or PNG, up to 12 MB", required=True) }}
+      {% endif %}
+
+      <div class="form-section-title">The loan</div>
+      <div class="sm:col-span-2">
+        <label class="text-xs font-semibold text-ink-600 block mb-2">Loan type</label>
+        <div class="grid gap-3 sm:grid-cols-2">
+          {% for t in types %}
+          <label class="radio-card">
+            <input type="radio" name="loan_type" value="{{ t.key }}" {{ 'checked' if form.get('loan_type') == t.key }} required>
+            <div class="rc-title">{{ t.label }}</div>
+            <div class="rc-sub">{{ '%g' % t.rate }}% interest &middot; {{ t.days }} days</div>
+          </label>
+          {% else %}
+          <p class="text-sm text-ink-400">No loan types are open right now. Please try again later.</p>
+          {% endfor %}
+        </div>
+      </div>
+      {{ f.text("amount", "Amount you need (GHS)", form, type="number", inputmode="decimal", required=True) }}
+      {{ f.text("income", "Your monthly income (GHS)", form, type="number", inputmode="decimal", required=True) }}
+      {{ f.text("purpose", "What is the loan for?", form, span2=True, maxlength=200, required=True) }}
+
+      {{ guarantor_block("g1", "Guarantor (UCU Member)", form, True) }}
+
+      <div data-second-guarantor class="sm:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5 p-4 rounded border border-amber-300 bg-amber-50/50">
+        <p data-second-note class="sm:col-span-2 text-sm text-amber-900 font-medium">{% if guest %}Non-member loans require a second guarantor who is your close friend or family member (UCU membership not required).{% else %}All loans require a second guarantor who is a UCU member.{% endif %}</p>
+        {{ guarantor_block("g2", "Second guarantor ({% if guest %}Close Friend/Family{% else %}UCU Member{% endif %})", form, True, optional_email=guest, optional_ucu=guest) }}
+      </div>
+    </div>
+
+    <div class="mt-7 flex flex-col-reverse sm:flex-row sm:justify-between gap-3">
+      <a href="{{ url_for('public.home') if guest else url_for('loans.portal') }}" class="btn btn-outline">Cancel</a>
+      <div class="flex flex-col sm:flex-row gap-3">
+        <button type="button" id="download-pdf-btn" class="btn btn-outline sm:min-w-[200px]">Print/Save guarantor form</button>
+        <button type="submit" class="btn btn-gold sm:min-w-[200px]">Submit loan application</button>
+      </div>
+    </div>
+  </div>
+
+  <aside class="card card-pad lg:sticky lg:top-24">
+    <h3 class="text-base mb-3">What you will repay</h3>
+    <div data-loan-preview><p class="text-ink-400 text-sm">Choose a loan type and enter the amount to see what you will repay.</p></div>
+    <hr class="my-4 border-line">
+    <h4 class="text-sm mb-2">About guarantors</h4>
+    <p class="text-xs text-ink-600 leading-relaxed">{% if guest %}Non-member loans require two guarantors: one UCU member and one close friend or family member (UCU membership not required for the second guarantor).{% else %}Your guarantor must be an active UCU member. We check their email or telephone against our records. If your loan is more than two thirds of their total yearly earnings, you must add a second guarantor.{% endif %}</p>
+  </aside>
+</form>
+</div>
+{% endblock %}

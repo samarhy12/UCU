@@ -1,0 +1,4 @@
+{% extends "email_templates/base_email.html" %}
+{% block content %}
+<p>Hello {{ user.first_name }},</p><p>Thank you for applying. We are sorry, but we are not able to approve your loan <strong>{{ loan.reference }}</strong> at this time.</p>{% if loan.decision_note %}<div style="background:#F6F4EF;border:1px solid #DEDACC;border-radius:4px;padding:14px 16px;margin:16px 0;"><strong>Reason:</strong> {{ loan.decision_note }}</div>{% endif %}<p>You are welcome to contact us on {{ org.phone }} to talk about it.</p>
+{% endblock %}

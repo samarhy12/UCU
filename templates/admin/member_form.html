@@ -1,0 +1,21 @@
+{% extends "layout_app.html" %}
+{% block title %}{{ 'Edit member' if editing else 'Add member' }} - Unity Credit Union{% endblock %}
+{% block page_title %}{{ 'Edit ' ~ member.display_name if editing else 'Add a member' }}{% endblock %}
+{% block page_sub %}<div class="text-xs text-ink-400 mt-0.5">{{ 'Changes are saved straight away.' if editing else 'The member is verified at once and gets a temporary password by email.' }}</div>{% endblock %}
+{% block breadcrumbs %}<nav class="breadcrumb"><a href="{{ url_for('admin.dashboard') }}">Dashboard</a><span class="sep">/</span><a href="{{ url_for('admin.members_list') }}">Members</a><span class="sep">/</span><span class="current">{{ 'Edit' if editing else 'Add member' }}</span></nav>{% endblock %}
+
+{% block content %}
+<div class="card card-pad w-full max-w-3xl">
+  <form method="POST" enctype="multipart/form-data" novalidate>
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
+      {% with show_password=false, docs_required=false %}{% include "partials/_member_fields.html" %}{% endwith %}
+    </div>
+    {% if editing %}<p class="hint mt-3 text-xs text-ink-400">Choose a new file only if you want to replace the current one.</p>{% endif %}
+    <div class="mt-7 flex flex-col-reverse sm:flex-row sm:justify-between gap-3">
+      <a href="{{ url_for('admin.member_detail', user_id=member.id) if editing else url_for('admin.members_list') }}" class="btn btn-outline">Cancel</a>
+      <button type="submit" class="btn btn-gold sm:min-w-[180px]">{{ 'Save changes' if editing else 'Add member' }}</button>
+    </div>
+  </form>
+</div>
+{% endblock %}

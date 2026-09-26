@@ -1,0 +1,24 @@
+{% extends "layout_app.html" %}
+{% import "partials/_forms.html" as f %}
+{% block title %}Season greeting - Unity Credit Union{% endblock %}
+{% block page_title %}Season greeting{% endblock %}
+{% block page_sub %}<div class="text-xs text-ink-400 mt-0.5">The message and poster shown on the home page</div>{% endblock %}
+{% block content %}
+<div class="card card-pad w-full max-w-3xl">
+  <form method="POST" enctype="multipart/form-data" novalidate>
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+    <label class="flex items-center gap-2 text-sm font-semibold mb-6 cursor-pointer"><input type="checkbox" name="active" class="w-4 h-4 accent-gold-500" {{ 'checked' if form.get('active') }}> Show the greeting on the home page</label>
+    <div class="grid gap-4 sm:gap-5">
+      {{ f.text("title", "Title", form, maxlength=120) }}
+      {{ f.textarea("intro", "Message", form, rows=4, hint="Leave an empty line between paragraphs.") }}
+      {{ f.textarea("callout", "Highlighted news", form, rows=3, hint="Shown in a highlighted box. Leave empty to skip.") }}
+      {{ f.textarea("closing", "Closing words", form, rows=2, hint="Shown just before the date.") }}
+      {{ f.text("date", "Date or event", form, required=False, hint="Shown in large gold text, for example 24th September 2026.") }}
+      {{ f.text("signoff", "Signed by", form, required=False) }}
+      {{ f.upload("image", "Poster picture", "image/png,image/jpeg", "JPG or PNG, up to 8 MB", required=False, existing_url=(url_for('static', filename='uploads/greeting/' + current.image) if current and current.image else '')) }}
+      {% if current and current.image %}<label class="flex items-center gap-2 text-sm cursor-pointer"><input type="checkbox" name="remove_image" class="w-4 h-4 accent-gold-500"> Remove the current poster</label>{% endif %}
+    </div>
+    <div class="mt-7 flex flex-col-reverse sm:flex-row sm:justify-between gap-3"><a href="{{ url_for('public.home') }}" class="btn btn-outline">View home page</a><button class="btn btn-gold sm:min-w-[160px]" type="submit">Save greeting</button></div>
+  </form>
+</div>
+{% endblock %}

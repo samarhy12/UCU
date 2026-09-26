@@ -1,0 +1,53 @@
+{% from "partials/_macros.html" import icon, social_icon %}
+<footer class="bg-navy-900 text-white no-print relative overflow-hidden">
+  <div class="flag-stripe"></div>
+  <div class="hero-orb bg-gold-500/20 w-72 h-72 -top-24 -left-24"></div>
+  <div class="relative max-w-6xl mx-auto px-5 sm:px-8 pt-14 pb-10 grid gap-10 sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1.2fr_1fr]">
+    <div>
+      <div class="flex items-center gap-3">
+        <img src="{{ url_for('static', filename='icons/logo-mark.png') }}" alt="" class="w-12 h-12 object-contain" />
+        <div>
+          <div class="font-display text-lg font-bold leading-tight">{{ org.name }}</div>
+          <div class="text-[10px] tracking-[0.1em] text-gold-300 uppercase whitespace-nowrap">{{ org.motto }}</div>
+        </div>
+      </div>
+      <p class="text-sm text-white/60 leading-relaxed mt-5 max-w-xs">A susu savings and credit union where members save together, borrow at fair rates and share in the yearly dividend.</p>
+    </div>
+
+    <div>
+      <h3 class="!text-white text-[13px] uppercase tracking-[0.14em] mb-4">Quick links</h3>
+      <ul class="space-y-3">
+        <li><a class="footer-link" href="{{ url_for('public.about') }}">About us</a></li>
+        <li><a class="footer-link" href="{{ url_for('public.services') }}">Services</a></li>
+        <li><a class="footer-link" href="{{ url_for('public.gallery') }}">Gallery</a></li>
+        <li><a class="footer-link" href="{{ url_for('public.faqs') }}">FAQs</a></li>
+        <li><a class="footer-link" href="{{ url_for('loans.non_member_loan') }}">Non-member loan (NMLOAN)</a></li>
+      </ul>
+    </div>
+
+    <div>
+      <h3 class="!text-white text-[13px] uppercase tracking-[0.14em] mb-4">Contact us</h3>
+      <ul class="space-y-3.5 text-sm text-white/75">
+        <li><a class="inline-flex items-start gap-2.5 hover:text-gold-300 transition-colors" href="mailto:{{ org.email }}">{{ icon('mail', 'w-4 h-4 mt-0.5 flex-shrink-0 text-gold-300') }}<span class="break-all">{{ org.email }}</span></a></li>
+        <li><a class="inline-flex items-start gap-2.5 hover:text-gold-300 transition-colors" href="tel:{{ org.phone }}">{{ icon('phone', 'w-4 h-4 mt-0.5 flex-shrink-0 text-gold-300') }}{{ org.phone }}</a></li>
+        <li class="inline-flex items-start gap-2.5">{{ icon('home', 'w-4 h-4 mt-0.5 flex-shrink-0 text-gold-300') }}<span>{{ org.address.replace('Head office: ', '') }}</span></li>
+      </ul>
+    </div>
+
+    <div>
+      <h3 class="!text-white text-[13px] uppercase tracking-[0.14em] mb-4">Connect with us</h3>
+      <div class="flex items-center gap-3">
+        <a class="social-btn" href="{{ org.facebook }}" target="_blank" rel="noopener" aria-label="Facebook">{{ social_icon('facebook') }}</a>
+        <a class="social-btn" href="{{ org.whatsapp }}" target="_blank" rel="noopener" aria-label="WhatsApp">{{ social_icon('whatsapp') }}</a>
+        <a class="social-btn" href="{{ org.tiktok }}" target="_blank" rel="noopener" aria-label="TikTok">{{ social_icon('tiktok') }}</a>
+      </div>
+      <p class="text-xs text-white/50 mt-4 max-w-[14rem] leading-relaxed">Message us on WhatsApp for quick help with your account.</p>
+    </div>
+  </div>
+  <div class="relative border-t border-white/10">
+    <div class="max-w-6xl mx-auto px-5 sm:px-8 py-5 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-white/45">
+      <span>&copy; {{ current_year }} {{ org.name }}. All rights reserved.</span>
+      <a href="#top" onclick="window.scrollTo({top:0,behavior:'smooth'});return false;" class="inline-flex items-center gap-1.5 hover:text-gold-300 transition-colors">Back to top <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-3.5 h-3.5"><path d="M12 19V5M5 12l7-7 7 7"/></svg></a>
+    </div>
+  </div>
+</footer>

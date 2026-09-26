@@ -1,0 +1,49 @@
+{% macro text(name, label, form, type="text", required=True, hint="", autocomplete="off", inputmode="", placeholder="", span2=False, maxlength=None) %}
+<div class="field {{ 'sm:col-span-2' if span2 }}">
+  <label for="f-{{ name }}">{{ label }}{% if not required %} <span class="font-normal text-ink-400">(optional)</span>{% endif %}</label>
+  <input type="{{ type }}" id="f-{{ name }}" name="{{ name }}" value="{{ form.get(name) or '' }}"
+         {% if required %}required{% endif %} autocomplete="{{ autocomplete }}"
+         {% if inputmode %}inputmode="{{ inputmode }}"{% endif %} {% if placeholder %}placeholder="{{ placeholder }}"{% endif %}
+         {% if maxlength %}maxlength="{{ maxlength }}"{% endif %}>
+  {% if hint %}<span class="hint">{{ hint }}</span>{% endif %}
+</div>
+{% endmacro %}
+
+{% macro select(name, label, form, options, placeholder="Select", required=True, span2=False) %}
+<div class="field {{ 'sm:col-span-2' if span2 }}">
+  <label for="f-{{ name }}">{{ label }}</label>
+  <select id="f-{{ name }}" name="{{ name }}" {% if required %}required{% endif %}>
+    <option value="" {{ 'selected' if not form.get(name) }} disabled>{{ placeholder }}</option>
+    {% for o in options %}<option value="{{ o }}" {{ 'selected' if form.get(name) == o }}>{{ o }}</option>{% endfor %}
+  </select>
+</div>
+{% endmacro %}
+
+{% macro textarea(name, label, form, rows=3, required=False, hint="", span2=True) %}
+<div class="field {{ 'sm:col-span-2' if span2 }}">
+  <label for="f-{{ name }}">{{ label }}{% if not required %} <span class="font-normal text-ink-400">(optional)</span>{% endif %}</label>
+  <textarea id="f-{{ name }}" name="{{ name }}" rows="{{ rows }}" {% if required %}required{% endif %}>{{ form.get(name) or '' }}</textarea>
+  {% if hint %}<span class="hint">{{ hint }}</span>{% endif %}
+</div>
+{% endmacro %}
+
+{# Upload box with a small preview for images #}
+{% macro upload(name, label, accept, hint, required=True, existing_url="") %}
+<div class="field" x-data="{ file: '', preview: '{{ existing_url }}' }">
+  <label for="f-{{ name }}">{{ label }}{% if not required %} <span class="font-normal text-ink-400">(optional)</span>{% endif %}</label>
+  <label for="f-{{ name }}" class="flex items-center gap-3 border border-dashed border-line rounded bg-cream-100 hover:border-gold-500 cursor-pointer p-3 transition-colors">
+    <template x-if="preview"><img :src="preview" alt="" class="w-14 h-14 object-cover rounded flex-shrink-0"></template>
+    <template x-if="!preview">
+      <span class="w-14 h-14 rounded bg-cream-200 text-ink-400 flex items-center justify-center flex-shrink-0">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" class="w-6 h-6"><path d="M12 16V4M7 9l5-5 5 5M4 20h16"/></svg>
+      </span>
+    </template>
+    <span class="min-w-0 text-sm">
+      <span class="block font-semibold text-navy-800" x-text="file ? 'Change file' : 'Choose file'"></span>
+      <span class="block text-xs text-ink-400 truncate" x-text="file || '{{ hint }}'"></span>
+    </span>
+  </label>
+  <input type="file" id="f-{{ name }}" name="{{ name }}" accept="{{ accept }}" class="sr-only" {% if required %}required{% endif %}
+         @change="const f = $event.target.files[0]; file = f ? f.name : ''; preview = (f && f.type.startsWith('image/')) ? URL.createObjectURL(f) : '{{ existing_url }}';">
+</div>
+{% endmacro %}

@@ -1,0 +1,10 @@
+{% extends "layout_public.html" %}
+{% block title %}Not allowed - Unity Credit Union{% endblock %}
+{% block content %}
+<div class="px-5 py-20 text-center max-w-md mx-auto">
+  <div class="font-mono text-5xl text-gold-500 mb-3">403</div>
+  <h1 class="text-2xl mb-2">Not allowed</h1>
+  <p class="text-ink-600 text-sm mb-6">You do not have permission to open this page.</p>
+  <div class="flex justify-center gap-3"><a href="javascript:history.back()" class="btn btn-outline">Go back</a><a href="{{ url_for('public.home') }}" class="btn btn-gold">Home</a></div>
+</div>
+{% endblock %}

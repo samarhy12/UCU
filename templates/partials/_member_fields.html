@@ -1,0 +1,49 @@
+{# Shared member fields. Expects: form, regions. Optional: show_password, docs_required, member #}
+{% import "partials/_forms.html" as f %}
+
+{% if show_password|default(false) %}
+<div class="form-section-title">Sign-in details</div>
+{{ f.text("email", "Email", form, type="email", autocomplete="email", inputmode="email", span2=True) }}
+<div class="field">
+  <label for="f-password">Password</label>
+  <input type="password" id="f-password" name="password" required minlength="{{ config.PASSWORD_MIN_LENGTH }}" autocomplete="new-password">
+  <span class="hint">At least {{ config.PASSWORD_MIN_LENGTH }} characters.</span>
+</div>
+<div class="field">
+  <label for="f-confirm_password">Confirm password</label>
+  <input type="password" id="f-confirm_password" name="confirm_password" required autocomplete="new-password">
+</div>
+{% endif %}
+
+<div class="form-section-title">Personal details</div>
+{% if not show_password|default(false) %}
+{{ f.text("email", "Email", form, type="email", autocomplete="email", inputmode="email", span2=True) }}
+{% endif %}
+{{ f.text("first_name", "First name", form, autocomplete="given-name") }}
+{{ f.text("last_name", "Last name", form, autocomplete="family-name") }}
+{{ f.text("other_names", "Other names", form, required=False) }}
+<div class="field">
+  <label for="f-date_of_birth">Date of birth</label>
+  <input type="date" id="f-date_of_birth" name="date_of_birth" required value="{{ form.get('date_of_birth') or '' }}">
+  <span class="hint">You must be at least {{ config.MINIMUM_MEMBER_AGE }} years old.</span>
+</div>
+{{ f.text("national_id", "Ghana Card number", form, placeholder="GHA-123456789-0", autocomplete="off", hint="Written on the front of your Ghana Card.") }}
+{{ f.text("occupation", "Occupation", form) }}
+{{ f.text("phone_number", "Phone number", form, type="tel", autocomplete="tel", inputmode="tel", placeholder="0241234567") }}
+
+<div class="form-section-title">Where you live</div>
+{{ f.text("address", "Address", form, span2=True, autocomplete="street-address") }}
+{{ f.text("hometown", "Hometown", form) }}
+{{ f.text("city", "Place of living (town or city)", form) }}
+{{ f.select("state", "Region", form, regions, placeholder="Select your region") }}
+{{ f.text("country", "Country", {"country": form.get("country") or "Ghana"}) }}
+
+<div class="form-section-title">Introducer and next of kin</div>
+{{ f.text("introducer", "Introducer", form, required=False, hint="The UCU member who introduced you, if any.", span2=True) }}
+{{ f.text("nok_name", "Next of kin: full name", form) }}
+{{ f.text("nok_phone", "Next of kin: phone number", form, type="tel", inputmode="tel") }}
+{{ f.text("nok_relationship", "Relationship to next of kin", form, placeholder="For example: Wife, Brother") }}
+
+<div class="form-section-title">Documents</div>
+{{ f.upload("national_id_upload", "Ghana Card (picture or PDF)", "image/png,image/jpeg,application/pdf", "JPG, PNG or PDF, up to 12 MB", required=docs_required|default(true)) }}
+{{ f.upload("passport_photo", "Passport photo", "image/png,image/jpeg", "JPG or PNG, up to 12 MB", required=docs_required|default(true)) }}
