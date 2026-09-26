@@ -188,6 +188,31 @@ By default, the application uses SQLite stored in `instance/credit_union.db`. Th
 - Small-scale deployments with low traffic
 - Single-user or small team usage
 
+#### SQLite Setup
+
+**Option 1: Manual initialization**
+```bash
+# Initialize Flask-Migrate
+flask db init
+
+# Create initial migration
+flask db migrate -m "Initial database schema"
+
+# Apply the migration
+flask db upgrade
+```
+
+**Option 2: Use initialization script**
+```bash
+# On Linux/Mac
+./init_database.sh
+
+# On Windows
+init_database.bat
+```
+
+**Note**: Migrations are not tracked in git for this project. Each environment initializes its own migrations.
+
 ### MySQL (Production Recommended)
 
 For production hosting, MySQL is recommended for better performance, concurrent access, and data integrity.
@@ -248,15 +273,34 @@ pip install pymysql
 
 It's already included in `requirements.txt`.
 
-#### 5. Run Migrations
+#### 5. Initialize Database Migrations
 
-After configuring MySQL, run the migrations:
+Since migrations are not tracked in git (they're in .gitignore), you need to initialize them in production:
 
+**Option 1: Manual initialization**
 ```bash
+# Initialize Flask-Migrate
+flask db init
+
+# Create initial migration
+flask db migrate -m "Initial database schema"
+
+# Apply the migration
 flask db upgrade
 ```
 
-This will create all necessary tables in your MySQL database.
+**Option 2: Use initialization script**
+```bash
+# On Linux/Mac
+./init_database.sh
+
+# On Windows
+init_database.bat
+```
+
+This will create the `migrations/` directory and set up the database schema in your MySQL database.
+
+**Note**: Migrations are not tracked in git for this project. Each production environment initializes its own migrations to ensure clean database state.
 
 #### 6. MySQL Connection Pool Configuration
 
@@ -290,8 +334,26 @@ mysqldump -u ucu_user -p ucu_production | gzip > backups/ucu_$(date +%Y%m%d).sql
 
 ### Database Migration
 
-Don't forget to run database migrations before deploying:
+**Important**: Migrations are not tracked in git for this project. Initialize migrations in each environment:
+
+**First time setup only:**
 ```bash
+# Option 1: Manual
+flask db init
+flask db migrate -m "Initial database schema"
+flask db upgrade
+
+# Option 2: Use initialization script
+# On Linux/Mac
+./init_database.sh
+
+# On Windows
+init_database.bat
+```
+
+**For subsequent schema changes:**
+```bash
+flask db migrate -m "Description of changes"
 flask db upgrade
 ```
 

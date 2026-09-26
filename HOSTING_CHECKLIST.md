@@ -29,9 +29,10 @@
   - [ ] Create database and user
   - [ ] Set DATABASE_URL in `.env`: `mysql://username:password@host/database`
   - [ ] Verify PyMySQL is installed
-- [ ] Run database migrations: `flask db upgrade`
+- [ ] Initialize Flask-Migrate (first time only): `flask db init`
+- [ ] Create initial migration: `flask db migrate -m "Initial database schema"`
+- [ ] Apply migrations: `flask db upgrade`
 - [ ] Verify database connection
-- [ ] Backup existing database if upgrading
 - [ ] Test database operations
 - [ ] Set up automated backups
 

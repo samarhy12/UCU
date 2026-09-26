@@ -27,3 +27,6 @@ node_modules/
 .idea/
 .DS_Store
 Thumbs.db
+
+# Database migrations (initialize in production)
+migrations/
