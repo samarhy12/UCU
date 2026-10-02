@@ -26,6 +26,19 @@ def _recordable_months(today=None):
     return months
 
 
+def _recordable_dates():
+    """Allow administrators to select any date for recording contributions."""
+    today = date.today()
+    # Return list of dates from 2 years ago to current date
+    dates = []
+    start_date = date(today.year - 2, 1, 1)
+    current = start_date
+    while current <= today:
+        dates.append(current)
+        current = date(current.year, current.month + 1, 1) if current.month < 12 else date(current.year + 1, 1, 1)
+    return dates
+
+
 def _cycle_is_locked(month):
     """Once dividends are declared for a cycle, its contributions no longer change."""
     cycle = Cycle.query.filter_by(start_year=rules.cycle_start_year_from_month(month)).first()
@@ -47,6 +60,17 @@ def contributions():
     month = request.args.get("month", months[0])
     if month not in months:
         month = months[0]
+
+    # Allow custom date selection
+    custom_date = request.args.get("date")
+    if custom_date:
+        try:
+            from datetime import datetime
+            custom_date_obj = datetime.strptime(custom_date, "%Y-%m-%d").date()
+            month = f"{custom_date_obj.year}-{custom_date_obj.month:02d}"
+        except (ValueError, AttributeError):
+            pass  # Fall back to default month selection
+
     q = (request.args.get("q") or "").strip()
     show = request.args.get("show", "all")          # all | unpaid
 
@@ -78,7 +102,8 @@ def contributions():
                            months=[(m, rules.month_label(m)) for m in months], q=q, show=show,
                            month_total=month_total, locked=_cycle_is_locked(month),
                            cycle_label=rules.cycle_label(rules.cycle_start_year_from_month(month)),
-                           query_params={k: v for k, v in (("month", month), ("q", q), ("show", show)) if v})
+                           custom_date=custom_date,
+                           query_params={k: v for k, v in (("month", month), ("q", q), ("show", show), ("date", custom_date)) if v})
 
 
 @bp.route("/contributions/record/<int:user_id>", methods=["POST"])

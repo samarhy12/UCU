@@ -13,7 +13,6 @@
   {% else %}
   <a href="{{ url_for('loans.new_loan') }}" class="btn btn-gold">{{ icon('plus', 'w-4 h-4') }} Request new loan</a>
   {% endif %}
-  <a href="{{ url_for('loans.verify') }}" class="btn btn-primary">{{ icon('verify', 'w-4 h-4') }} Verify loan</a>
   <a href="{{ url_for('loans.history') }}" class="btn btn-outline">{{ icon('clock', 'w-4 h-4') }} Paid loans</a>
   <a href="{{ url_for('loans.non_member_loan') }}" class="btn btn-outline">NMLOAN (non-member)</a>
 </div>

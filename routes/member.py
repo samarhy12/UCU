@@ -100,6 +100,12 @@ def profile():
         return render_template("member/profile.html", user=user, editable=False,
                                regions=member_service.GHANA_REGIONS)
 
+    # Check if profile is locked - only admins can edit locked profiles
+    if user.profile_locked:
+        flash("Your profile is locked. Please contact the administrator to make changes.", "info")
+        return render_template("member/profile.html", user=user, editable=False,
+                               regions=member_service.GHANA_REGIONS)
+
     if request.method == "POST":
         form = request.form
         values = {f: (form.get(f) or "").strip() for f in

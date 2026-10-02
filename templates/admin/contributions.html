@@ -10,6 +10,9 @@
 <form method="GET" class="flex flex-col lg:flex-row lg:items-end gap-3 mb-4">
   <div class="field lg:w-56"><label for="month">Month</label>
     <select id="month" name="month" onchange="this.form.submit()">{% for value, label in months %}<option value="{{ value }}" {{ 'selected' if value == month }}>{{ label }}</option>{% endfor %}</select></div>
+  <div class="field lg:w-48"><label for="date">Custom Date (Optional)</label>
+    <input type="date" id="date" name="date" value="{{ custom_date or '' }}" class="field-input">
+    <span class="hint">Override auto month selection</span></div>
   <div class="search-box max-w-none lg:max-w-sm">{{ icon('search') }}<input type="text" name="q" value="{{ q }}" placeholder="Search name, phone or UCU number" autocomplete="off"></div>
   <div class="field lg:w-44"><label for="show">Show</label>
     <select id="show" name="show" onchange="this.form.submit()"><option value="all" {{ 'selected' if show == 'all' }}>All members</option><option value="unpaid" {{ 'selected' if show == 'unpaid' }}>Not paid this month</option></select></div>

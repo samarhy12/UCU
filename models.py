@@ -56,6 +56,7 @@ class User(UserMixin, db.Model):
     failed_login_attempts = db.Column(db.Integer, nullable=False, default=0, server_default="0")
     locked_until = db.Column(db.DateTime, nullable=True)
     last_login_at = db.Column(db.DateTime, nullable=True)
+    profile_locked = db.Column(db.Boolean, nullable=False, default=False, server_default=false())
 
     contributions = db.relationship("Contribution", backref="user", lazy=True,
                                     foreign_keys="Contribution.user_id")
@@ -243,6 +244,15 @@ class Loan(db.Model):
     guarantor2_name = db.Column(db.String(255), nullable=True)
     guarantor2_email = db.Column(db.String(255), nullable=True)
     guarantor2_phone = db.Column(db.String(50), nullable=True)
+
+    # Payment method details
+    payment_method = db.Column(db.String(20), nullable=True)  # 'bank' or 'momo'
+    bank_name = db.Column(db.String(100), nullable=True)
+    account_name = db.Column(db.String(150), nullable=True)
+    account_number = db.Column(db.String(50), nullable=True)
+    momo_carrier = db.Column(db.String(20), nullable=True)  # 'mtn', 'telecel', 'at'
+    momo_number = db.Column(db.String(20), nullable=True)
+    momo_name = db.Column(db.String(150), nullable=True)
 
     payments = db.relationship("LoanPayment", backref="loan", lazy=True,
                                order_by="LoanPayment.id")

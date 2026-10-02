@@ -112,7 +112,7 @@ document.addEventListener("DOMContentLoaded", () => {
             `<div class="kv"><dt>Interest (${type.rate}%)</dt><dd class="font-mono">GHS ${money(interest)}</dd></div>` +
             `<div class="kv"><dt>You repay in total</dt><dd class="font-mono text-navy-800 font-semibold">GHS ${money(total)}</dd></div>` +
             `<div class="kv"><dt>Time to repay</dt><dd>${type.days} days</dd></div>` +
-            `<div class="kv"><dt>Due about</dt><dd>${due.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}</dd></div>` +
+            `<div class="kv"><dt>Maturity date</dt><dd class="font-mono text-navy-800 font-semibold">${due.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}</dd></div>` +
             `<p class="text-[11px] text-ink-400 mt-2">The exact due date counts from the day the loan is approved.</p>`;
         }
       }
@@ -164,6 +164,45 @@ document.addEventListener("DOMContentLoaded", () => {
       };
       input.addEventListener("input", () => { clearTimeout(timer); timer = setTimeout(run, 500); });
       if (input.value) run();
+    });
+  }
+
+  // ---- Payment method selection ----
+  const paymentMethodInputs = document.querySelectorAll('[data-payment-type]');
+  const bankDetails = document.getElementById('bank-details');
+  const momoDetails = document.getElementById('momo-details');
+
+  if (paymentMethodInputs.length && bankDetails && momoDetails) {
+    paymentMethodInputs.forEach(input => {
+      input.addEventListener('change', () => {
+        const selectedMethod = document.querySelector('[data-payment-type]:checked')?.value;
+        if (selectedMethod === 'bank') {
+          bankDetails.classList.remove('hidden');
+          momoDetails.classList.add('hidden');
+          // Make bank fields required
+          bankDetails.querySelectorAll('input').forEach(el => el.required = true);
+          momoDetails.querySelectorAll('input, select').forEach(el => el.required = false);
+        } else if (selectedMethod === 'momo') {
+          momoDetails.classList.remove('hidden');
+          bankDetails.classList.add('hidden');
+          // Make momo fields required
+          momoDetails.querySelectorAll('input, select').forEach(el => el.required = true);
+          bankDetails.querySelectorAll('input').forEach(el => el.required = false);
+        } else {
+          bankDetails.classList.add('hidden');
+          momoDetails.classList.add('hidden');
+          bankDetails.querySelectorAll('input').forEach(el => el.required = false);
+          momoDetails.querySelectorAll('input, select').forEach(el => el.required = false);
+        }
+      });
+    });
+  }
+
+  // ---- Print loan request form ----
+  const printFormBtn = document.getElementById("print-form-btn");
+  if (printFormBtn) {
+    printFormBtn.addEventListener("click", () => {
+      window.print();
     });
   }
 

@@ -76,7 +76,9 @@
         </div>
       </div>
       <a href="{{ url_for('auth.change_password') }}" class="nav-link mt-2">{{ icon('lock') }}Change password</a>
-      <a href="{{ url_for('auth.logout') }}" class="nav-link">{{ icon('logout') }}Sign out</a>
+      <form action="{{ url_for('auth.logout') }}" method="POST" class="mt-2">
+        <button type="submit" class="nav-link w-full text-left">{{ icon('logout') }}Sign out</button>
+      </form>
     </div>
   </aside>
 

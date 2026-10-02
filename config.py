@@ -104,6 +104,7 @@ class Config:
     LOGIN_MAX_ATTEMPTS = 5
     LOGIN_LOCKOUT_MINUTES = 15
     RESET_TOKEN_MAX_AGE = 3600
+    SESSION_TIMEOUT_MINUTES = int(os.environ.get("SESSION_TIMEOUT_MINUTES", "30"))  # Auto-logout after inactivity
 
     SESSION_COOKIE_HTTPONLY = True
     SESSION_COOKIE_SAMESITE = "Lax"

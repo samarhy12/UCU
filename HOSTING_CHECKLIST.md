@@ -21,6 +21,10 @@
 - [ ] Update SECRET_KEY in `.env`
 - [ ] Set FORCE_HTTPS=1 when using HTTPS
 - [ ] Ensure SESSION_COOKIE_SECURE is enabled in production
+- [ ] Configure session timeout (SESSION_TIMEOUT_MINUTES in .env)
+  - Default: 30 minutes of inactivity
+  - Set to 0 to disable auto-logout
+  - Recommended: 15-30 minutes for production
 
 ### 3. Database Setup
 - [ ] Choose database: SQLite (small scale) or MySQL (production recommended)

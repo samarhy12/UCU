@@ -155,6 +155,28 @@ def build_loan(form, applicant, audience):
     if errors:
         return None, errors
 
+    # Extract payment method details
+    payment_method = (form.get("payment_method") or "").strip().lower()
+    bank_name = (form.get("bank_name") or "").strip()
+    account_name = (form.get("account_name") or "").strip()
+    account_number = (form.get("account_number") or "").strip()
+    momo_carrier = (form.get("momo_carrier") or "").strip()
+    momo_number = (form.get("momo_number") or "").strip()
+    momo_name = (form.get("momo_name") or "").strip()
+
+    # Validate payment method details
+    if payment_method == "bank":
+        if not bank_name or not account_name or not account_number:
+            errors.append("Please provide all bank details (bank name, account name, account number).")
+    elif payment_method == "momo":
+        if not momo_carrier or not momo_number or not momo_name:
+            errors.append("Please provide all MoMo details (carrier, number, account name).")
+    elif not payment_method:
+        errors.append("Please select a payment method (Bank or MoMo).")
+
+    if errors:
+        return None, errors
+
     loan = Loan(
         amount=rules.money(amount), purpose=purpose, income=rules.money(income), status="pending",
         loan_type=loan_type, term=info["days"], guarantor_id=g1.id,
@@ -164,6 +186,13 @@ def build_loan(form, applicant, audience):
         guarantor2_name=g2.display_name if g2 and not g2.id else None,
         guarantor2_email=g2.email if g2 and not g2.id else None,
         guarantor2_phone=g2.phone_number if g2 and not g2.id else None,
+        payment_method=payment_method if payment_method in ("bank", "momo") else None,
+        bank_name=bank_name if payment_method == "bank" else None,
+        account_name=account_name if payment_method == "bank" else None,
+        account_number=account_number if payment_method == "bank" else None,
+        momo_carrier=momo_carrier if payment_method == "momo" else None,
+        momo_number=momo_number if payment_method == "momo" else None,
+        momo_name=momo_name if payment_method == "momo" else None,
         application_date=utcnow())
     rate, total, _ = rules.compute_loan(loan.amount, loan_type)
     loan.interest_rate = rate

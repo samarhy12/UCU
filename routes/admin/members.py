@@ -168,6 +168,23 @@ def member_edit(user_id):
     return redirect(url_for("admin.member_detail", user_id=user.id))
 
 
+@bp.route("/members/<int:user_id>/toggle-profile-lock", methods=["POST"])
+@admin_required
+def toggle_profile_lock(user_id):
+    """Toggle profile lock status - only admins can access this."""
+    user = _member_or_404(user_id)
+    if user.is_admin:
+        flash("Cannot lock administrator profiles.", "error")
+        return redirect(url_for("admin.member_detail", user_id=user.id))
+
+    user.profile_locked = not user.profile_locked
+    action = "locked" if user.profile_locked else "unlocked"
+    log_action(current_user, f"profile_{action}", user.account_number or user.email, user.display_name)
+    db.session.commit()
+    flash(f"Profile has been {action}.", "success")
+    return redirect(url_for("admin.member_detail", user_id=user.id))
+
+
 # ---------------------------------------------------------------------------
 # Member page
 # ---------------------------------------------------------------------------

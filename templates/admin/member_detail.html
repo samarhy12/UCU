@@ -20,6 +20,14 @@
         <button type="button" class="btn btn-danger-outline btn-block" @click="deny = true">Deny sign-up</button>
         {% endif %}
         <a href="{{ url_for('admin.member_edit', user_id=member.id) }}" class="btn btn-outline btn-block">{{ icon('edit', 'w-4 h-4') }} Edit details</a>
+        {% if not member.is_admin %}
+        <form method="POST" action="{{ url_for('admin.toggle_profile_lock', user_id=member.id) }}">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+          <button class="btn btn-outline btn-block" type="submit">
+            {{ icon('lock', 'w-4 h-4') }} {{ 'Unlock profile' if member.profile_locked else 'Lock profile' }}
+          </button>
+        </form>
+        {% endif %}
         {% if not member.is_guest %}
         <form method="POST" action="{{ url_for('admin.member_reset_password', user_id=member.id) }}" data-confirm="Create a new temporary password for this member?">
           <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" /><button class="btn btn-outline btn-block" type="submit">{{ icon('key', 'w-4 h-4') }} Reset password</button></form>

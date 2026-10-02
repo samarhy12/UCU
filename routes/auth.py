@@ -1,4 +1,5 @@
 import hashlib
+from datetime import datetime
 
 from flask import (Blueprint, current_app, flash, redirect, render_template, request, session,
                    url_for)
@@ -53,6 +54,8 @@ def login():
         session.clear()
         login_user(user, remember=remember)
         session.permanent = True
+        # Set initial session activity timestamp
+        session['last_activity'] = datetime.now().isoformat()
 
         nxt = request.args.get("next") or request.form.get("next")
         if nxt and is_safe_redirect(nxt):
@@ -62,11 +65,12 @@ def login():
     return render_template("auth/login.html")
 
 
-@bp.route("/logout", methods=["POST", "GET"])
+@bp.route("/logout", methods=["POST"])
 @login_required
 def logout():
     logout_user()
     session.clear()
+    session.pop('last_activity', None)
     flash("You have been signed out.", "info")
     return redirect(url_for("public.home"))
 
@@ -118,6 +122,7 @@ def register():
     user.is_admin = False
     user.is_verified = False
     user.is_active_member = True
+    user.profile_locked = True  # Lock new user profiles by default
     if user.id:                                   # an earlier non-member applicant: replace the old files
         member_service.delete_member_files(user)
     else:

@@ -22,7 +22,9 @@
       <div class="hidden md:flex items-center gap-2">
         {% if current_user.is_authenticated %}
         <a href="{{ url_for('member.dashboard') }}" class="btn btn-primary btn-sm">My dashboard</a>
-        <a href="{{ url_for('auth.logout') }}" class="btn btn-outline btn-sm">Sign out</a>
+        <form action="{{ url_for('auth.logout') }}" method="POST">
+          <button type="submit" class="btn btn-outline btn-sm">Sign out</button>
+        </form>
         {% else %}
         <a href="{{ url_for('auth.login') }}" class="btn btn-outline btn-sm">Sign in</a>
         <a href="{{ url_for('auth.register') }}" class="btn btn-gold btn-sm">Register</a>
@@ -48,7 +50,9 @@
       <div class="grid grid-cols-2 gap-2 pt-2">
         {% if current_user.is_authenticated %}
         <a href="{{ url_for('member.dashboard') }}" class="btn btn-primary">My dashboard</a>
-        <a href="{{ url_for('auth.logout') }}" class="btn btn-outline">Sign out</a>
+        <form action="{{ url_for('auth.logout') }}" method="POST">
+          <button type="submit" class="btn btn-outline">Sign out</button>
+        </form>
         {% else %}
         <a href="{{ url_for('auth.login') }}" class="btn btn-outline">Sign in</a>
         <a href="{{ url_for('auth.register') }}" class="btn btn-gold">Register</a>

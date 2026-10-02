@@ -1,8 +1,8 @@
 import os
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 
 import click
-from flask import Flask, redirect, render_template, request, url_for
+from flask import Flask, redirect, render_template, request, session, url_for
 from flask_login import current_user, logout_user
 from flask_migrate import Migrate
 
@@ -45,7 +45,7 @@ def create_app(config_class=Config):
     # -----------------------------------------------------------------
     # Access rules that apply to every page
     # -----------------------------------------------------------------
-    open_endpoints = {"static", "auth.logout", "auth.change_password"}
+    open_endpoints = {"static", "auth.logout", "auth.change_password", "auth.login"}
 
     @app.before_request
     def housekeeping():
@@ -60,6 +60,24 @@ def create_app(config_class=Config):
             return redirect(url_for("auth.login"))
         if current_user.must_change_password and request.endpoint not in open_endpoints:
             return redirect(url_for("auth.change_password"))
+
+        # Session timeout - auto-logout after inactivity
+        session_timeout = app.config.get("SESSION_TIMEOUT_MINUTES", 30)
+        if session_timeout > 0:
+            last_activity = session.get('last_activity')
+            if last_activity:
+                try:
+                    last_activity_time = datetime.fromisoformat(last_activity)
+                    if datetime.now() - last_activity_time > timedelta(minutes=session_timeout):
+                        logout_user()
+                        session.clear()
+                        return redirect(url_for("auth.login"))
+                except (ValueError, TypeError):
+                    # If timestamp is invalid, reset it
+                    pass
+            # Update last activity time
+            session['last_activity'] = datetime.now().isoformat()
+
         return None
 
     @app.after_request

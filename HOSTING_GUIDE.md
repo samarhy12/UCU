@@ -128,7 +128,13 @@ FORCE_HTTPS=1
 
 # Update site URL
 SITE_URL=https://ucu.raydexhub.com
+
+# Session timeout (auto-logout after inactivity in minutes)
+# Default is 30 minutes. Set to 0 to disable auto-logout.
+SESSION_TIMEOUT_MINUTES=30
 ```
+
+**Session Timeout Feature**: The application automatically logs out users after a period of inactivity for security. By default, users are logged out after 30 minutes of inactivity. This can be customized via the `SESSION_TIMEOUT_MINUTES` environment variable.
 
 ### 8. Email Delivery Best Practices
 
@@ -354,6 +360,18 @@ init_database.bat
 **For subsequent schema changes:**
 ```bash
 flask db migrate -m "Description of changes"
+flask db upgrade
+```
+
+**Important**: Recent updates added the following new database fields:
+- `user.profile_locked` - Boolean field to lock user profiles
+- `loan.payment_method` - Payment method selection ('bank' or 'momo')
+- `loan.bank_name`, `loan.account_name`, `loan.account_number` - Bank transfer details
+- `loan.momo_carrier`, `loan.momo_number`, `loan.momo_name` - Mobile money details
+
+When deploying to production, run:
+```bash
+flask db migrate -m "Add profile locking and payment method fields"
 flask db upgrade
 ```
 
